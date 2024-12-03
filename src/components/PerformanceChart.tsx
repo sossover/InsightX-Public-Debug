@@ -20,47 +20,61 @@ export function PerformanceChart() {
       <CardContent>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart 
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
+              <YAxis 
+                yAxisId="left" 
+                domain={[0, 8000]}
+                label={{ value: 'Spend ($)', angle: -90, position: 'insideLeft' }}
+              />
+              <YAxis 
+                yAxisId="right" 
+                orientation="right" 
+                domain={[0, 6]}
+                label={{ value: 'ROAS', angle: 90, position: 'insideRight' }}
+              />
               <Tooltip />
               <Legend />
-              {/* Render Areas first so they appear behind the lines */}
+              <defs>
+                <linearGradient id="roasGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#9b87f5" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#9b87f5" stopOpacity={0.4}/>
+                </linearGradient>
+              </defs>
               <Area
                 yAxisId="right"
-                type="monotone"
                 dataKey="roasMax"
                 stroke="none"
-                fill="#9b87f5"
-                fillOpacity={0.4}
-                name="ROAS Confidence"
+                fill="url(#roasGradient)"
+                name="ROAS Range"
               />
               <Area
                 yAxisId="right"
-                type="monotone"
                 dataKey="roasMin"
                 stroke="none"
-                fill="#9b87f5"
-                fillOpacity={0.4}
+                fill="url(#roasGradient)"
               />
-              {/* Render Lines last so they appear on top */}
               <Line 
                 yAxisId="left" 
                 type="monotone" 
                 dataKey="spend" 
                 stroke="#4285F4" 
                 name="Spend"
-                strokeWidth={2} 
+                strokeWidth={2}
+                dot={{ strokeWidth: 2 }}
               />
               <Line 
                 yAxisId="right" 
                 type="monotone" 
                 dataKey="roas" 
                 stroke="#34A853" 
-                name="ROAS" 
+                name="ROAS"
                 strokeWidth={2}
+                dot={{ strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>
