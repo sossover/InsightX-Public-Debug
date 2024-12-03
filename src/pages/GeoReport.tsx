@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Footer } from "@/components/Footer";
 
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -65,6 +66,8 @@ const GeoReport = () => {
               </div>
             </div>
           </main>
+
+          <Footer />
         </div>
 
         <MetricsSidebar />

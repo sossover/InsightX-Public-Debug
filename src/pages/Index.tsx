@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { useState } from "react";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -94,6 +95,8 @@ const Index = () => {
               </div>
             </div>
           </main>
+
+          <Footer />
         </div>
 
         <MetricsSidebar />
