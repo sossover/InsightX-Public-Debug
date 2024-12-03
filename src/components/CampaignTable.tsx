@@ -26,27 +26,26 @@ const campaigns = [
     conversions: 3,
     cpa: 1062.01,
   },
-  // Add more campaigns as needed
 ];
 
 export function CampaignTable() {
   return (
-    <div className="rounded-md border">
+    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Campaign</TableHead>
-            <TableHead className="text-right">Spend</TableHead>
-            <TableHead className="text-right">Impressions</TableHead>
-            <TableHead className="text-right">Clicks</TableHead>
-            <TableHead className="text-right">CTR</TableHead>
-            <TableHead className="text-right">Conversions</TableHead>
-            <TableHead className="text-right">CPA</TableHead>
+          <TableRow className="bg-gray-50">
+            <TableHead className="font-semibold">Campaign</TableHead>
+            <TableHead className="text-right font-semibold">Spend</TableHead>
+            <TableHead className="text-right font-semibold">Impressions</TableHead>
+            <TableHead className="text-right font-semibold">Clicks</TableHead>
+            <TableHead className="text-right font-semibold">CTR</TableHead>
+            <TableHead className="text-right font-semibold">Conversions</TableHead>
+            <TableHead className="text-right font-semibold">CPA</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {campaigns.map((campaign) => (
-            <TableRow key={campaign.name}>
+            <TableRow key={campaign.name} className="hover:bg-gray-50">
               <TableCell className="font-medium">{campaign.name}</TableCell>
               <TableCell className="text-right">${campaign.spend.toFixed(2)}</TableCell>
               <TableCell className="text-right">{campaign.impressions.toLocaleString()}</TableCell>
