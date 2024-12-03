@@ -39,7 +39,7 @@ export function NavigationSidebar() {
                     isActive={location.pathname === item.url}
                     onClick={() => item.url.startsWith("/") && navigate(item.url)}
                   >
-                    <a className="flex items-center gap-2">
+                    <a className="flex items-center gap-2 transition-colors duration-200 hover:text-google-blue">
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </a>

@@ -8,9 +8,6 @@ import { Logo } from "@/components/Logo";
 import { CalendarDays, Filter } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GeoMap } from "@/components/GeoMap";
-import { CountryStats } from "@/components/CountryStats";
-import { DeviceStats } from "@/components/DeviceStats";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -58,18 +55,42 @@ const Index = () => {
           {/* Main Content */}
           <main className="pt-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <GeoMap />
-                <CountryStats />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <MetricCard
+                  title="Total Spend"
+                  value="$8,577.40"
+                  trend={12}
+                />
+                <MetricCard
+                  title="Impressions"
+                  value="850,987"
+                  trend={-5}
+                />
+                <MetricCard
+                  title="Clicks"
+                  value="16,540"
+                  trend={8}
+                />
+                <MetricCard
+                  title="Conversions"
+                  value="253"
+                  trend={15}
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
-                    <CampaignTable />
-                  </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <PerformanceChart />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
+                  <CampaignTable />
                 </div>
-                <DeviceStats />
+              </div>
+
+              <div className="mt-6">
+                <AiInsights />
               </div>
             </div>
           </main>
