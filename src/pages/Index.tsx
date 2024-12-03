@@ -21,8 +21,8 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="relative min-h-screen flex w-full">
-        {/* Black Friday Banner */}
-        <div className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-custom-purple-300 to-custom-purple-500 text-white py-3 text-center font-semibold animate-pulse shadow-lg">
+        {/* Black Friday Banner - Updated styling */}
+        <div className="fixed top-0 left-0 right-0 z-[9999] w-full bg-gradient-to-r from-custom-purple-300 to-custom-purple-500 text-white py-3 text-center font-semibold shadow-lg">
           🎉 Black Friday Sale - 60% Off All Plans! Limited Time Only 🎉
         </div>
 
@@ -33,7 +33,7 @@ const Index = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Adjusted top padding to account for banner */}
+          {/* Adjusted top navigation for banner */}
           <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30 top-12">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
@@ -62,7 +62,7 @@ const Index = () => {
             </div>
           </nav>
 
-          {/* Main Content - adjusted padding for banner */}
+          {/* Main Content */}
           <main className="pt-28">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
