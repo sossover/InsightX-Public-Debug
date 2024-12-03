@@ -20,7 +20,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="relative min-h-screen flex w-full">
+      <div className="relative min-h-screen flex w-full mt-12">
         {/* Black Friday Banner - Updated styling */}
         <div className="fixed top-0 left-0 right-0 z-[9999] w-full bg-gradient-to-r from-custom-purple-300 to-custom-purple-500 text-white py-3 text-center font-semibold shadow-lg">
           🎉 Black Friday Sale - 60% Off All Plans! Limited Time Only 🎉
@@ -63,7 +63,7 @@ const Index = () => {
           </nav>
 
           {/* Main Content */}
-          <main className="pt-28">
+          <main className="pt-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
