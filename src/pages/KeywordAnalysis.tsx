@@ -26,12 +26,34 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 
 const keywordData = [
-  { keyword: "supermetrics", spend: 62.31, impressions: 484, clicks: 9, ctr: "1.86%", conversions: 2, cpc: 31.15 },
-  { keyword: "looker studio meta ads", spend: 43.66, impressions: 190, clicks: 13, ctr: "6.84%", conversions: 1, cpc: 43.66 },
-  { keyword: "salesforce bigquery", spend: 33.55, impressions: 141, clicks: 9, ctr: "6.38%", conversions: 0, cpc: 0 },
-  { keyword: "meta looker studio", spend: 22.05, impressions: 149, clicks: 9, ctr: "6.04%", conversions: 0, cpc: 0 },
-  { keyword: "powerbi google ads", spend: 18.45, impressions: 61, clicks: 6, ctr: "9.84%", conversions: 2, cpc: 9.23 },
+  { keyword: "supermetrics", spend: 62.31, impressions: 484, clicks: 9, ctr: "1.86%", conversions: 2, cpa: 31.15 },
+  { keyword: "looker studio meta ads", spend: 43.66, impressions: 190, clicks: 13, ctr: "6.84%", conversions: 1, cpa: 1062.01 },
+  { keyword: "salesforce bigquery", spend: 33.55, impressions: 141, clicks: 9, ctr: "6.38%", conversions: 0, cpa: 0 },
+  { keyword: "meta looker studio", spend: 22.05, impressions: 149, clicks: 9, ctr: "6.04%", conversions: 0, cpa: 0 },
+  { keyword: "powerbi google ads", spend: 18.45, impressions: 61, clicks: 6, ctr: "9.84%", conversions: 2, cpa: 9.23 },
 ];
+
+const getColorForCTR = (ctr: string) => {
+  const ctrValue = parseFloat(ctr);
+  if (ctrValue >= 8) return "text-google-green font-medium";
+  if (ctrValue >= 5) return "text-google-blue font-medium";
+  if (ctrValue >= 2) return "text-google-yellow font-medium";
+  return "text-google-red font-medium";
+};
+
+const getColorForCPA = (cpa: number) => {
+  if (cpa === 0) return "text-gray-400";
+  if (cpa <= 10) return "text-google-green font-medium";
+  if (cpa <= 50) return "text-google-blue font-medium";
+  if (cpa <= 100) return "text-google-yellow font-medium";
+  return "text-google-red font-medium";
+};
+
+const getColorForConversions = (conversions: number) => {
+  if (conversions >= 2) return "text-google-green font-medium";
+  if (conversions === 1) return "text-google-yellow font-medium";
+  return "text-google-red font-medium";
+};
 
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -139,10 +161,12 @@ const KeywordAnalysis = () => {
                           <TableCell className="text-right">${row.spend.toFixed(2)}</TableCell>
                           <TableCell className="text-right">{row.impressions}</TableCell>
                           <TableCell className="text-right">{row.clicks}</TableCell>
-                          <TableCell className="text-right">{row.ctr}</TableCell>
-                          <TableCell className="text-right">{row.conversions}</TableCell>
-                          <TableCell className="text-right">
-                            {row.cpc > 0 ? `$${row.cpc.toFixed(2)}` : "—"}
+                          <TableCell className={`text-right ${getColorForCTR(row.ctr)}`}>{row.ctr}</TableCell>
+                          <TableCell className={`text-right ${getColorForConversions(row.conversions)}`}>
+                            {row.conversions}
+                          </TableCell>
+                          <TableCell className={`text-right ${getColorForCPA(row.cpa)}`}>
+                            {row.cpa > 0 ? `$${row.cpa.toFixed(2)}` : "—"}
                           </TableCell>
                         </TableRow>
                       ))}
