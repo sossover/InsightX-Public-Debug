@@ -25,6 +25,16 @@ export default {
         "google-yellow": "#FBBC05",
         "google-green": "#34A853",
         "google-gray": "#5F6368",
+        // Custom purple palette
+        "custom-purple": {
+          50: "#F2E7FE",
+          100: "#E5DEFF",
+          200: "#D6BCFA",
+          300: "#9b87f5",
+          400: "#7E69AB",
+          500: "#6E59A5",
+          600: "#1A1F2C",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
