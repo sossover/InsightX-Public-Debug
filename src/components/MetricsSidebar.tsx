@@ -17,7 +17,7 @@ import {
 export function MetricsSidebar() {
   return (
     <Sidebar side="right">
-      <SidebarContent>
+      <SidebarContent className="h-screen flex flex-col justify-center">
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2">
             <Filter className="w-4 h-4" />
