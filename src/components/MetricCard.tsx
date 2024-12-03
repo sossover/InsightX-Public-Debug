@@ -10,7 +10,7 @@ interface MetricCardProps {
 
 export function MetricCard({ title, value, description, trend }: MetricCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow bg-white border-gray-200">
+    <Card className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 bg-white border-gray-200">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-google-gray">{title}</CardTitle>
         {trend !== undefined && (
@@ -20,11 +20,11 @@ export function MetricCard({ title, value, description, trend }: MetricCardProps
             }`}
           >
             {trend >= 0 ? (
-              <TrendingUp className="h-3 w-3" />
+              <TrendingUp className="h-3 w-3 animate-bounce" />
             ) : (
-              <TrendingDown className="h-3 w-3" />
+              <TrendingDown className="h-3 w-3 animate-bounce" />
             )}
-            <span>
+            <span className="animate-fade-in">
               {trend > 0 ? "+" : ""}
               {trend}%
             </span>
@@ -32,9 +32,9 @@ export function MetricCard({ title, value, description, trend }: MetricCardProps
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-google-blue">{value}</div>
+        <div className="text-2xl font-bold text-google-blue animate-fade-in">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          <p className="text-xs text-muted-foreground mt-1 animate-fade-in">{description}</p>
         )}
       </CardContent>
     </Card>

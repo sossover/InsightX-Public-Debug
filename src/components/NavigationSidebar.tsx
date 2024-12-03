@@ -26,10 +26,13 @@ export function NavigationSidebar() {
   const navigate = useNavigate();
 
   return (
-    <Sidebar>
+    <Sidebar className="border-r border-gray-200">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <div className="px-3 py-4">
+            <h2 className="text-2xl font-bold text-google-blue mb-1">Yoad</h2>
+            <p className="text-sm text-gray-500">Marketing Analytics</p>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -39,7 +42,7 @@ export function NavigationSidebar() {
                     isActive={location.pathname === item.url}
                     onClick={() => item.url.startsWith("/") && navigate(item.url)}
                   >
-                    <a className="flex items-center gap-2 transition-colors duration-200 hover:text-google-blue">
+                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1">
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </a>
