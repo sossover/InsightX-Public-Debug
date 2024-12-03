@@ -13,6 +13,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
+import { WebinarInvite } from "./WebinarInvite";
 
 export function MetricsSidebar() {
   return (
@@ -67,6 +68,11 @@ export function MetricsSidebar() {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Webinar Invitation */}
+        <div className="mt-6">
+          <WebinarInvite />
+        </div>
 
         {/* Black Friday Banner */}
         <div className="mt-6 p-4 bg-gradient-to-r from-custom-purple-300 to-custom-purple-500 text-white rounded-lg shadow-lg">
