@@ -10,8 +10,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar";
 
 export function MetricsSidebar() {
@@ -67,6 +67,15 @@ export function MetricsSidebar() {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Black Friday Banner */}
+        <div className="mt-6 p-4 bg-gradient-to-r from-custom-purple-300 to-custom-purple-500 text-white rounded-lg shadow-lg">
+          <h3 className="text-lg font-semibold mb-2">🎉 Black Friday Sale!</h3>
+          <p className="text-sm mb-3">Get 60% off all plans for a limited time only.</p>
+          <button className="w-full bg-white text-custom-purple-500 py-2 px-4 rounded-md font-semibold hover:bg-opacity-90 transition-colors">
+            Claim Offer
+          </button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
