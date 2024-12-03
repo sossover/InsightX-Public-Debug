@@ -2,13 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area } from "recharts";
 
 const data = [
-  { date: "26 Nov", spend: 5000, roas: 2.5, roasMin: 1.8, roasMax: 3.2 },
-  { date: "27 Nov", spend: 4800, roas: 2.8, roasMin: 2.1, roasMax: 3.5 },
-  { date: "28 Nov", spend: 6200, roas: 3.2, roasMin: 2.5, roasMax: 3.9 },
-  { date: "29 Nov", spend: 5800, roas: 2.9, roasMin: 2.2, roasMax: 3.6 },
-  { date: "30 Nov", spend: 5500, roas: 3.5, roasMin: 2.8, roasMax: 4.2 },
-  { date: "1 Dec", spend: 4900, roas: 3.8, roasMin: 3.1, roasMax: 4.5 },
-  { date: "2 Dec", spend: 5100, roas: 4.2, roasMin: 3.5, roasMax: 4.9 },
+  { date: "26 Nov", spend: 5000, roas: 2.5, roasMin: 1.2, roasMax: 3.8 },
+  { date: "27 Nov", spend: 4800, roas: 2.8, roasMin: 1.5, roasMax: 4.1 },
+  { date: "28 Nov", spend: 6200, roas: 3.2, roasMin: 1.9, roasMax: 4.5 },
+  { date: "29 Nov", spend: 5800, roas: 2.9, roasMin: 1.6, roasMax: 4.2 },
+  { date: "30 Nov", spend: 5500, roas: 3.5, roasMin: 2.2, roasMax: 4.8 },
+  { date: "1 Dec", spend: 4900, roas: 3.8, roasMin: 2.5, roasMax: 5.1 },
+  { date: "2 Dec", spend: 5100, roas: 4.2, roasMin: 2.9, roasMax: 5.5 },
 ];
 
 export function PerformanceChart() {
@@ -39,24 +39,20 @@ export function PerformanceChart() {
               />
               <Tooltip />
               <Legend />
-              <defs>
-                <linearGradient id="roasGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#9b87f5" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#9b87f5" stopOpacity={0.4}/>
-                </linearGradient>
-              </defs>
               <Area
                 yAxisId="right"
                 dataKey="roasMax"
                 stroke="none"
-                fill="url(#roasGradient)"
+                fill="#9b87f5"
+                fillOpacity={0.3}
                 name="ROAS Range"
               />
               <Area
                 yAxisId="right"
                 dataKey="roasMin"
                 stroke="none"
-                fill="url(#roasGradient)"
+                fill="#9b87f5"
+                fillOpacity={0.3}
               />
               <Line 
                 yAxisId="left" 
