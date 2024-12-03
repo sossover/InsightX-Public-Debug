@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,10 +9,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const items = [
-  { title: "Overview", icon: Home, url: "#" },
-  { title: "Campaign Performance", icon: TrendingUp, url: "#", active: true },
+  { title: "Overview", icon: Home, url: "/" },
+  { title: "Campaign Performance", icon: TrendingUp, url: "/" },
+  { title: "Geographic Analysis", icon: Globe, url: "/geo-report" },
   { title: "Audience Insights", icon: Users, url: "#" },
   { title: "Conversion Analysis", icon: BarChart, url: "#" },
   { title: "Channel Mix", icon: PieChart, url: "#" },
@@ -20,6 +22,9 @@ const items = [
 ];
 
 export function NavigationSidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -29,8 +34,12 @@ export function NavigationSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.active}>
-                    <a href={item.url} className="flex items-center gap-2">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.url}
+                    onClick={() => item.url.startsWith("/") && navigate(item.url)}
+                  >
+                    <a className="flex items-center gap-2">
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </a>
