@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ReferFriend } from "./ReferFriend";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
@@ -88,6 +89,11 @@ export function NavigationSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Refer a Friend */}
+      <div className="px-3">
+        <ReferFriend />
+      </div>
     </Sidebar>
   );
 }

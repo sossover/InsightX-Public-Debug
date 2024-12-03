@@ -26,6 +26,24 @@ const campaigns = [
     conversions: 3,
     cpa: 1062.01,
   },
+  {
+    name: "Search - Brand Terms",
+    spend: 2845.65,
+    impressions: 125890,
+    clicks: 8965,
+    ctr: "7.12%",
+    conversions: 425,
+    cpa: 6.70,
+  },
+  {
+    name: "Display - Remarketing",
+    spend: 1578.92,
+    impressions: 458962,
+    clicks: 3256,
+    ctr: "0.71%",
+    conversions: 85,
+    cpa: 18.58,
+  },
 ];
 
 export function CampaignTable() {
