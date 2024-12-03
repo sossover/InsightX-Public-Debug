@@ -27,6 +27,7 @@ const Index = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
+          {/* Fixed Navigation */}
           <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
@@ -55,8 +56,8 @@ const Index = () => {
             </div>
           </nav>
 
-          {/* Main Content */}
-          <main className="mt-16">
+          {/* Main Content with proper top padding */}
+          <main className="pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
