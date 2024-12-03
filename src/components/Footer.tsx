@@ -14,86 +14,88 @@ export const Footer = () => {
       </div>
 
       <footer className="bg-white border-t border-gray-200 w-full">
-        <div className="max-w-[1400px] mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-            {/* Company */}
-            <div>
-              <h3 className="font-semibold text-primary mb-4">Company</h3>
-              <ul className="space-y-3">
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">About Yoad</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Careers</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Contact Us</Link></li>
-              </ul>
-            </div>
-
-            {/* Features */}
-            <div>
-              <h3 className="font-semibold text-primary mb-4">Features</h3>
-              <ul className="space-y-3">
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Campaign Analytics</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Geographic Insights</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Performance Metrics</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">AI-Powered Analysis</Link></li>
-              </ul>
-            </div>
-
-            {/* Solutions */}
-            <div>
-              <h3 className="font-semibold text-primary mb-4">Solutions</h3>
-              <ul className="space-y-3">
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Enterprise Analytics</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Agency Dashboard</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Marketing Teams</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Consultants</Link></li>
-              </ul>
-            </div>
-
-            {/* Learn */}
-            <div>
-              <h3 className="font-semibold text-primary mb-4">Learn</h3>
-              <ul className="space-y-3">
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Blog</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Documentation</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Case Studies</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Resources</Link></li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h3 className="font-semibold text-primary mb-4">Support</h3>
-              <ul className="space-y-3">
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Help Center</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">API Documentation</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Community</Link></li>
-                <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Status</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Social Media & Copyright */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="text-gray-600 mb-4 md:mb-0">
-                © 2024 Yoad Analytics. All rights reserved.
+        <div className="w-full px-4 py-12">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+              {/* Company */}
+              <div>
+                <h3 className="font-semibold text-primary mb-4">Company</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">About Yoad</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Careers</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Contact Us</Link></li>
+                </ul>
               </div>
-              <div className="flex space-x-6">
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  <Youtube className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
+
+              {/* Features */}
+              <div>
+                <h3 className="font-semibold text-primary mb-4">Features</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Campaign Analytics</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Geographic Insights</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Performance Metrics</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">AI-Powered Analysis</Link></li>
+                </ul>
+              </div>
+
+              {/* Solutions */}
+              <div>
+                <h3 className="font-semibold text-primary mb-4">Solutions</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Enterprise Analytics</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Agency Dashboard</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Marketing Teams</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Consultants</Link></li>
+                </ul>
+              </div>
+
+              {/* Learn */}
+              <div>
+                <h3 className="font-semibold text-primary mb-4">Learn</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Blog</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Documentation</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Case Studies</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Resources</Link></li>
+                </ul>
+              </div>
+
+              {/* Support */}
+              <div>
+                <h3 className="font-semibold text-primary mb-4">Support</h3>
+                <ul className="space-y-3">
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Help Center</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">API Documentation</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Community</Link></li>
+                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Status</Link></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Social Media & Copyright */}
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="text-gray-600 mb-4 md:mb-0">
+                  © 2024 Yoad Analytics. All rights reserved.
+                </div>
+                <div className="flex space-x-6">
+                  <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                    <Youtube className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                    <Twitter className="h-5 w-5" />
+                  </a>
+                  <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
