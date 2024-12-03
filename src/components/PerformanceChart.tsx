@@ -32,19 +32,20 @@ export function PerformanceChart() {
                 type="monotone"
                 dataKey="roasMax"
                 stroke="none"
-                fill="#E5DEFF"
-                fillOpacity={0.5}
+                fill="#9b87f5"
+                fillOpacity={0.3}
+                name="ROAS Confidence"
               />
               <Area
                 yAxisId="right"
                 type="monotone"
                 dataKey="roasMin"
                 stroke="none"
-                fill="#E5DEFF"
-                fillOpacity={0.5}
+                fill="#9b87f5"
+                fillOpacity={0.3}
               />
               <Line yAxisId="left" type="monotone" dataKey="spend" stroke="#4285F4" name="Spend" />
-              <Line yAxisId="right" type="monotone" dataKey="roas" stroke="#34A853" name="ROAS" />
+              <Line yAxisId="right" type="monotone" dataKey="roas" stroke="#34A853" name="ROAS" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
