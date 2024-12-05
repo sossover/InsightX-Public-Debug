@@ -18,11 +18,11 @@ const mainItems = [
   { title: "Campaign Performance", icon: TrendingUp, url: "/" },
   { title: "Geographic Analysis", icon: Globe, url: "/geo-report" },
   { title: "Keyword Analysis", icon: KeyRound, url: "/keyword-analysis" },
-  { title: "Audience Insights", icon: Users, url: "#" },
-  { title: "Conversion Analysis", icon: BarChart, url: "#" },
-  { title: "Channel Mix", icon: PieChart, url: "#" },
+  { title: "Audience Insights", icon: Users, url: "/audience-insights" },
+  { title: "Conversion Analysis", icon: BarChart, url: "/conversion-analysis" },
+  { title: "Channel Mix", icon: PieChart, url: "/channel-mix" },
   { title: "Optimization List", icon: ListChecks, url: "/optimization-list" },
-  { title: "Settings", icon: Settings, url: "#" },
+  { title: "Settings", icon: Settings, url: "/settings" },
 ];
 
 const createItems = [
