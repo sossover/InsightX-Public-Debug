@@ -10,6 +10,7 @@ import { WebinarInvite } from "@/components/WebinarInvite";
 import { ReferFriend } from "@/components/ReferFriend";
 import { ConversionGoals } from "@/components/ConversionGoals";
 import { ConversionSources } from "@/components/ConversionSources";
+import { AiInsights } from "@/components/AiInsights";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
@@ -138,6 +139,24 @@ export default function ConversionAnalysis() {
                 </CardContent>
               </Card>
 
+              <div className="lg:col-span-2">
+                <AiInsights 
+                  campaigns={campaignData}
+                  deviceData={[
+                    { name: "DESKTOP", value: 65.5, color: "#4285F4" },
+                    { name: "MOBILE", value: 28.3, color: "#34A853" },
+                    { name: "TABLET", value: 6.2, color: "#EA4335" },
+                  ]}
+                  countryData={[
+                    { country: "United States", spend: 1250.45, impressions: 25000, clicks: 1200, conversions: 85 },
+                    { country: "United Kingdom", spend: 850.32, impressions: 18000, clicks: 850, conversions: 42 },
+                    { country: "Germany", spend: 650.18, impressions: 15000, clicks: 720, conversions: 38 },
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <div className="space-y-6">
                 <WebinarInvite />
                 <ReferFriend />
