@@ -4,7 +4,6 @@ import { CampaignTable } from "@/components/CampaignTable";
 import { AiInsights } from "@/components/AiInsights";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { MetricsSidebar } from "@/components/MetricsSidebar";
-import { Logo } from "@/components/Logo";
 import { CalendarDays, Menu } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -85,35 +84,32 @@ const Index = () => {
           {/* Fixed Navigation */}
           <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30 dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto">
-                  <Logo />
-                  <div className="flex items-center gap-4">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-[140px] sm:w-[240px] justify-start text-left font-normal">
-                          <CalendarDays className="mr-2 h-4 w-4" />
-                          <span className="truncate">
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+              <div className="flex h-16 items-center">
+                <div className="flex items-center gap-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-[140px] sm:w-[240px] justify-start text-left font-normal">
+                        <CalendarDays className="mr-2 h-4 w-4" />
+                        <span className="truncate">
+                          {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
           </nav>
 
-          {/* Main Content with proper top padding */}
+          {/* Main Content */}
           <main className="flex-1 flex flex-col justify-center pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="mb-4">
