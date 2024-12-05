@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import GeoReport from "./pages/GeoReport";
 import KeywordAnalysis from "./pages/KeywordAnalysis";
 import OptimizationList from "./pages/OptimizationList";
+import ConversionAnalysis from "./pages/ConversionAnalysis";
+import ChannelMix from "./pages/ChannelMix";
+import AudienceInsights from "./pages/AudienceInsights";
 import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
@@ -72,6 +75,30 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <OptimizationList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/conversion-analysis"
+            element={
+              <ProtectedRoute>
+                <ConversionAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/channel-mix"
+            element={
+              <ProtectedRoute>
+                <ChannelMix />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/audience-insights"
+            element={
+              <ProtectedRoute>
+                <AudienceInsights />
               </ProtectedRoute>
             }
           />
