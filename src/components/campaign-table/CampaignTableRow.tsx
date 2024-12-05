@@ -6,12 +6,13 @@ import { Campaign } from "./types";
 
 interface CampaignTableRowProps {
   campaign: Campaign;
+  isTotal?: boolean;
 }
 
-export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
+export function CampaignTableRow({ campaign, isTotal }: CampaignTableRowProps) {
   return (
-    <TableRow key={campaign.name} className="hover:bg-gray-50">
-      <TableCell className="font-medium">{campaign.name}</TableCell>
+    <TableRow key={campaign.name} className={`hover:bg-gray-50 ${isTotal ? "font-semibold bg-gray-50" : ""}`}>
+      <TableCell>{campaign.name}</TableCell>
       <TableCell className="text-right">${campaign.spend.toFixed(2)}</TableCell>
       <TableCell className="text-right">{campaign.impressions.toLocaleString()}</TableCell>
       <TableCell className="text-right">{campaign.clicks.toLocaleString()}</TableCell>
