@@ -13,7 +13,7 @@ const defaultData = [
 
 const generateRandomData = () => {
   const dates = ["26 Nov", "27 Nov", "28 Nov", "29 Nov", "30 Nov", "1 Dec", "2 Dec"];
-  return dates.map(date => {
+  return dates.map((date) => {
     const spend = Math.random() * 8000 + 4000;
     const roas = Math.random() * 3 + 2;
     const variance = Math.random() * 1.5 + 0.5;
@@ -32,7 +32,7 @@ interface PerformanceChartProps {
 }
 
 export function PerformanceChart({ useSampleData = false }: PerformanceChartProps) {
-  const data = useSampleData ? generateRandomData() : defaultData;
+  const chartData = useSampleData ? generateRandomData() : defaultData;
 
   return (
     <Card className="col-span-4">
@@ -43,7 +43,7 @@ export function PerformanceChart({ useSampleData = false }: PerformanceChartProp
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
-              data={data}
+              data={chartData}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
