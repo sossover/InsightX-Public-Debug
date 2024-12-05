@@ -27,13 +27,11 @@ export default function OptimizationList() {
     const savedItems = localStorage.getItem('optimizationItems');
     if (savedItems) {
       const parsedItems = JSON.parse(savedItems);
-      // Add impact if it doesn't exist for older items
       const itemsWithImpact = parsedItems.map((item: any) => ({
         ...item,
         impact: item.impact || getRandomImpact(),
       }));
       setItems(itemsWithImpact);
-      // Update localStorage with impact scores
       localStorage.setItem('optimizationItems', JSON.stringify(itemsWithImpact));
     }
   }, []);
@@ -41,6 +39,11 @@ export default function OptimizationList() {
   const getRandomImpact = () => {
     const impacts: ('high' | 'medium' | 'low')[] = ['high', 'medium', 'low'];
     return impacts[Math.floor(Math.random() * impacts.length)];
+  };
+
+  const handleMondayClick = (item: OptimizationItem) => {
+    console.log('Sending to Monday.com:', item);
+    // Here you would integrate with Monday.com's API
   };
 
   const sortedItems = [...items].sort((a, b) => {
@@ -80,22 +83,36 @@ export default function OptimizationList() {
                 </div>
               </div>
 
-              <Tabs value={viewType}>
+              <Tabs value={viewType} className="w-full">
                 <TabsContent value="list" className="space-y-4">
                   {sortedItems.map((item, index) => (
                     <div
                       key={index}
-                      className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start"
+                      className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div className="flex-1">
-                        <p className="text-gray-700">{item.text}</p>
-                        <p className="text-sm text-gray-500 mt-2">
-                          Added: {new Date(item.timestamp).toLocaleString()}
-                        </p>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="text-gray-700">{item.text}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <p className="text-sm text-gray-500">
+                              Added: {new Date(item.timestamp).toLocaleString()}
+                            </p>
+                            <button
+                              onClick={() => handleMondayClick(item)}
+                              className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
+                              title="Send to Monday.com"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 16C7 14.3431 8.34315 13 10 13C11.6569 13 13 14.3431 13 16C13 17.6569 11.6569 19 10 19C8.34315 19 7 17.6569 7 16Z" fill="#FF3D57"/>
+                                <path d="M19 16C19 14.3431 20.3431 13 22 13C23.6569 13 25 14.3431 25 16C25 17.6569 23.6569 19 22 19C20.3431 19 19 17.6569 19 16Z" fill="#FF3D57"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium ${impactColors[item.impact]}`}>
+                          {item.impact.charAt(0).toUpperCase() + item.impact.slice(1)} Impact
+                        </span>
                       </div>
-                      <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium ${impactColors[item.impact]}`}>
-                        {item.impact.charAt(0).toUpperCase() + item.impact.slice(1)} Impact
-                      </span>
                     </div>
                   ))}
                   {items.length === 0 && (
