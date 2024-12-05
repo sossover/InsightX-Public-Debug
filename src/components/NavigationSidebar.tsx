@@ -43,7 +43,7 @@ export function NavigationSidebar() {
   };
 
   return (
-    <Sidebar className="border-r border-gray-200 cursor-none group">
+    <Sidebar className="border-r border-gray-200 group">
       <SidebarContent>
         <SidebarGroup>
           <div className="px-3 py-4">
