@@ -170,7 +170,7 @@ const Index = () => {
               </div>
 
               <div className="mt-6">
-                <AiInsights />
+                <AiInsights campaigns={campaigns} />
               </div>
             </div>
           </main>

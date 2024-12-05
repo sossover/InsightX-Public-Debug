@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const defaultCampaigns = [
   {
@@ -55,10 +55,14 @@ const campaignTypes = [
   "Performance Max - Seasonal",
   "Local Campaigns - Retail",
   "App Campaigns - Install",
-  "Video Action - Awareness"
+  "Video Action - Awareness",
+  "Search - Competitor Terms",
+  "Display - Custom Intent",
+  "Performance Max - Dynamic",
+  "Shopping - Bestsellers"
 ];
 
-const generateRandomCampaign = () => {
+const generateRandomCampaign = (usedNames: Set<string>) => {
   const spend = Math.random() * 10000 + 1000;
   const impressions = Math.floor(Math.random() * 1000000 + 50000);
   const clicks = Math.floor(Math.random() * 30000 + 500);
@@ -66,8 +70,15 @@ const generateRandomCampaign = () => {
   const ctr = ((clicks / impressions) * 100).toFixed(2) + "%";
   const cpa = spend / (conversions || 1);
 
+  // Find an unused campaign name
+  let name;
+  do {
+    name = campaignTypes[Math.floor(Math.random() * campaignTypes.length)];
+  } while (usedNames.has(name));
+  usedNames.add(name);
+
   return {
-    name: campaignTypes[Math.floor(Math.random() * campaignTypes.length)],
+    name,
     spend,
     impressions,
     clicks,
@@ -78,7 +89,8 @@ const generateRandomCampaign = () => {
 };
 
 const generateSampleData = () => {
-  return Array(4).fill(null).map(generateRandomCampaign);
+  const usedNames = new Set<string>();
+  return Array(4).fill(null).map(() => generateRandomCampaign(usedNames));
 };
 
 interface CampaignTableProps {

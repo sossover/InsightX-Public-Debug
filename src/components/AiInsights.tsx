@@ -13,7 +13,21 @@ interface InsightsData {
   recommendations: string[];
 }
 
-export function AiInsights() {
+interface Campaign {
+  name: string;
+  spend: number;
+  impressions: number;
+  clicks: number;
+  ctr: string;
+  conversions: number;
+  cpa: number;
+}
+
+interface AiInsightsProps {
+  campaigns: Campaign[];
+}
+
+export function AiInsights({ campaigns }: AiInsightsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<InsightsData | null>(null);
   const { toast } = useToast();
@@ -21,46 +35,6 @@ export function AiInsights() {
   const generateInsights = async () => {
     setIsLoading(true);
     try {
-      // Get data from the campaign table component
-      const campaignData = [
-        {
-          name: "Performance Max - Competitor KW",
-          spend: 4614.52,
-          impressions: 780417,
-          clicks: 15769,
-          ctr: "2.02%",
-          conversions: 250,
-          cpa: 18.44,
-        },
-        {
-          name: "Performance Max - In-Market",
-          spend: 3962.88,
-          impressions: 70570,
-          clicks: 771,
-          ctr: "1.09%",
-          conversions: 3,
-          cpa: 1062.01,
-        },
-        {
-          name: "Search - Brand Terms",
-          spend: 2845.65,
-          impressions: 125890,
-          clicks: 8965,
-          ctr: "7.12%",
-          conversions: 425,
-          cpa: 6.70,
-        },
-        {
-          name: "Display - Remarketing",
-          spend: 1578.92,
-          impressions: 458962,
-          clicks: 3256,
-          ctr: "0.71%",
-          conversions: 85,
-          cpa: 18.58,
-        },
-      ];
-
       const deviceData = [
         { name: "DESKTOP", value: 95.1, color: "#4285F4" },
         { name: "MOBILE", value: 3.8, color: "#34A853" },
@@ -74,7 +48,7 @@ export function AiInsights() {
       ];
 
       const { data, error } = await supabase.functions.invoke('generate-insights', {
-        body: { campaignData, deviceData, countryData }
+        body: { campaignData: campaigns, deviceData, countryData }
       });
 
       if (error) throw error;
