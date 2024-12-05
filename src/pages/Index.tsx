@@ -53,12 +53,15 @@ const Index = () => {
             <Button 
               variant="outline" 
               size="icon" 
-              className="fixed top-4 right-4 z-50 bg-background"
+              className="fixed top-4 right-4 z-50 bg-background border shadow-sm dark:bg-custom-purple-600 dark:border-custom-purple-400"
             >
               <Menu className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[80vw] sm:w-[400px] overflow-y-auto">
+          <SheetContent 
+            side="right" 
+            className="w-[80vw] sm:w-[400px] overflow-y-auto border-l dark:border-custom-purple-400 dark:bg-custom-purple-600"
+          >
             <div className="h-full overflow-y-auto pb-20">
               <MetricsSidebar />
             </div>
@@ -80,7 +83,7 @@ const Index = () => {
         
         <div className="flex-1 flex flex-col">
           {/* Fixed Navigation */}
-          <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
+          <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30 dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto">
@@ -153,8 +156,8 @@ const Index = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-6">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 overflow-x-auto">
-                  <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 overflow-x-auto dark:bg-custom-purple-600 dark:border-custom-purple-400">
+                  <h2 className="text-lg font-semibold text-google-gray mb-6 dark:text-white">Campaign Performance</h2>
                   <CampaignTable 
                     useSampleData={useSampleData} 
                     onCampaignsChange={handleCampaignsChange}
