@@ -26,6 +26,11 @@ export function Recommendations({ recommendations }: RecommendationsProps) {
     }
   }, [recommendations]);
 
+  const getRandomImpact = () => {
+    const impacts = ['high', 'medium', 'low'] as const;
+    return impacts[Math.floor(Math.random() * impacts.length)];
+  };
+
   const handleAddItem = (recommendation: string, index: number) => {
     if (addedItems.has(index)) return;
 
@@ -40,12 +45,13 @@ export function Recommendations({ recommendations }: RecommendationsProps) {
       origin: { y: 0.6 },
     });
 
-    // Save to localStorage
+    // Save to localStorage with impact score
     const savedItems = localStorage.getItem('optimizationItems');
     const items = savedItems ? JSON.parse(savedItems) : [];
     const newItem = {
       text: recommendation,
       timestamp: new Date().toISOString(),
+      impact: getRandomImpact(),
     };
     localStorage.setItem('optimizationItems', JSON.stringify([...items, newItem]));
 
