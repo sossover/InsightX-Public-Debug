@@ -80,7 +80,7 @@ export default function OptimizationList() {
                 </div>
               </div>
 
-              <Tabs.Root value={viewType} className="w-full">
+              <Tabs value={viewType}>
                 <TabsContent value="list" className="space-y-4">
                   {sortedItems.map((item, index) => (
                     <div
@@ -107,7 +107,7 @@ export default function OptimizationList() {
                 <TabsContent value="kanban">
                   <KanbanView items={sortedItems} />
                 </TabsContent>
-              </Tabs.Root>
+              </Tabs>
             </div>
           </main>
         </div>
