@@ -13,7 +13,7 @@ const defaultData = [
 
 const generateRandomData = () => {
   const dates = ["26 Nov", "27 Nov", "28 Nov", "29 Nov", "30 Nov", "1 Dec", "2 Dec"];
-  const data = dates.map(date => {
+  return dates.map(date => {
     const spend = Math.random() * 8000 + 4000;
     const roas = Math.random() * 3 + 2;
     const variance = Math.random() * 1.5 + 0.5;
@@ -25,7 +25,6 @@ const generateRandomData = () => {
       roasMax: roas + variance,
     };
   });
-  return data;
 };
 
 interface PerformanceChartProps {
@@ -33,7 +32,6 @@ interface PerformanceChartProps {
 }
 
 export function PerformanceChart({ useSampleData = false }: PerformanceChartProps) {
-  // Generate data only once when useSampleData changes
   const data = useSampleData ? generateRandomData() : defaultData;
 
   return (
