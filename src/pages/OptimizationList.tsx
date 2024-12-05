@@ -7,11 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanView } from "@/components/KanbanView";
 import { OptimizationListItem } from "@/components/list/OptimizationListItem";
 import { OptimizationItem } from "@/types/optimization";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function OptimizationList() {
   const [items, setItems] = useState<OptimizationItem[]>([]);
   const [sortBy, setSortBy] = useState<'date' | 'impact'>('date');
   const [viewType, setViewType] = useState<'list' | 'kanban'>('list');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const savedItems = localStorage.getItem('optimizationItems');
@@ -40,6 +45,24 @@ export default function OptimizationList() {
     }
   });
 
+  const renderMetricsSidebar = () => {
+    if (isMobile) {
+      return (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
+              <Menu className="h-4 w-4" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <MetricsSidebar />
+          </SheetContent>
+        </Sheet>
+      );
+    }
+    return <MetricsSidebar />;
+  };
+
   return (
     <SidebarProvider>
       <div className="relative min-h-screen flex w-full">
@@ -47,11 +70,11 @@ export default function OptimizationList() {
         <div className="flex-1 flex flex-col">
           <main className="flex-1 flex flex-col pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h1 className="text-2xl font-bold text-google-blue">Optimization List</h1>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                   <Select value={sortBy} onValueChange={(value: 'date' | 'impact') => setSortBy(value)}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px]">
                       <SelectValue placeholder="Sort by..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -59,7 +82,7 @@ export default function OptimizationList() {
                       <SelectItem value="impact">Sort by Impact</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Tabs value={viewType} onValueChange={(value: 'list' | 'kanban') => setViewType(value)}>
+                  <Tabs value={viewType} onValueChange={(value: 'list' | 'kanban') => setViewType(value)} className="w-full sm:w-auto">
                     <TabsList>
                       <TabsTrigger value="list">List View</TabsTrigger>
                       <TabsTrigger value="kanban">Kanban View</TabsTrigger>
@@ -80,13 +103,15 @@ export default function OptimizationList() {
                   )}
                 </TabsContent>
                 <TabsContent value="kanban">
-                  <KanbanView items={sortedItems} />
+                  <div className="overflow-x-auto pb-4">
+                    <KanbanView items={sortedItems} />
+                  </div>
                 </TabsContent>
               </Tabs>
             </div>
           </main>
         </div>
-        <MetricsSidebar />
+        {renderMetricsSidebar()}
       </div>
     </SidebarProvider>
   );

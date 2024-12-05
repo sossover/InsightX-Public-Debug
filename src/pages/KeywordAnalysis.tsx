@@ -2,28 +2,14 @@ import { useState } from "react";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { MetricsSidebar } from "@/components/MetricsSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { KeywordHeader } from "@/components/keyword-analysis/KeywordHeader";
+import { KeywordFilters } from "@/components/keyword-analysis/KeywordFilters";
+import { KeywordTable } from "@/components/keyword-analysis/KeywordTable";
+import { KeywordInsights } from "@/components/keyword-analysis/KeywordInsights";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { AiInsights } from "@/components/AiInsights";
-import { CalendarDays } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { Menu } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Campaign } from "@/components/campaign-table/types";
 
 const keywordData: Campaign[] = [
@@ -99,6 +85,25 @@ const getColorForConversions = (conversions: number) => {
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(keywordData);
+  const isMobile = useIsMobile();
+
+  const renderMetricsSidebar = () => {
+    if (isMobile) {
+      return (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
+              <Menu className="h-4 w-4" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <MetricsSidebar />
+          </SheetContent>
+        </Sheet>
+      );
+    }
+    return <MetricsSidebar />;
+  };
 
   return (
     <SidebarProvider>
@@ -110,120 +115,22 @@ const KeywordAnalysis = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Fixed Navigation */}
-          <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-8">
-                  <h1 className="text-2xl font-bold text-google-blue">Keyword Analysis</h1>
-                  <div className="flex items-center gap-4">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-[240px] justify-start text-left font-normal">
-                          <CalendarDays className="mr-2 h-4 w-4" />
-                          {date ? format(date, "PPP") : <span>Pick a date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </nav>
+          <KeywordHeader date={date} setDate={setDate} />
 
-          {/* Main Content */}
           <main className="flex-1 flex flex-col pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {/* Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Campaign" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Campaigns</SelectItem>
-                    <SelectItem value="search">Search Campaign</SelectItem>
-                    <SelectItem value="display">Display Campaign</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Target Country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Countries</SelectItem>
-                    <SelectItem value="us">United States</SelectItem>
-                    <SelectItem value="uk">United Kingdom</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select defaultValue="all">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Keyword" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Keywords</SelectItem>
-                    <SelectItem value="brand">Brand Keywords</SelectItem>
-                    <SelectItem value="non-brand">Non-Brand Keywords</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Input placeholder="Search keywords..." className="h-10" />
+              <KeywordFilters />
+              <div className="overflow-x-auto">
+                <KeywordTable data={campaigns} />
               </div>
-
-              {/* Keyword Table */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-google-gray mb-6">Keyword Performance</h2>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Keyword</TableHead>
-                        <TableHead className="text-right">Spend</TableHead>
-                        <TableHead className="text-right">Impressions</TableHead>
-                        <TableHead className="text-right">Clicks</TableHead>
-                        <TableHead className="text-right">CTR</TableHead>
-                        <TableHead className="text-right">Conversions</TableHead>
-                        <TableHead className="text-right">Cost per Conversion</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {keywordData.map((row) => (
-                        <TableRow key={row.keyword}>
-                          <TableCell className="font-medium">{row.name}</TableCell>
-                          <TableCell className="text-right">${row.spend.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">{row.impressions}</TableCell>
-                          <TableCell className="text-right">{row.clicks}</TableCell>
-                          <TableCell className={`text-right ${getColorForCTR(row.ctr)}`}>{row.ctr}</TableCell>
-                          <TableCell className={`text-right ${getColorForConversions(row.conversions)}`}>
-                            {row.conversions}
-                          </TableCell>
-                          <TableCell className={`text-right ${getColorForCPA(row.cpa)}`}>
-                            {row.cpa > 0 ? `$${row.cpa.toFixed(2)}` : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+              <div className="mt-6">
+                <KeywordInsights campaigns={campaigns} />
               </div>
-
-              {/* AI Insights */}
-              <AiInsights campaigns={campaigns} />
             </div>
           </main>
         </div>
 
-        <MetricsSidebar />
+        {renderMetricsSidebar()}
       </div>
     </SidebarProvider>
   );
