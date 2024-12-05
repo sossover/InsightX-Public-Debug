@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { campaignData, deviceData, countryData } = await req.json();
+    const { campaignData, deviceData, countryData, keywordData } = await req.json();
 
     // Calculate totals for the system message
     const totals = campaignData.reduce((acc: any, campaign: any) => ({
@@ -24,15 +24,30 @@ serve(async (req) => {
       conversions: acc.conversions + campaign.conversions,
     }), { spend: 0, impressions: 0, clicks: 0, conversions: 0 });
 
-    const systemMessage = `You are an AI marketing analyst. Analyze the following campaign data and provide insights:
-Campaign Data: ${JSON.stringify(campaignData)}
-Device Data: ${JSON.stringify(deviceData)}
-Country Data: ${JSON.stringify(countryData)}
-Totals - Spend: $${totals.spend.toFixed(2)}, Impressions: ${totals.impressions}, Clicks: ${totals.clicks}, Conversions: ${totals.conversions}`;
+    // Create a context-aware system message based on available data
+    let systemMessage = `You are an AI marketing analyst. Analyze the following data:\n`;
+    
+    if (campaignData?.length > 0) {
+      systemMessage += `Campaign Data: ${JSON.stringify(campaignData)}\n`;
+    }
+    
+    if (deviceData?.length > 0) {
+      systemMessage += `Device Distribution: ${JSON.stringify(deviceData)}\n`;
+    }
+    
+    if (countryData?.length > 0) {
+      systemMessage += `Geographic Performance: ${JSON.stringify(countryData)}\n`;
+    }
+    
+    if (keywordData?.length > 0) {
+      systemMessage += `Keyword Performance: ${JSON.stringify(keywordData)}\n`;
+    }
 
-    const userMessage = `Please provide:
+    systemMessage += `\nTotals - Spend: $${totals.spend.toFixed(2)}, Impressions: ${totals.impressions}, Clicks: ${totals.clicks}, Conversions: ${totals.conversions}`;
+
+    const userMessage = `Based on the provided data, please provide:
 1. A brief summary of overall performance
-2. 3-4 key observations about the data
+2. 3-4 key observations focusing on the most relevant metrics and patterns
 3. 2-3 actionable recommendations for improvement
 Format the response as a JSON object with fields: summary (string), observations (array of strings), and recommendations (array of strings).`;
 

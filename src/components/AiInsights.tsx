@@ -25,9 +25,12 @@ interface Campaign {
 
 interface AiInsightsProps {
   campaigns: Campaign[];
+  deviceData?: Array<{ name: string; value: number; color: string }>;
+  countryData?: Array<{ country: string; spend: number; impressions: number; clicks: number; conversions: number }>;
+  keywordData?: Array<Campaign>;
 }
 
-export function AiInsights({ campaigns }: AiInsightsProps) {
+export function AiInsights({ campaigns, deviceData, countryData, keywordData }: AiInsightsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<InsightsData | null>(null);
   const { toast } = useToast();
@@ -35,20 +38,16 @@ export function AiInsights({ campaigns }: AiInsightsProps) {
   const generateInsights = async () => {
     setIsLoading(true);
     try {
-      const deviceData = [
-        { name: "DESKTOP", value: 95.1, color: "#4285F4" },
-        { name: "MOBILE", value: 3.8, color: "#34A853" },
-        { name: "TABLET", value: 1.1, color: "#EA4335" },
-      ];
-
-      const countryData = [
-        { country: "Brazil", spend: 108.79, impressions: 1322, clicks: 56, conversions: 7 },
-        { country: "Spain", spend: 66.3, impressions: 3840, clicks: 46, conversions: 0 },
-        { country: "United Kingdom", spend: 60.72, impressions: 1250, clicks: 22, conversions: 0 },
-      ];
+      // Use the provided data or empty arrays as fallbacks
+      const dataToAnalyze = {
+        campaignData: campaigns,
+        deviceData: deviceData || [],
+        countryData: countryData || [],
+        keywordData: keywordData || [],
+      };
 
       const { data, error } = await supabase.functions.invoke('generate-insights', {
-        body: { campaignData: campaigns, deviceData, countryData }
+        body: dataToAnalyze
       });
 
       if (error) throw error;

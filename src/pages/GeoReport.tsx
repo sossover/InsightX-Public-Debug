@@ -52,6 +52,20 @@ const defaultCampaigns = [
   },
 ];
 
+const deviceData = [
+  { name: "DESKTOP", value: 95.1, color: "#4285F4" },
+  { name: "MOBILE", value: 3.8, color: "#34A853" },
+  { name: "TABLET", value: 1.1, color: "#EA4335" },
+];
+
+const countryData = [
+  { country: "Brazil", spend: 108.79, impressions: 1322, clicks: 56, conversions: 7 },
+  { country: "Spain", spend: 66.3, impressions: 3840, clicks: 46, conversions: 0 },
+  { country: "United Kingdom", spend: 60.72, impressions: 1250, clicks: 22, conversions: 0 },
+  { country: "Poland", spend: 48.43, impressions: 2052, clicks: 32, conversions: 0 },
+  { country: "France", spend: 40.1, impressions: 3125, clicks: 28, conversions: 1 },
+];
+
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(defaultCampaigns);
@@ -94,12 +108,15 @@ const GeoReport = () => {
             </div>
           </nav>
 
-          {/* Main Content */}
           <main className="mt-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <GeoMap />
-                <AiInsights campaigns={campaigns} />
+                <AiInsights 
+                  campaigns={campaigns}
+                  deviceData={deviceData}
+                  countryData={countryData}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2">
