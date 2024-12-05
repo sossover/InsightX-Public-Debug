@@ -5,8 +5,15 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+interface InsightsData {
+  summary: string;
+  observations: string[];
+  recommendations: string[];
+}
+
 export function AiInsights() {
   const [isLoading, setIsLoading] = useState(false);
+  const [insights, setInsights] = useState<InsightsData | null>(null);
   const { toast } = useToast();
 
   const generateInsights = async () => {
@@ -70,10 +77,9 @@ export function AiInsights() {
 
       if (error) throw error;
 
-      const insights = JSON.parse(data.insights);
+      console.log('Response from Edge Function:', data);
 
-      // Update the UI with new insights
-      // For now, we'll just show a success message
+      setInsights(data.insights);
       toast({
         title: "Insights Generated",
         description: "New AI insights have been generated successfully.",
@@ -110,58 +116,53 @@ export function AiInsights() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-google-blue" />
-            <h3 className="font-semibold text-sm">Performance Summary</h3>
-          </div>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            Your campaigns are performing well overall, with a 2.02% CTR on your top performing campaign.
-            However, there's room for optimization in your In-Market audiences campaign.
-          </p>
-        </div>
-        
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <AlertCircle className="h-4 w-4 text-google-yellow" />
-            <h3 className="font-semibold text-sm">Key Observations</h3>
-          </div>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>Competitor keyword campaigns show strong engagement</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>In-Market audience CPA is significantly higher than other campaigns</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>Budget utilization is at 54% of the allocated amount</span>
-            </li>
-          </ul>
-        </div>
+        {insights ? (
+          <>
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-google-blue" />
+                <h3 className="font-semibold text-sm">Performance Summary</h3>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {insights.summary}
+              </p>
+            </div>
+            
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="h-4 w-4 text-google-yellow" />
+                <h3 className="font-semibold text-sm">Key Observations</h3>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2">
+                {insights.observations.map((observation, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
+                    <span>{observation}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Zap className="h-4 w-4 text-google-green" />
-            <h3 className="font-semibold text-sm">Recommendations</h3>
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="h-4 w-4 text-google-green" />
+                <h3 className="font-semibold text-sm">Recommendations</h3>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2">
+                {insights.recommendations.map((recommendation, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
+                    <span>{recommendation}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-gray-500 py-8">
+            Click generate to get AI-powered insights about your campaign performance
           </div>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>Consider increasing budget for high-performing competitor campaigns</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>Review and refine In-Market audience targeting to improve CPA</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-              <span>Optimize ad scheduling based on peak performance hours</span>
-            </li>
-          </ul>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

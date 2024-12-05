@@ -40,18 +40,20 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a marketing analytics expert. Provide concise, actionable insights.' },
+          { role: 'system', content: 'You are a marketing analytics expert. Provide concise, actionable insights in JSON format.' },
           { role: 'user', content: prompt }
         ],
+        response_format: { type: "json_object" }
       }),
     });
 
     const data = await response.json();
     console.log('OpenAI Response:', data);
 
-    return new Response(JSON.stringify({ 
-      insights: data.choices[0].message.content 
-    }), {
+    // Parse the content as JSON
+    const insights = JSON.parse(data.choices[0].message.content);
+
+    return new Response(JSON.stringify({ insights }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
