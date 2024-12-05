@@ -12,7 +12,7 @@ export function MetricCard({ title, value, description, trend }: MetricCardProps
   return (
     <Card className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 bg-white border-gray-200">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-google-gray">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium text-google-gray truncate">{title}</CardTitle>
         {trend !== undefined && (
           <div
             className={`flex items-center gap-1 text-xs font-medium ${
@@ -24,7 +24,7 @@ export function MetricCard({ title, value, description, trend }: MetricCardProps
             ) : (
               <TrendingDown className="h-3 w-3 animate-bounce" />
             )}
-            <span className="animate-fade-in">
+            <span className="animate-fade-in whitespace-nowrap">
               {trend > 0 ? "+" : ""}
               {trend}%
             </span>
@@ -32,9 +32,9 @@ export function MetricCard({ title, value, description, trend }: MetricCardProps
         )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-google-blue animate-fade-in">{value}</div>
+        <div className="text-xl sm:text-2xl font-bold text-google-blue animate-fade-in truncate">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground mt-1 animate-fade-in">{description}</p>
+          <p className="text-xs text-muted-foreground mt-1 animate-fade-in line-clamp-2">{description}</p>
         )}
       </CardContent>
     </Card>

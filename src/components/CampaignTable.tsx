@@ -35,7 +35,7 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange }: Camp
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+    <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">
       <Table>
         <CampaignTableHeader />
         <TableBody>

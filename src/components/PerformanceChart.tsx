@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area } from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const defaultData = [
   { date: "26 Nov", spend: 5000, roas: 2.5, roasMin: 1.2, roasMax: 3.8 },
@@ -33,6 +34,7 @@ interface PerformanceChartProps {
 
 export function PerformanceChart({ useSampleData = false }: PerformanceChartProps) {
   const data = useSampleData ? generateRandomData() : defaultData;
+  const isMobile = useIsMobile();
 
   return (
     <Card className="col-span-4">
@@ -40,27 +42,38 @@ export function PerformanceChart({ useSampleData = false }: PerformanceChartProp
         <CardTitle>Spend vs ROAS</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[300px] w-full overflow-x-auto">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
               data={data}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ 
+                top: 5, 
+                right: isMobile ? 10 : 30, 
+                left: isMobile ? 0 : 20, 
+                bottom: 5 
+              }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: isMobile ? 10 : 12 }}
+                interval={isMobile ? 1 : 0}
+              />
               <YAxis 
                 yAxisId="left" 
                 domain={[0, 8000]}
-                label={{ value: 'Spend ($)', angle: -90, position: 'insideLeft' }}
+                label={isMobile ? null : { value: 'Spend ($)', angle: -90, position: 'insideLeft' }}
+                tick={{ fontSize: isMobile ? 10 : 12 }}
               />
               <YAxis 
                 yAxisId="right" 
                 orientation="right" 
                 domain={[0, 6]}
-                label={{ value: 'ROAS', angle: 90, position: 'insideRight' }}
+                label={isMobile ? null : { value: 'ROAS', angle: 90, position: 'insideRight' }}
+                tick={{ fontSize: isMobile ? 10 : 12 }}
               />
               <Tooltip />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
               <Area
                 yAxisId="right"
                 dataKey="roasMax"
@@ -83,7 +96,7 @@ export function PerformanceChart({ useSampleData = false }: PerformanceChartProp
                 stroke="#4285F4" 
                 name="Spend"
                 strokeWidth={2}
-                dot={{ strokeWidth: 2 }}
+                dot={{ strokeWidth: isMobile ? 1 : 2 }}
               />
               <Line 
                 yAxisId="right" 
@@ -92,7 +105,7 @@ export function PerformanceChart({ useSampleData = false }: PerformanceChartProp
                 stroke="#34A853" 
                 name="ROAS"
                 strokeWidth={2}
-                dot={{ strokeWidth: 2 }}
+                dot={{ strokeWidth: isMobile ? 1 : 2 }}
               />
             </LineChart>
           </ResponsiveContainer>
