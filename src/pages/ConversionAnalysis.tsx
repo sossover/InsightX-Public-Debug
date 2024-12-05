@@ -24,7 +24,6 @@ const conversionData = [
 export default function ConversionAnalysis() {
   const [data] = useState(conversionData);
 
-  // Transform conversion data to match Campaign type
   const campaignData: Campaign[] = data.map(item => ({
     name: item.date,
     spend: item.conversions * 50,
@@ -49,7 +48,7 @@ export default function ConversionAnalysis() {
         <NavigationSidebar />
         
         <div className="flex-1 overflow-auto bg-gray-50">
-          <main className="p-8 space-y-8 max-w-7xl mx-auto">
+          <main className="p-8 space-y-8">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-custom-purple-500">Conversion Analysis</h1>
@@ -78,16 +77,17 @@ export default function ConversionAnalysis() {
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <Card className="lg:col-span-2 bg-white shadow-lg border-none">
-                <CardHeader>
-                  <CardTitle className="text-xl font-semibold text-custom-purple-500">
-                    Conversion Trends
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
+            <div className="flex flex-1 gap-6">
+              <div className="flex-1 space-y-6">
+                <Card className="bg-white shadow-lg border-none">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold text-custom-purple-500">
+                      Conversion Trends
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[400px]">
+                      <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={conversionData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis 
@@ -134,12 +134,23 @@ export default function ConversionAnalysis() {
                           name="Conversion Rate (%)"
                         />
                       </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
 
-              <div className="lg:col-span-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <ConversionGoals />
+                  <ConversionSources />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <WebinarInvite />
+                  <ReferFriend />
+                </div>
+              </div>
+
+              <div className="w-[400px] flex-shrink-0">
                 <AiInsights 
                   campaigns={campaignData}
                   deviceData={[
@@ -154,18 +165,6 @@ export default function ConversionAnalysis() {
                   ]}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <div className="space-y-6">
-                <WebinarInvite />
-                <ReferFriend />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <ConversionGoals />
-              <ConversionSources />
             </div>
           </main>
         </div>
