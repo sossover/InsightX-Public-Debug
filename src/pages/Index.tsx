@@ -21,20 +21,24 @@ const defaultMetrics = {
   conversions: 253,
 };
 
-const sampleMetrics = {
-  spend: 12456.78,
-  impressions: 1250000,
-  clicks: 25000,
-  conversions: 450,
-};
+const generateSampleMetrics = () => ({
+  spend: Math.random() * 15000 + 8000,
+  impressions: Math.floor(Math.random() * 1500000 + 800000),
+  clicks: Math.floor(Math.random() * 30000 + 15000),
+  conversions: Math.floor(Math.random() * 600 + 200),
+});
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [useSampleData, setUseSampleData] = useState(false);
+  const [sampleMetrics, setSampleMetrics] = useState(generateSampleMetrics());
   
   const currentMetrics = useSampleData ? sampleMetrics : defaultMetrics;
 
   const handleSampleDataToggle = () => {
+    if (!useSampleData || useSampleData) {
+      setSampleMetrics(generateSampleMetrics());
+    }
     setUseSampleData(!useSampleData);
   };
 

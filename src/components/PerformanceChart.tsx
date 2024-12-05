@@ -11,22 +11,28 @@ const defaultData = [
   { date: "2 Dec", spend: 5100, roas: 4.2, roasMin: 2.9, roasMax: 5.5 },
 ];
 
-const sampleData = [
-  { date: "26 Nov", spend: 6500, roas: 3.1, roasMin: 1.8, roasMax: 4.4 },
-  { date: "27 Nov", spend: 6200, roas: 3.4, roasMin: 2.1, roasMax: 4.7 },
-  { date: "28 Nov", spend: 7800, roas: 3.8, roasMin: 2.5, roasMax: 5.1 },
-  { date: "29 Nov", spend: 7400, roas: 3.5, roasMin: 2.2, roasMax: 4.8 },
-  { date: "30 Nov", spend: 7100, roas: 4.1, roasMin: 2.8, roasMax: 5.4 },
-  { date: "1 Dec", spend: 6500, roas: 4.4, roasMin: 3.1, roasMax: 5.7 },
-  { date: "2 Dec", spend: 6700, roas: 4.8, roasMin: 3.5, roasMax: 6.1 },
-];
+const generateRandomData = () => {
+  const dates = ["26 Nov", "27 Nov", "28 Nov", "29 Nov", "30 Nov", "1 Dec", "2 Dec"];
+  return dates.map(date => {
+    const spend = Math.random() * 8000 + 4000;
+    const roas = Math.random() * 3 + 2;
+    const variance = Math.random() * 1.5 + 0.5;
+    return {
+      date,
+      spend,
+      roas,
+      roasMin: roas - variance,
+      roasMax: roas + variance,
+    };
+  });
+};
 
 interface PerformanceChartProps {
   useSampleData?: boolean;
 }
 
 export function PerformanceChart({ useSampleData = false }: PerformanceChartProps) {
-  const data = useSampleData ? sampleData : defaultData;
+  const data = useSampleData ? generateRandomData() : defaultData;
 
   return (
     <Card className="col-span-4">
