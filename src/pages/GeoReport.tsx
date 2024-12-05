@@ -8,12 +8,11 @@ import { CalendarDays, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { format } from "date-fns";
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Footer } from "@/components/Footer";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 const defaultCampaigns = [
   {
@@ -71,25 +70,6 @@ const countryData = [
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(defaultCampaigns);
-  const isMobile = useIsMobile();
-
-  const renderMetricsSidebar = () => {
-    if (isMobile) {
-      return (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
-              <Menu className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar campaigns={campaigns} />
-          </SheetContent>
-        </Sheet>
-      );
-    }
-    return <MetricsSidebar campaigns={campaigns} />;
-  };
 
   return (
     <SidebarProvider>

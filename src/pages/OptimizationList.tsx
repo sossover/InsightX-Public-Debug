@@ -1,5 +1,4 @@
 import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { MetricsSidebar } from "@/components/MetricsSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,10 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanView } from "@/components/KanbanView";
 import { OptimizationListItem } from "@/components/list/OptimizationListItem";
 import { OptimizationItem } from "@/types/optimization";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Campaign } from "@/components/campaign-table/types";
 
 export default function OptimizationList() {

@@ -6,10 +6,7 @@ import { KeywordHeader } from "@/components/keyword-analysis/KeywordHeader";
 import { KeywordFilters } from "@/components/keyword-analysis/KeywordFilters";
 import { KeywordTable } from "@/components/keyword-analysis/KeywordTable";
 import { KeywordInsights } from "@/components/keyword-analysis/KeywordInsights";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Campaign } from "@/components/campaign-table/types";
 
 const keywordData: Campaign[] = [
