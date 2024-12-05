@@ -8,6 +8,8 @@ import { Campaign } from "@/components/campaign-table/types";
 import { MetricCard } from "@/components/MetricCard";
 import { WebinarInvite } from "@/components/WebinarInvite";
 import { ReferFriend } from "@/components/ReferFriend";
+import { ConversionGoals } from "@/components/ConversionGoals";
+import { ConversionSources } from "@/components/ConversionSources";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
@@ -76,72 +78,75 @@ export default function ConversionAnalysis() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <div className="lg:col-span-3">
-                <Card className="bg-white shadow-lg border-none">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-custom-purple-500">
-                      Conversion Trends
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[400px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={conversionData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis 
-                            dataKey="date" 
-                            stroke="#6E59A5"
-                            tick={{ fill: '#6E59A5' }}
-                          />
-                          <YAxis 
-                            yAxisId="left" 
-                            stroke="#4285F4"
-                            tick={{ fill: '#4285F4' }}
-                          />
-                          <YAxis 
-                            yAxisId="right" 
-                            orientation="right" 
-                            stroke="#34A853"
-                            tick={{ fill: '#34A853' }}
-                          />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'white',
-                              border: '1px solid #e0e0e0',
-                              borderRadius: '8px',
-                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                            }}
-                          />
-                          <Legend />
-                          <Line
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="conversions"
-                            stroke="#4285F4"
-                            strokeWidth={2}
-                            dot={{ fill: '#4285F4', strokeWidth: 2 }}
-                            name="Conversions"
-                          />
-                          <Line
-                            yAxisId="right"
-                            type="monotone"
-                            dataKey="rate"
-                            stroke="#34A853"
-                            strokeWidth={2}
-                            dot={{ fill: '#34A853', strokeWidth: 2 }}
-                            name="Conversion Rate (%)"
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="lg:col-span-2 bg-white shadow-lg border-none">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-custom-purple-500">
+                    Conversion Trends
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={conversionData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="#6E59A5"
+                          tick={{ fill: '#6E59A5' }}
+                        />
+                        <YAxis 
+                          yAxisId="left" 
+                          stroke="#4285F4"
+                          tick={{ fill: '#4285F4' }}
+                        />
+                        <YAxis 
+                          yAxisId="right" 
+                          orientation="right" 
+                          stroke="#34A853"
+                          tick={{ fill: '#34A853' }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'white',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                          }}
+                        />
+                        <Legend />
+                        <Line
+                          yAxisId="left"
+                          type="monotone"
+                          dataKey="conversions"
+                          stroke="#4285F4"
+                          strokeWidth={2}
+                          dot={{ fill: '#4285F4', strokeWidth: 2 }}
+                          name="Conversions"
+                        />
+                        <Line
+                          yAxisId="right"
+                          type="monotone"
+                          dataKey="rate"
+                          stroke="#34A853"
+                          strokeWidth={2}
+                          dot={{ fill: '#34A853', strokeWidth: 2 }}
+                          name="Conversion Rate (%)"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
 
               <div className="space-y-6">
                 <WebinarInvite />
                 <ReferFriend />
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <ConversionGoals />
+              <ConversionSources />
             </div>
           </main>
         </div>
