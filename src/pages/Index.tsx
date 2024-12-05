@@ -1,5 +1,4 @@
 import { MetricCard } from "@/components/MetricCard";
-import { PerformanceChart } from "@/components/PerformanceChart";
 import { CampaignTable } from "@/components/CampaignTable";
 import { AiInsights } from "@/components/AiInsights";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
@@ -117,10 +116,6 @@ const Index = () => {
                   value={metrics.conversions.toLocaleString()}
                   trend={15}
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <PerformanceChart useSampleData={useSampleData} />
               </div>
 
               <div className="grid grid-cols-1 gap-6">
