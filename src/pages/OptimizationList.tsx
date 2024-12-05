@@ -5,18 +5,8 @@ import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanView } from "@/components/KanbanView";
-
-interface OptimizationItem {
-  text: string;
-  timestamp: string;
-  impact: 'high' | 'medium' | 'low';
-}
-
-const impactColors = {
-  high: 'text-google-red',
-  medium: 'text-google-yellow',
-  low: 'text-google-green',
-};
+import { OptimizationListItem } from "@/components/list/OptimizationListItem";
+import { OptimizationItem } from "@/types/optimization";
 
 export default function OptimizationList() {
   const [items, setItems] = useState<OptimizationItem[]>([]);
@@ -39,11 +29,6 @@ export default function OptimizationList() {
   const getRandomImpact = () => {
     const impacts: ('high' | 'medium' | 'low')[] = ['high', 'medium', 'low'];
     return impacts[Math.floor(Math.random() * impacts.length)];
-  };
-
-  const handleMondayClick = (item: OptimizationItem) => {
-    console.log('Sending to Monday.com:', item);
-    // Here you would integrate with Monday.com's API
   };
 
   const sortedItems = [...items].sort((a, b) => {
@@ -85,36 +70,8 @@ export default function OptimizationList() {
 
               <Tabs value={viewType} className="w-full">
                 <TabsContent value="list" className="space-y-4">
-                  {sortedItems.map((item, index) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="text-gray-700">{item.text}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <p className="text-sm text-gray-500">
-                              Added: {new Date(item.timestamp).toLocaleString()}
-                            </p>
-                            <button
-                              onClick={() => handleMondayClick(item)}
-                              className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
-                              title="Send to Monday.com"
-                            >
-                              <img 
-                                src="/lovable-uploads/14ea84ca-932d-4481-96ad-5b7be22869b5.png" 
-                                alt="Monday.com"
-                                className="w-4 h-4 object-contain"
-                              />
-                            </button>
-                          </div>
-                        </div>
-                        <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium ${impactColors[item.impact]}`}>
-                          {item.impact.charAt(0).toUpperCase() + item.impact.slice(1)} Impact
-                        </span>
-                      </div>
-                    </div>
+                  {sortedItems.map((item) => (
+                    <OptimizationListItem key={item.timestamp} item={item} />
                   ))}
                   {items.length === 0 && (
                     <div className="text-center text-gray-500 py-8">
