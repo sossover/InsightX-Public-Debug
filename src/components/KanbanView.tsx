@@ -11,7 +11,21 @@ export function KanbanView({ items }: KanbanViewProps) {
   const [columns, setColumns] = useState<KanbanColumnType[]>(() => {
     const savedColumns = localStorage.getItem('kanbanColumns');
     if (savedColumns) {
-      return JSON.parse(savedColumns);
+      const parsedColumns = JSON.parse(savedColumns);
+      // Update "To Do" column with latest items while preserving other columns
+      return parsedColumns.map(col => {
+        if (col.id === 'todo') {
+          return {
+            ...col,
+            items: items.filter(item => 
+              !parsedColumns.find(c => c.id !== 'todo' && 
+                c.items.some(i => i.timestamp === item.timestamp)
+              )
+            )
+          };
+        }
+        return col;
+      });
     }
     return [
       {
@@ -31,6 +45,26 @@ export function KanbanView({ items }: KanbanViewProps) {
       },
     ];
   });
+
+  // Update columns when items prop changes
+  useEffect(() => {
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const todoColumn = newColumns.find(col => col.id === 'todo');
+      if (todoColumn) {
+        // Get all items that are not in other columns
+        const itemsInOtherColumns = newColumns
+          .filter(col => col.id !== 'todo')
+          .flatMap(col => col.items)
+          .map(item => item.timestamp);
+        
+        todoColumn.items = items.filter(
+          item => !itemsInOtherColumns.includes(item.timestamp)
+        );
+      }
+      return newColumns;
+    });
+  }, [items]);
 
   useEffect(() => {
     localStorage.setItem('kanbanColumns', JSON.stringify(columns));
