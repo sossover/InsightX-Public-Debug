@@ -1,79 +1,85 @@
-export const defaultCampaigns = [
+import { Campaign } from "./types";
+
+export const defaultCampaigns: Campaign[] = [
   {
-    name: "Performance Max - Dynamic",
-    spend: 3129.19,
-    impressions: 565017,
-    clicks: 23176,
-    ctr: "4.09%",
-    conversions: 330,
-    cpa: 3.59,
+    name: "Performance Max - Competitor KW",
+    spend: 4614.52,
+    impressions: 780417,
+    clicks: 15769,
+    ctr: "2.02%",
+    conversions: 250,
+    cpa: 18.44,
   },
   {
-    name: "Shopping - Bestsellers",
-    spend: 1043.59,
-    impressions: 751143,
-    clicks: 16637,
-    ctr: "2.21%",
-    conversions: 525,
-    cpa: 1.99,
+    name: "Performance Max - In-Market",
+    spend: 3962.88,
+    impressions: 70570,
+    clicks: 771,
+    ctr: "1.09%",
+    conversions: 3,
+    cpa: 1062.01,
   },
   {
-    name: "Display - Custom Intent",
-    spend: 3189.07,
-    impressions: 765800,
-    clicks: 17543,
-    ctr: "2.29%",
-    conversions: 391,
-    cpa: 8.16,
+    name: "Search - Brand Terms",
+    spend: 2845.65,
+    impressions: 125890,
+    clicks: 8965,
+    ctr: "7.12%",
+    conversions: 425,
+    cpa: 6.70,
   },
   {
-    name: "Smart Shopping - Electronics",
-    spend: 17137.91,
-    impressions: 137190,
-    clicks: 25410,
-    ctr: "18.52%",
-    conversions: 489,
-    cpa: 14.60,
+    name: "Display - Remarketing",
+    spend: 1578.92,
+    impressions: 458962,
+    clicks: 3256,
+    ctr: "0.71%",
+    conversions: 85,
+    cpa: 18.58,
   },
 ];
 
-export const generateSampleData = () => {
-  return [
-    {
-      name: "Performance Max - Dynamic",
-      spend: 3129.19,
-      impressions: 565017,
-      clicks: 23176,
-      ctr: "4.09%",
-      conversions: 330,
-      cpa: 3.59,
-    },
-    {
-      name: "Shopping - Bestsellers",
-      spend: 1043.59,
-      impressions: 751143,
-      clicks: 16637,
-      ctr: "2.21%",
-      conversions: 525,
-      cpa: 1.99,
-    },
-    {
-      name: "Display - Custom Intent",
-      spend: 3189.07,
-      impressions: 765800,
-      clicks: 17543,
-      ctr: "2.29%",
-      conversions: 391,
-      cpa: 8.16,
-    },
-    {
-      name: "Smart Shopping - Electronics",
-      spend: 17137.91,
-      impressions: 137190,
-      clicks: 25410,
-      ctr: "18.52%",
-      conversions: 489,
-      cpa: 14.60,
-    },
-  ];
+export const campaignTypes = [
+  "Smart Shopping - Electronics",
+  "Discovery - New Markets",
+  "Search - Product Terms",
+  "Display - Lookalike",
+  "Performance Max - Seasonal",
+  "Local Campaigns - Retail",
+  "App Campaigns - Install",
+  "Video Action - Awareness",
+  "Search - Competitor Terms",
+  "Display - Custom Intent",
+  "Performance Max - Dynamic",
+  "Shopping - Bestsellers"
+];
+
+export const generateRandomCampaign = (usedNames: Set<string>): Campaign => {
+  const spend = Math.random() * 10000 + 1000;
+  const impressions = Math.floor(Math.random() * 1000000 + 50000);
+  const clicks = Math.floor(Math.random() * 30000 + 500);
+  const conversions = Math.floor(Math.random() * 600 + 1);
+  const ctr = ((clicks / impressions) * 100).toFixed(2) + "%";
+  const cpa = spend / (conversions || 1);
+
+  let name;
+  do {
+    name = campaignTypes[Math.floor(Math.random() * campaignTypes.length)];
+  } while (usedNames.has(name));
+  usedNames.add(name);
+
+  return {
+    name,
+    spend,
+    impressions,
+    clicks,
+    ctr,
+    conversions,
+    cpa,
+  };
+};
+
+export const generateSampleData = (): Campaign[] => {
+  const usedNames = new Set<string>();
+  return Array(4).fill(null).map(() => generateRandomCampaign(usedNames));
 };

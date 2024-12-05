@@ -17,7 +17,7 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange }: Camp
       setSampleData(generateSampleData());
     }
     onCampaignsChange?.(campaigns);
-  }, [useSampleData, campaigns, onCampaignsChange]); // Added missing dependencies
+  }, [useSampleData]); // Only regenerate when useSampleData changes
 
   // Calculate totals
   const totals: Campaign = {
