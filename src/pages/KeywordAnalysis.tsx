@@ -57,6 +57,7 @@ const getColorForConversions = (conversions: number) => {
 
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [campaigns, setCampaigns] = useState(keywordData);
 
   return (
     <SidebarProvider>
@@ -176,7 +177,7 @@ const KeywordAnalysis = () => {
               </div>
 
               {/* AI Insights */}
-              <AiInsights />
+              <AiInsights campaigns={campaigns} />
             </div>
           </main>
         </div>

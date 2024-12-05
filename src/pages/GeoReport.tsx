@@ -13,8 +13,48 @@ import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Footer } from "@/components/Footer";
 
+const defaultCampaigns = [
+  {
+    name: "Performance Max - Competitor KW",
+    spend: 4614.52,
+    impressions: 780417,
+    clicks: 15769,
+    ctr: "2.02%",
+    conversions: 250,
+    cpa: 18.44,
+  },
+  {
+    name: "Performance Max - In-Market",
+    spend: 3962.88,
+    impressions: 70570,
+    clicks: 771,
+    ctr: "1.09%",
+    conversions: 3,
+    cpa: 1062.01,
+  },
+  {
+    name: "Search - Brand Terms",
+    spend: 2845.65,
+    impressions: 125890,
+    clicks: 8965,
+    ctr: "7.12%",
+    conversions: 425,
+    cpa: 6.70,
+  },
+  {
+    name: "Display - Remarketing",
+    spend: 1578.92,
+    impressions: 458962,
+    clicks: 3256,
+    ctr: "0.71%",
+    conversions: 85,
+    cpa: 18.58,
+  },
+];
+
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [campaigns, setCampaigns] = useState(defaultCampaigns);
 
   return (
     <SidebarProvider>
@@ -59,7 +99,7 @@ const GeoReport = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <GeoMap />
-                <AiInsights />
+                <AiInsights campaigns={campaigns} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2">
