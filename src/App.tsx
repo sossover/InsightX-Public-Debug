@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import GeoReport from "./pages/GeoReport";
 import KeywordAnalysis from "./pages/KeywordAnalysis";
+import OptimizationList from "./pages/OptimizationList";
 import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <KeywordAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/optimization-list"
+            element={
+              <ProtectedRoute>
+                <OptimizationList />
               </ProtectedRoute>
             }
           />
