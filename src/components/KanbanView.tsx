@@ -50,8 +50,9 @@ export function KanbanView({ items }: KanbanViewProps) {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    const sourceColumn = columns.find(col => col.id === source.droppableId);
-    const destColumn = columns.find(col => col.id === destination.droppableId);
+    const newColumns = [...columns];
+    const sourceColumn = newColumns.find(col => col.id === source.droppableId);
+    const destColumn = newColumns.find(col => col.id === destination.droppableId);
 
     if (!sourceColumn || !destColumn) return;
 
@@ -60,7 +61,7 @@ export function KanbanView({ items }: KanbanViewProps) {
     const [removed] = sourceItems.splice(source.index, 1);
     destItems.splice(destination.index, 0, removed);
 
-    setColumns(columns.map(col => {
+    const updatedColumns = newColumns.map(col => {
       if (col.id === source.droppableId) {
         return { ...col, items: sourceItems };
       }
@@ -68,7 +69,10 @@ export function KanbanView({ items }: KanbanViewProps) {
         return { ...col, items: destItems };
       }
       return col;
-    }));
+    });
+
+    setColumns(updatedColumns);
+    localStorage.setItem('kanbanColumns', JSON.stringify(updatedColumns));
   };
 
   const handleMondayClick = (item: OptimizationItem) => {
@@ -113,10 +117,11 @@ export function KanbanView({ items }: KanbanViewProps) {
                                 className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
                                 title="Send to Monday.com"
                               >
-                                <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M7 16C7 14.3431 8.34315 13 10 13C11.6569 13 13 14.3431 13 16C13 17.6569 11.6569 19 10 19C8.34315 19 7 17.6569 7 16Z" fill="#FF3D57"/>
-                                  <path d="M19 16C19 14.3431 20.3431 13 22 13C23.6569 13 25 14.3431 25 16C25 17.6569 23.6569 19 22 19C20.3431 19 19 17.6569 19 16Z" fill="#FF3D57"/>
-                                </svg>
+                                <img 
+                                  src="/lovable-uploads/14ea84ca-932d-4481-96ad-5b7be22869b5.png" 
+                                  alt="Monday.com"
+                                  className="w-4 h-4 object-contain"
+                                />
                               </button>
                             </div>
                             <span className="text-xs text-gray-500">
