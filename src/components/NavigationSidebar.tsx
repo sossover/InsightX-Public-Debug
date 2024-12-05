@@ -43,7 +43,7 @@ export function NavigationSidebar() {
   };
 
   return (
-    <Sidebar className="border-r border-gray-200">
+    <Sidebar className="border-r border-gray-200 cursor-none group">
       <SidebarContent>
         <SidebarGroup>
           <div className="px-3 py-4">
@@ -59,9 +59,9 @@ export function NavigationSidebar() {
                     isActive={location.pathname === item.url}
                     onClick={() => item.url.startsWith("/") && navigate(item.url)}
                   >
-                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1">
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
+                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
+                      <item.icon className="w-4 h-4 relative z-10" />
+                      <span className="relative z-10">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -83,12 +83,14 @@ export function NavigationSidebar() {
                     onClick={() => item.url.startsWith("/") && navigate(item.url)}
                   >
                     <a 
-                      className={`flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 ${
-                        item.isCreate ? 'bg-custom-purple-300 text-white rounded-lg px-4 py-2 hover:bg-custom-purple-400 hover:text-white' : ''
+                      className={`flex items-center gap-2 transition-all duration-200 group-hover:cursor-pointer relative ${
+                        item.isCreate 
+                          ? 'bg-custom-purple-300 text-white rounded-lg px-4 py-2 hover:bg-custom-purple-400 hover:text-white' 
+                          : 'hover:text-google-blue hover:translate-x-1 before:content-[\'\'] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left'
                       }`}
                     >
-                      <item.icon className={`w-4 h-4 ${item.isCreate ? 'text-white' : ''}`} />
-                      <span>{item.title}</span>
+                      <item.icon className={`w-4 h-4 relative z-10 ${item.isCreate ? 'text-white' : ''}`} />
+                      <span className="relative z-10">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -102,10 +104,10 @@ export function NavigationSidebar() {
       <div className="px-3 mb-4">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-google-blue transition-colors duration-200"
+          className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-google-blue transition-colors duration-200 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left"
         >
-          <LogOut className="w-4 h-4" />
-          <span>Logout</span>
+          <LogOut className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">Logout</span>
         </button>
       </div>
 
