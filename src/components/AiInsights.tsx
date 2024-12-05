@@ -1,9 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Lightbulb, TrendingUp, AlertCircle, Zap, RefreshCw } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { AiInsightHeader } from "./ai-insights/AiInsightHeader";
+import { PerformanceSummary } from "./ai-insights/PerformanceSummary";
+import { KeyObservations } from "./ai-insights/KeyObservations";
+import { Recommendations } from "./ai-insights/Recommendations";
 
 interface InsightsData {
   summary: string;
@@ -104,64 +106,13 @@ export function AiInsights() {
 
   return (
     <Card className="bg-gradient-to-br from-white to-gray-50 border-gray-200">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 pb-6">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-google-blue" />
-          <CardTitle className="text-lg">AI Insights</CardTitle>
-        </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={generateInsights}
-          disabled={isLoading}
-          className="gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Generate
-        </Button>
-      </CardHeader>
+      <AiInsightHeader onGenerate={generateInsights} isLoading={isLoading} />
       <CardContent className="space-y-6 pt-6">
         {insights ? (
           <>
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-4 w-4 text-google-blue" />
-                <h3 className="font-semibold text-sm">Performance Summary</h3>
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {insights.summary}
-              </p>
-            </div>
-            
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <AlertCircle className="h-4 w-4 text-google-yellow" />
-                <h3 className="font-semibold text-sm">Key Observations</h3>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-2">
-                {insights.observations.map((observation, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-                    <span>{observation}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="h-4 w-4 text-google-green" />
-                <h3 className="font-semibold text-sm">Recommendations</h3>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-2">
-                {insights.recommendations.map((recommendation, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="block w-1 h-1 rounded-full bg-gray-400 mt-2" />
-                    <span>{recommendation}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <PerformanceSummary summary={insights.summary} />
+            <KeyObservations observations={insights.observations} />
+            <Recommendations recommendations={insights.recommendations} />
           </>
         ) : (
           <div className="text-center text-gray-500 py-8">
