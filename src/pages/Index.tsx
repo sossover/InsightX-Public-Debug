@@ -50,12 +50,18 @@ const Index = () => {
       return (
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="fixed top-4 right-4 z-50 bg-background"
+            >
               <Menu className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar />
+          <SheetContent side="right" className="w-[80vw] sm:w-[400px] overflow-y-auto">
+            <div className="h-full overflow-y-auto pb-20">
+              <MetricsSidebar />
+            </div>
           </SheetContent>
         </Sheet>
       );
