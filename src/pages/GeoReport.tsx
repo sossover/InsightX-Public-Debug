@@ -1,10 +1,9 @@
 import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { MetricsSidebar } from "@/components/MetricsSidebar";
 import { GeoMap } from "@/components/GeoMap";
 import { CountryStats } from "@/components/CountryStats";
 import { DeviceStats } from "@/components/DeviceStats";
 import { AiInsights } from "@/components/AiInsights";
-import { CalendarDays, Menu } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -133,7 +132,11 @@ const GeoReport = () => {
           <Footer />
         </div>
 
-        <ChatPanel />
+        <ChatPanel 
+          countryData={countryData}
+          campaignData={campaigns}
+          deviceData={deviceData}
+        />
       </div>
     </SidebarProvider>
   );

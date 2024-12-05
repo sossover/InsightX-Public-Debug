@@ -5,13 +5,20 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, Send, Bot } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Campaign } from "../campaign-table/types";
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export function ChatPanel() {
+interface ChatPanelProps {
+  countryData?: any[];
+  campaignData?: Campaign[];
+  deviceData?: any[];
+}
+
+export function ChatPanel({ countryData, campaignData, deviceData }: ChatPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -29,7 +36,15 @@ export function ChatPanel() {
 
     try {
       const { data, error } = await supabase.functions.invoke('chat-analyst', {
-        body: { message: input, messages: messages }
+        body: { 
+          message: input, 
+          messages: messages,
+          context: {
+            countryData,
+            campaignData,
+            deviceData
+          }
+        }
       });
 
       if (error) throw error;
