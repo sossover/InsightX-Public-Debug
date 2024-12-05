@@ -11,34 +11,70 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Footer } from "@/components/Footer";
 
-const defaultMetrics = {
-  spend: 8577.40,
-  impressions: 850987,
-  clicks: 16540,
-  conversions: 253,
+const calculateMetricsFromCampaigns = (campaigns: any[]) => {
+  return campaigns.reduce((acc, campaign) => ({
+    spend: acc.spend + campaign.spend,
+    impressions: acc.impressions + campaign.impressions,
+    clicks: acc.clicks + campaign.clicks,
+    conversions: acc.conversions + campaign.conversions,
+  }), {
+    spend: 0,
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+  });
 };
 
-const generateSampleMetrics = () => ({
-  spend: Math.random() * 15000 + 8000,
-  impressions: Math.floor(Math.random() * 1500000 + 800000),
-  clicks: Math.floor(Math.random() * 30000 + 15000),
-  conversions: Math.floor(Math.random() * 600 + 200),
-});
+const defaultCampaigns = [
+  {
+    name: "Performance Max - Competitor KW",
+    spend: 4614.52,
+    impressions: 780417,
+    clicks: 15769,
+    ctr: "2.02%",
+    conversions: 250,
+    cpa: 18.44,
+  },
+  {
+    name: "Performance Max - In-Market",
+    spend: 3962.88,
+    impressions: 70570,
+    clicks: 771,
+    ctr: "1.09%",
+    conversions: 3,
+    cpa: 1062.01,
+  },
+  {
+    name: "Search - Brand Terms",
+    spend: 2845.65,
+    impressions: 125890,
+    clicks: 8965,
+    ctr: "7.12%",
+    conversions: 425,
+    cpa: 6.70,
+  },
+  {
+    name: "Display - Remarketing",
+    spend: 1578.92,
+    impressions: 458962,
+    clicks: 3256,
+    ctr: "0.71%",
+    conversions: 85,
+    cpa: 18.58,
+  },
+];
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [useSampleData, setUseSampleData] = useState(false);
-  const [sampleMetrics, setSampleMetrics] = useState(generateSampleMetrics());
+  const [campaigns, setCampaigns] = useState(defaultCampaigns);
   
-  const currentMetrics = useSampleData ? sampleMetrics : defaultMetrics;
+  const currentMetrics = useMemo(() => calculateMetricsFromCampaigns(campaigns), [campaigns]);
 
   const handleSampleDataToggle = () => {
-    if (!useSampleData || useSampleData) {
-      setSampleMetrics(generateSampleMetrics());
-    }
     setUseSampleData(!useSampleData);
   };
 
@@ -96,7 +132,10 @@ const Index = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
                   title="Total Spend"
-                  value={`$${currentMetrics.spend.toLocaleString()}`}
+                  value={`$${currentMetrics.spend.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`}
                   trend={12}
                 />
                 <MetricCard
@@ -123,7 +162,10 @@ const Index = () => {
               <div className="grid grid-cols-1 gap-6">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
-                  <CampaignTable useSampleData={useSampleData} />
+                  <CampaignTable 
+                    useSampleData={useSampleData} 
+                    onCampaignsChange={setCampaigns}
+                  />
                 </div>
               </div>
 

@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect } from "react";
 
 const defaultCampaigns = [
   {
@@ -82,10 +83,15 @@ const generateSampleData = () => {
 
 interface CampaignTableProps {
   useSampleData?: boolean;
+  onCampaignsChange?: (campaigns: any[]) => void;
 }
 
-export function CampaignTable({ useSampleData = false }: CampaignTableProps) {
+export function CampaignTable({ useSampleData = false, onCampaignsChange }: CampaignTableProps) {
   const campaigns = useSampleData ? generateSampleData() : defaultCampaigns;
+
+  useEffect(() => {
+    onCampaignsChange?.(campaigns);
+  }, [campaigns, onCampaignsChange]);
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
