@@ -3,24 +3,21 @@ import { PerformanceChart } from "@/components/PerformanceChart";
 import { CampaignTable } from "@/components/CampaignTable";
 import { AiInsights } from "@/components/AiInsights";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { MetricsSidebar } from "@/components/MetricsSidebar";
-import { CalendarDays, Menu } from "lucide-react";
+import { ChatPanel } from "@/components/chat/ChatPanel";
+import { CalendarDays } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { Footer } from "@/components/Footer";
 import { Campaign } from "@/components/campaign-table/types";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [useSampleData, setUseSampleData] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const isMobile = useIsMobile();
 
   const metrics = useMemo(() => {
     const totals = campaigns.reduce(
@@ -44,33 +41,6 @@ const Index = () => {
     setCampaigns(newCampaigns);
   };
 
-  const renderMetricsSidebar = () => {
-    if (isMobile) {
-      return (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="fixed top-4 right-4 z-50 bg-background border shadow-sm dark:bg-custom-purple-600 dark:border-custom-purple-400"
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent 
-            side="right" 
-            className="w-[80vw] sm:w-[400px] overflow-y-auto border-l dark:border-custom-purple-400 dark:bg-custom-purple-600"
-          >
-            <div className="h-full overflow-y-auto pb-20">
-              <MetricsSidebar campaigns={campaigns} />
-            </div>
-          </SheetContent>
-        </Sheet>
-      );
-    }
-    return <MetricsSidebar campaigns={campaigns} />;
-  };
-
   return (
     <SidebarProvider>
       <div className="relative min-h-screen flex w-full">
@@ -81,7 +51,6 @@ const Index = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Fixed Navigation */}
           <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30 dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center">
@@ -109,8 +78,7 @@ const Index = () => {
             </div>
           </nav>
 
-          {/* Main Content */}
-          <main className="flex-1 flex flex-col justify-center pt-24">
+          <main className="flex-1 flex flex-col pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="mb-4">
                 <Button 
@@ -170,7 +138,7 @@ const Index = () => {
           <Footer />
         </div>
 
-        {renderMetricsSidebar()}
+        <ChatPanel />
       </div>
     </SidebarProvider>
   );

@@ -63,25 +63,6 @@ const keywordData: Campaign[] = [
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(keywordData);
-  const isMobile = useIsMobile();
-
-  const renderMetricsSidebar = () => {
-    if (isMobile) {
-      return (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
-              <Menu className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar campaigns={campaigns} />
-          </SheetContent>
-        </Sheet>
-      );
-    }
-    return <MetricsSidebar campaigns={campaigns} />;
-  };
 
   return (
     <SidebarProvider>
@@ -108,7 +89,7 @@ const KeywordAnalysis = () => {
           </main>
         </div>
 
-        {renderMetricsSidebar()}
+        <ChatPanel />
       </div>
     </SidebarProvider>
   );

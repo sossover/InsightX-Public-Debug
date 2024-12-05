@@ -153,7 +153,7 @@ const GeoReport = () => {
           <Footer />
         </div>
 
-        {renderMetricsSidebar()}
+        <ChatPanel />
       </div>
     </SidebarProvider>
   );

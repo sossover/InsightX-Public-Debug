@@ -18,7 +18,6 @@ export default function OptimizationList() {
   const [sortBy, setSortBy] = useState<'date' | 'impact'>('date');
   const [viewType, setViewType] = useState<'list' | 'kanban'>('list');
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     const savedItems = localStorage.getItem('optimizationItems');
@@ -46,24 +45,6 @@ export default function OptimizationList() {
       return impactOrder[b.impact] - impactOrder[a.impact];
     }
   });
-
-  const renderMetricsSidebar = () => {
-    if (isMobile) {
-      return (
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="fixed bottom-4 right-4 z-50">
-              <Menu className="h-4 w-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar campaigns={campaigns} />
-          </SheetContent>
-        </Sheet>
-      );
-    }
-    return <MetricsSidebar campaigns={campaigns} />;
-  };
 
   return (
     <SidebarProvider>
@@ -113,7 +94,7 @@ export default function OptimizationList() {
             </div>
           </main>
         </div>
-        {renderMetricsSidebar()}
+        <ChatPanel />
       </div>
     </SidebarProvider>
   );
