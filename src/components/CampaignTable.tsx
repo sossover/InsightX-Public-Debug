@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const campaigns = [
+const defaultCampaigns = [
   {
     name: "Performance Max - Competitor KW",
     spend: 4614.52,
@@ -46,7 +46,52 @@ const campaigns = [
   },
 ];
 
-export function CampaignTable() {
+const sampleCampaigns = [
+  {
+    name: "Smart Shopping - Electronics",
+    spend: 6789.45,
+    impressions: 950000,
+    clicks: 22000,
+    ctr: "2.32%",
+    conversions: 380,
+    cpa: 17.87,
+  },
+  {
+    name: "Discovery - New Markets",
+    spend: 4567.89,
+    impressions: 85000,
+    clicks: 950,
+    ctr: "1.12%",
+    conversions: 15,
+    cpa: 304.53,
+  },
+  {
+    name: "Search - Product Terms",
+    spend: 3456.78,
+    impressions: 145000,
+    clicks: 10500,
+    ctr: "7.24%",
+    conversions: 520,
+    cpa: 6.65,
+  },
+  {
+    name: "Display - Lookalike",
+    spend: 2345.67,
+    impressions: 550000,
+    clicks: 4200,
+    ctr: "0.76%",
+    conversions: 95,
+    cpa: 24.69,
+  },
+];
+
+interface CampaignTableProps {
+  useSampleData?: boolean;
+}
+
+export function CampaignTable({ useSampleData = false }: CampaignTableProps) {
+  const campaigns = useSampleData ? sampleCampaigns : defaultCampaigns;
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
       <Table>

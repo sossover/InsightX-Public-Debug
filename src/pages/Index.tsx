@@ -14,8 +14,29 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { Footer } from "@/components/Footer";
 
+const defaultMetrics = {
+  spend: 8577.40,
+  impressions: 850987,
+  clicks: 16540,
+  conversions: 253,
+};
+
+const sampleMetrics = {
+  spend: 12456.78,
+  impressions: 1250000,
+  clicks: 25000,
+  conversions: 450,
+};
+
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [useSampleData, setUseSampleData] = useState(false);
+  
+  const currentMetrics = useSampleData ? sampleMetrics : defaultMetrics;
+
+  const handleSampleDataToggle = () => {
+    setUseSampleData(!useSampleData);
+  };
 
   return (
     <SidebarProvider>
@@ -59,37 +80,46 @@ const Index = () => {
           {/* Main Content with proper top padding */}
           <main className="flex-1 flex flex-col justify-center pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="mb-4">
+                <Button 
+                  variant="outline" 
+                  onClick={handleSampleDataToggle}
+                  className="mb-2"
+                >
+                  {useSampleData ? "Use Real Data" : "Sample Data"}
+                </Button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
                   title="Total Spend"
-                  value="$8,577.40"
+                  value={`$${currentMetrics.spend.toLocaleString()}`}
                   trend={12}
                 />
                 <MetricCard
                   title="Impressions"
-                  value="850,987"
+                  value={currentMetrics.impressions.toLocaleString()}
                   trend={-5}
                 />
                 <MetricCard
                   title="Clicks"
-                  value="16,540"
+                  value={currentMetrics.clicks.toLocaleString()}
                   trend={8}
                 />
                 <MetricCard
                   title="Conversions"
-                  value="253"
+                  value={currentMetrics.conversions.toLocaleString()}
                   trend={15}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <PerformanceChart />
+                <PerformanceChart useSampleData={useSampleData} />
               </div>
 
               <div className="grid grid-cols-1 gap-6">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
-                  <CampaignTable />
+                  <CampaignTable useSampleData={useSampleData} />
                 </div>
               </div>
 
