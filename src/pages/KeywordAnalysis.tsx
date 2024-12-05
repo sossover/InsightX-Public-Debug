@@ -24,13 +24,54 @@ import { CalendarDays } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { Campaign } from "@/components/campaign-table/types";
 
-const keywordData = [
-  { keyword: "supermetrics", spend: 62.31, impressions: 484, clicks: 9, ctr: "1.86%", conversions: 2, cpa: 31.15 },
-  { keyword: "looker studio meta ads", spend: 43.66, impressions: 190, clicks: 13, ctr: "6.84%", conversions: 1, cpa: 1062.01 },
-  { keyword: "salesforce bigquery", spend: 33.55, impressions: 141, clicks: 9, ctr: "6.38%", conversions: 0, cpa: 0 },
-  { keyword: "meta looker studio", spend: 22.05, impressions: 149, clicks: 9, ctr: "6.04%", conversions: 0, cpa: 0 },
-  { keyword: "powerbi google ads", spend: 18.45, impressions: 61, clicks: 6, ctr: "9.84%", conversions: 2, cpa: 9.23 },
+const keywordData: Campaign[] = [
+  {
+    name: "supermetrics",
+    spend: 62.31,
+    impressions: 484,
+    clicks: 9,
+    ctr: "1.86%",
+    conversions: 2,
+    cpa: 31.15,
+  },
+  {
+    name: "looker studio meta ads",
+    spend: 43.66,
+    impressions: 190,
+    clicks: 13,
+    ctr: "6.84%",
+    conversions: 1,
+    cpa: 1062.01,
+  },
+  {
+    name: "salesforce bigquery",
+    spend: 33.55,
+    impressions: 141,
+    clicks: 9,
+    ctr: "6.38%",
+    conversions: 0,
+    cpa: 0,
+  },
+  {
+    name: "meta looker studio",
+    spend: 22.05,
+    impressions: 149,
+    clicks: 9,
+    ctr: "6.04%",
+    conversions: 0,
+    cpa: 0,
+  },
+  {
+    name: "powerbi google ads",
+    spend: 18.45,
+    impressions: 61,
+    clicks: 6,
+    ctr: "9.84%",
+    conversions: 2,
+    cpa: 9.23,
+  },
 ];
 
 const getColorForCTR = (ctr: string) => {
@@ -158,7 +199,7 @@ const KeywordAnalysis = () => {
                     <TableBody>
                       {keywordData.map((row) => (
                         <TableRow key={row.keyword}>
-                          <TableCell className="font-medium">{row.keyword}</TableCell>
+                          <TableCell className="font-medium">{row.name}</TableCell>
                           <TableCell className="text-right">${row.spend.toFixed(2)}</TableCell>
                           <TableCell className="text-right">{row.impressions}</TableCell>
                           <TableCell className="text-right">{row.clicks}</TableCell>
