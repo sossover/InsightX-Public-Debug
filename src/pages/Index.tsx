@@ -13,69 +13,33 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { Footer } from "@/components/Footer";
-
-const calculateMetricsFromCampaigns = (campaigns: any[]) => {
-  return campaigns.reduce((acc, campaign) => ({
-    spend: acc.spend + campaign.spend,
-    impressions: acc.impressions + campaign.impressions,
-    clicks: acc.clicks + campaign.clicks,
-    conversions: acc.conversions + campaign.conversions,
-  }), {
-    spend: 0,
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-  });
-};
-
-const defaultCampaigns = [
-  {
-    name: "Performance Max - Competitor KW",
-    spend: 4614.52,
-    impressions: 780417,
-    clicks: 15769,
-    ctr: "2.02%",
-    conversions: 250,
-    cpa: 18.44,
-  },
-  {
-    name: "Performance Max - In-Market",
-    spend: 3962.88,
-    impressions: 70570,
-    clicks: 771,
-    ctr: "1.09%",
-    conversions: 3,
-    cpa: 1062.01,
-  },
-  {
-    name: "Search - Brand Terms",
-    spend: 2845.65,
-    impressions: 125890,
-    clicks: 8965,
-    ctr: "7.12%",
-    conversions: 425,
-    cpa: 6.70,
-  },
-  {
-    name: "Display - Remarketing",
-    spend: 1578.92,
-    impressions: 458962,
-    clicks: 3256,
-    ctr: "0.71%",
-    conversions: 85,
-    cpa: 18.58,
-  },
-];
+import { Campaign } from "@/components/campaign-table/types";
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [useSampleData, setUseSampleData] = useState(false);
-  const [campaigns, setCampaigns] = useState(defaultCampaigns);
-  
-  const currentMetrics = useMemo(() => calculateMetricsFromCampaigns(campaigns), [campaigns]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+
+  const metrics = useMemo(() => {
+    const totals = campaigns.reduce(
+      (acc, campaign) => ({
+        spend: acc.spend + campaign.spend,
+        impressions: acc.impressions + campaign.impressions,
+        clicks: acc.clicks + campaign.clicks,
+        conversions: acc.conversions + campaign.conversions,
+      }),
+      { spend: 0, impressions: 0, clicks: 0, conversions: 0 }
+    );
+
+    return totals;
+  }, [campaigns]);
 
   const handleSampleDataToggle = () => {
     setUseSampleData(!useSampleData);
+  };
+
+  const handleCampaignsChange = (newCampaigns: Campaign[]) => {
+    setCampaigns(newCampaigns);
   };
 
   return (
@@ -132,7 +96,7 @@ const Index = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <MetricCard
                   title="Total Spend"
-                  value={`$${currentMetrics.spend.toLocaleString(undefined, {
+                  value={`$${metrics.spend.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}`}
@@ -140,17 +104,17 @@ const Index = () => {
                 />
                 <MetricCard
                   title="Impressions"
-                  value={currentMetrics.impressions.toLocaleString()}
+                  value={metrics.impressions.toLocaleString()}
                   trend={-5}
                 />
                 <MetricCard
                   title="Clicks"
-                  value={currentMetrics.clicks.toLocaleString()}
+                  value={metrics.clicks.toLocaleString()}
                   trend={8}
                 />
                 <MetricCard
                   title="Conversions"
-                  value={currentMetrics.conversions.toLocaleString()}
+                  value={metrics.conversions.toLocaleString()}
                   trend={15}
                 />
               </div>
@@ -164,7 +128,7 @@ const Index = () => {
                   <h2 className="text-lg font-semibold text-google-gray mb-6">Campaign Performance</h2>
                   <CampaignTable 
                     useSampleData={useSampleData} 
-                    onCampaignsChange={setCampaigns}
+                    onCampaignsChange={handleCampaignsChange}
                   />
                 </div>
               </div>

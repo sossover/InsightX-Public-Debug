@@ -6,6 +6,7 @@ export interface Campaign {
   ctr: string;
   conversions: number;
   cpa: number;
+  keyword?: string; // Added to fix KeywordAnalysis component
 }
 
 export interface CampaignTableProps {
