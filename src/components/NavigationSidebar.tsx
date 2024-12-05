@@ -47,7 +47,7 @@ export function NavigationSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <div className="px-3 py-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
                 InsightX
               </h2>
