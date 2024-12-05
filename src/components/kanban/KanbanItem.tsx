@@ -12,6 +12,17 @@ export function KanbanItem({ item, index }: KanbanItemProps) {
     // Here you would integrate with Monday.com's API
   };
 
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'high':
+        return 'text-google-red bg-google-red/10';
+      case 'medium':
+        return 'text-google-yellow bg-google-yellow/10';
+      default:
+        return 'text-google-green bg-google-green/10';
+    }
+  };
+
   return (
     <Draggable draggableId={item.timestamp} index={index}>
       {(provided) => (
@@ -19,21 +30,17 @@ export function KanbanItem({ item, index }: KanbanItemProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="bg-white p-4 rounded-lg shadow-sm"
+          className="group bg-white dark:bg-custom-purple-600/50 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-custom-purple-300/20 backdrop-blur-sm animate-fade-in"
         >
-          <p className="text-sm text-gray-700">{item.text}</p>
-          <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-700 dark:text-gray-200 font-medium mb-3">{item.text}</p>
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-medium ${
-                item.impact === 'high' ? 'text-google-red' :
-                item.impact === 'medium' ? 'text-google-yellow' :
-                'text-google-green'
-              }`}>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${getImpactColor(item.impact)}`}>
                 {item.impact.charAt(0).toUpperCase() + item.impact.slice(1)} Impact
               </span>
               <button
                 onClick={handleMondayClick}
-                className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
+                className="inline-flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-custom-purple-500/30 transition-colors duration-200 opacity-0 group-hover:opacity-100"
                 title="Send to Monday.com"
               >
                 <img 
@@ -43,7 +50,7 @@ export function KanbanItem({ item, index }: KanbanItemProps) {
                 />
               </button>
             </div>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               {new Date(item.timestamp).toLocaleDateString()}
             </span>
           </div>

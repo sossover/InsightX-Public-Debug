@@ -10,18 +10,29 @@ export function OptimizationListItem({ item }: OptimizationListItemProps) {
     // Here you would integrate with Monday.com's API
   };
 
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'high':
+        return 'text-google-red bg-google-red/10';
+      case 'medium':
+        return 'text-google-yellow bg-google-yellow/10';
+      default:
+        return 'text-google-green bg-google-green/10';
+    }
+  };
+
   return (
-    <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start">
+    <div className="group p-4 bg-white dark:bg-custom-purple-600/50 rounded-lg border border-gray-200 dark:border-custom-purple-300/20 shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-sm animate-fade-in">
+      <div className="flex justify-between items-start gap-4">
         <div className="flex-1">
-          <p className="text-gray-700">{item.text}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <p className="text-sm text-gray-500">
+          <p className="text-gray-700 dark:text-gray-200 font-medium mb-3">{item.text}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Added: {new Date(item.timestamp).toLocaleString()}
             </p>
             <button
               onClick={handleMondayClick}
-              className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
+              className="inline-flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-custom-purple-500/30 transition-colors duration-200 opacity-0 group-hover:opacity-100"
               title="Send to Monday.com"
             >
               <img 
@@ -32,11 +43,7 @@ export function OptimizationListItem({ item }: OptimizationListItemProps) {
             </button>
           </div>
         </div>
-        <span className={`ml-4 px-3 py-1 rounded-full text-sm font-medium ${
-          item.impact === 'high' ? 'text-google-red' :
-          item.impact === 'medium' ? 'text-google-yellow' :
-          'text-google-green'
-        }`}>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getImpactColor(item.impact)}`}>
           {item.impact.charAt(0).toUpperCase() + item.impact.slice(1)} Impact
         </span>
       </div>
