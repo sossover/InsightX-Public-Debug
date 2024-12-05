@@ -79,6 +79,11 @@ export function AiInsights() {
 
       console.log('Response from Edge Function:', data);
 
+      if (!data.insights || typeof data.insights.summary !== 'string' || 
+          !Array.isArray(data.insights.observations) || !Array.isArray(data.insights.recommendations)) {
+        throw new Error('Invalid response format from server');
+      }
+
       setInsights(data.insights);
       toast({
         title: "Insights Generated",
