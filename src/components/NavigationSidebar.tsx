@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Download, Grid, Code, PlusCircle, KeyRound } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Download, Grid, Code, PlusCircle, KeyRound, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ReferFriend } from "./ReferFriend";
+import { supabase } from "@/integrations/supabase/client";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
@@ -34,6 +35,11 @@ const createItems = [
 export function NavigationSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <Sidebar className="border-r border-gray-200">
@@ -90,6 +96,17 @@ export function NavigationSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Logout Button */}
+      <div className="px-3 mb-4">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-google-blue transition-colors duration-200"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
+      </div>
 
       {/* Refer a Friend */}
       <div className="px-3">
