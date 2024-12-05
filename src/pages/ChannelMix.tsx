@@ -4,6 +4,7 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { useState } from "react";
+import { Campaign } from "@/components/campaign-table/types";
 
 const channelData = [
   { name: "Paid Search", value: 45, color: "#4285F4" },
@@ -14,7 +15,22 @@ const channelData = [
 ];
 
 export default function ChannelMix() {
-  const [campaigns] = useState(channelData);
+  const [data] = useState(channelData);
+
+  // Transform channel data to match Campaign type
+  const campaignData: Campaign[] = data.map(item => ({
+    name: item.name,
+    spend: item.value * 100, // Estimated spend based on percentage
+    impressions: item.value * 1000, // Estimated impressions
+    clicks: Math.floor(item.value * 50), // Estimated clicks
+    conversions: Math.floor(item.value * 2), // Estimated conversions
+    get ctr() {
+      return ((this.clicks / this.impressions) * 100).toFixed(2) + "%";
+    },
+    get cpa() {
+      return this.conversions > 0 ? this.spend / this.conversions : 0;
+    }
+  }));
 
   return (
     <SidebarProvider>
@@ -82,7 +98,7 @@ export default function ChannelMix() {
           </main>
         </div>
 
-        <ChatPanel campaignData={campaigns} />
+        <ChatPanel campaignData={campaignData} />
       </div>
     </SidebarProvider>
   );

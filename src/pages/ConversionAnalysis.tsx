@@ -4,6 +4,7 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useState } from "react";
+import { Campaign } from "@/components/campaign-table/types";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
@@ -15,7 +16,22 @@ const conversionData = [
 ];
 
 export default function ConversionAnalysis() {
-  const [campaigns] = useState(conversionData);
+  const [data] = useState(conversionData);
+
+  // Transform conversion data to match Campaign type
+  const campaignData: Campaign[] = data.map(item => ({
+    name: item.date,
+    spend: item.conversions * 50, // Estimated spend based on conversions
+    impressions: Math.floor(item.conversions * (100 / item.rate)), // Calculate impressions from conversion rate
+    clicks: Math.floor(item.conversions * 5), // Estimated clicks
+    conversions: item.conversions,
+    get ctr() {
+      return ((this.clicks / this.impressions) * 100).toFixed(2) + "%";
+    },
+    get cpa() {
+      return this.conversions > 0 ? this.spend / this.conversions : 0;
+    }
+  }));
 
   return (
     <SidebarProvider>
@@ -90,7 +106,7 @@ export default function ConversionAnalysis() {
           </main>
         </div>
 
-        <ChatPanel campaignData={campaigns} />
+        <ChatPanel campaignData={campaignData} />
       </div>
     </SidebarProvider>
   );

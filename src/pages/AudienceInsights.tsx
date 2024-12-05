@@ -4,6 +4,7 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useState } from "react";
+import { Campaign } from "@/components/campaign-table/types";
 
 const audienceData = [
   { age: "18-24", users: 1200, engagement: 3.2 },
@@ -15,7 +16,22 @@ const audienceData = [
 ];
 
 export default function AudienceInsights() {
-  const [campaigns] = useState(audienceData);
+  const [data] = useState(audienceData);
+
+  // Transform audience data to match Campaign type
+  const campaignData: Campaign[] = data.map(item => ({
+    name: `Age ${item.age}`,
+    spend: item.users * item.engagement, // Estimated spend based on users and engagement
+    impressions: item.users * 10, // Estimated impressions
+    clicks: Math.floor(item.users * (item.engagement / 10)), // Estimated clicks
+    conversions: Math.floor(item.users * (item.engagement / 100)), // Estimated conversions
+    get ctr() {
+      return ((this.clicks / this.impressions) * 100).toFixed(2) + "%";
+    },
+    get cpa() {
+      return this.conversions > 0 ? this.spend / this.conversions : 0;
+    }
+  }));
 
   return (
     <SidebarProvider>
@@ -71,7 +87,7 @@ export default function AudienceInsights() {
           </main>
         </div>
 
-        <ChatPanel campaignData={campaigns} />
+        <ChatPanel campaignData={campaignData} />
       </div>
     </SidebarProvider>
   );
