@@ -60,28 +60,6 @@ const keywordData: Campaign[] = [
   },
 ];
 
-const getColorForCTR = (ctr: string) => {
-  const ctrValue = parseFloat(ctr);
-  if (ctrValue >= 8) return "text-google-green font-medium";
-  if (ctrValue >= 5) return "text-google-blue font-medium";
-  if (ctrValue >= 2) return "text-google-yellow font-medium";
-  return "text-google-red font-medium";
-};
-
-const getColorForCPA = (cpa: number) => {
-  if (cpa === 0) return "text-gray-400";
-  if (cpa <= 10) return "text-google-green font-medium";
-  if (cpa <= 50) return "text-google-blue font-medium";
-  if (cpa <= 100) return "text-google-yellow font-medium";
-  return "text-google-red font-medium";
-};
-
-const getColorForConversions = (conversions: number) => {
-  if (conversions >= 2) return "text-google-green font-medium";
-  if (conversions === 1) return "text-google-yellow font-medium";
-  return "text-google-red font-medium";
-};
-
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(keywordData);
@@ -97,12 +75,12 @@ const KeywordAnalysis = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar />
+            <MetricsSidebar campaigns={campaigns} />
           </SheetContent>
         </Sheet>
       );
     }
-    return <MetricsSidebar />;
+    return <MetricsSidebar campaigns={campaigns} />;
   };
 
   return (

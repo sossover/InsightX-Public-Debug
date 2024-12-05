@@ -63,13 +63,13 @@ const Index = () => {
             className="w-[80vw] sm:w-[400px] overflow-y-auto border-l dark:border-custom-purple-400 dark:bg-custom-purple-600"
           >
             <div className="h-full overflow-y-auto pb-20">
-              <MetricsSidebar />
+              <MetricsSidebar campaigns={campaigns} />
             </div>
           </SheetContent>
         </Sheet>
       );
     }
-    return <MetricsSidebar />;
+    return <MetricsSidebar campaigns={campaigns} />;
   };
 
   return (

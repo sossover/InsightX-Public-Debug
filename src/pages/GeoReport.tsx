@@ -83,12 +83,12 @@ const GeoReport = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar />
+            <MetricsSidebar campaigns={campaigns} />
           </SheetContent>
         </Sheet>
       );
     }
-    return <MetricsSidebar />;
+    return <MetricsSidebar campaigns={campaigns} />;
   };
 
   return (

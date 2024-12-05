@@ -11,11 +11,13 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Campaign } from "@/components/campaign-table/types";
 
 export default function OptimizationList() {
   const [items, setItems] = useState<OptimizationItem[]>([]);
   const [sortBy, setSortBy] = useState<'date' | 'impact'>('date');
   const [viewType, setViewType] = useState<'list' | 'kanban'>('list');
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -55,12 +57,12 @@ export default function OptimizationList() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <MetricsSidebar />
+            <MetricsSidebar campaigns={campaigns} />
           </SheetContent>
         </Sheet>
       );
     }
-    return <MetricsSidebar />;
+    return <MetricsSidebar campaigns={campaigns} />;
   };
 
   return (
