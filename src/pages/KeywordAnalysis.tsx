@@ -86,7 +86,7 @@ const KeywordAnalysis = () => {
           </main>
         </div>
 
-        <ChatPanel />
+        <ChatPanel campaignData={campaigns} />
       </div>
     </SidebarProvider>
   );

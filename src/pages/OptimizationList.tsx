@@ -90,7 +90,7 @@ export default function OptimizationList() {
             </div>
           </main>
         </div>
-        <ChatPanel />
+        <ChatPanel campaignData={campaigns} />
       </div>
     </SidebarProvider>
   );

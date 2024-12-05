@@ -138,7 +138,7 @@ const Index = () => {
           <Footer />
         </div>
 
-        <ChatPanel />
+        <ChatPanel campaignData={campaigns} />
       </div>
     </SidebarProvider>
   );
