@@ -15,6 +15,7 @@ import AudienceInsights from "./pages/AudienceInsights";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Templates from "./pages/Templates";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -117,6 +118,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Templates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={
+              <ProtectedRoute>
+                <Pricing />
               </ProtectedRoute>
             }
           />
