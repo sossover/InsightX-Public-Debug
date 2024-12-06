@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Grid, LogOut, ListChecks, Sparkles, ArrowUpRight } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Grid, ListChecks, Sparkles, ArrowUpRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { FileUploadDialog } from "./FileUploadDialog";
 import { useToast } from "@/components/ui/use-toast";
+import { PricingModal } from "./PricingModal";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
@@ -37,6 +38,7 @@ export function NavigationSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -50,14 +52,6 @@ export function NavigationSidebar() {
     } else if (item.url.startsWith("/")) {
       navigate(item.url);
     }
-  };
-
-  const handleUpgradeClick = () => {
-    toast({
-      title: "Coming Soon!",
-      description: "The upgrade feature will be available soon.",
-      duration: 3000,
-    });
   };
 
   return (
@@ -120,11 +114,11 @@ export function NavigationSidebar() {
       {/* Upgrade Button */}
       <div className="px-3 mb-4">
         <button
-          onClick={handleUpgradeClick}
-          className="w-full flex items-center gap-2 px-4 py-2 bg-custom-purple-300 text-white rounded-lg hover:bg-custom-purple-400 transition-colors duration-200"
+          onClick={() => setIsPricingOpen(true)}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-custom-purple-300 to-google-blue text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
         >
-          <ArrowUpRight className="w-4 h-4" />
-          <span>Upgrade Now</span>
+          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:rotate-45" />
+          <span className="font-medium">Upgrade Now</span>
         </button>
       </div>
 
@@ -137,6 +131,12 @@ export function NavigationSidebar() {
       <FileUploadDialog 
         isOpen={isUploadDialogOpen}
         onClose={() => setIsUploadDialogOpen(false)}
+      />
+
+      {/* Pricing Modal */}
+      <PricingModal 
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
       />
     </Sidebar>
   );
