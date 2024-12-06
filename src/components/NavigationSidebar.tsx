@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, ListChecks, Sparkles, ArrowUpRight } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +31,7 @@ const mainItems = [
 
 const createItems = [
   { title: "Import", icon: FileText, url: "#", isImport: true },
+  { title: "Templates", icon: LayoutTemplate, url: "/templates" },
 ];
 
 export function NavigationSidebar() {
@@ -140,4 +141,3 @@ export function NavigationSidebar() {
     </Sidebar>
   );
 }
-
