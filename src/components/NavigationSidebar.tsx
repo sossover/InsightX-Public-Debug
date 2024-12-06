@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign, ChevronLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +16,7 @@ import { useState } from "react";
 import { FileUploadDialog } from "./FileUploadDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { PricingModal } from "./PricingModal";
+import { Button } from "./ui/button";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
@@ -35,13 +36,12 @@ const createItems = [
   { title: "Pricing", icon: DollarSign, url: "/pricing" },
 ];
 
-// ... keep existing code (handleLogout and other functions)
-
 export function NavigationSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -58,89 +58,98 @@ export function NavigationSidebar() {
   };
 
   return (
-    <Sidebar className="border-r border-gray-200 group">
-      <SidebarContent>
-        <SidebarGroup>
-          <div className="px-3 py-4">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
-                InsightX
-              </h2>
-              <Sparkles className="w-5 h-5 text-google-blue animate-pulse" />
-            </div>
-            <p className="text-sm text-gray-500">Marketing Analytics</p>
+    <div className="relative">
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`absolute -right-4 top-1/2 z-50 transform -translate-y-1/2 bg-white shadow-sm border rounded-full hover:bg-gray-50 transition-all duration-200 ${
+          isCollapsed ? "-right-4" : "-right-4"
+        }`}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <ChevronLeft className={`h-4 w-4 transition-transform duration-200 ${isCollapsed ? "rotate-180" : ""}`} />
+      </Button>
+
+      <div className={`transition-all duration-300 ${isCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"}`}>
+        <Sidebar className="border-r border-gray-200 group">
+          <SidebarContent>
+            <SidebarGroup>
+              <div className="px-3 py-4">
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
+                    InsightX
+                  </h2>
+                  <Sparkles className="w-5 h-5 text-google-blue animate-pulse" />
+                </div>
+                <p className="text-sm text-gray-500">Marketing Analytics</p>
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {mainItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === item.url}
+                        onClick={() => item.url.startsWith("/") && navigate(item.url)}
+                      >
+                        <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
+                          <item.icon className="w-4 h-4 relative z-10" />
+                          <span className="relative z-10">{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+
+                <div className="my-6 px-3">
+                  <div className="h-px bg-gray-200" />
+                </div>
+
+                <SidebarMenu>
+                  {createItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === item.url}
+                        onClick={() => handleItemClick(item)}
+                      >
+                        <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
+                          <item.icon className="w-4 h-4 relative z-10" />
+                          <span className="relative z-10">{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+
+          <div className="px-3 mb-4">
+            <button
+              onClick={() => setIsPricingOpen(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-custom-purple-300 to-google-blue text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+            >
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:rotate-45" />
+              <span className="font-medium">Upgrade Now</span>
+            </button>
           </div>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                    onClick={() => item.url.startsWith("/") && navigate(item.url)}
-                  >
-                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
-                      <item.icon className="w-4 h-4 relative z-10" />
-                      <span className="relative z-10">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
 
-            {/* Visual separator */}
-            <div className="my-6 px-3">
-              <div className="h-px bg-gray-200" />
-            </div>
+          <div className="px-3">
+            <ReferFriend />
+          </div>
 
-            {/* Create section */}
-            <SidebarMenu>
-              {createItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
-                      <item.icon className="w-4 h-4 relative z-10" />
-                      <span className="relative z-10">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+          <FileUploadDialog 
+            isOpen={isUploadDialogOpen}
+            onClose={() => setIsUploadDialogOpen(false)}
+          />
 
-      {/* Upgrade Button */}
-      <div className="px-3 mb-4">
-        <button
-          onClick={() => setIsPricingOpen(true)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-custom-purple-300 to-google-blue text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
-        >
-          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:rotate-45" />
-          <span className="font-medium">Upgrade Now</span>
-        </button>
+          <PricingModal 
+            isOpen={isPricingOpen}
+            onClose={() => setIsPricingOpen(false)}
+          />
+        </Sidebar>
       </div>
-
-      {/* Refer a Friend */}
-      <div className="px-3">
-        <ReferFriend />
-      </div>
-
-      {/* File Upload Dialog */}
-      <FileUploadDialog 
-        isOpen={isUploadDialogOpen}
-        onClose={() => setIsUploadDialogOpen(false)}
-      />
-
-      {/* Pricing Modal */}
-      <PricingModal 
-        isOpen={isPricingOpen}
-        onClose={() => setIsPricingOpen(false)}
-      />
-    </Sidebar>
+    </div>
   );
 }
