@@ -17,6 +17,8 @@ const pricingTiers = [
       "Limited Report Generation",
       "Email Support",
       "1 Team Member",
+      "Basic Data Export",
+      "7-Day Data History",
     ],
     buttonText: "Current Plan",
     isPopular: false,
@@ -34,6 +36,9 @@ const pricingTiers = [
       "5 Team Members",
       "Custom Dashboards",
       "API Access",
+      "30-Day Data History",
+      "Custom Report Builder",
+      "Advanced Filtering",
     ],
     buttonText: "Upgrade to Pro",
     isPopular: true,
@@ -51,6 +56,9 @@ const pricingTiers = [
       "Custom Integration",
       "Dedicated Account Manager",
       "Advanced Security",
+      "90-Day Data History",
+      "Priority Feature Access",
+      "Custom Training Sessions",
     ],
     buttonText: "Upgrade to Business",
     isPopular: false,
@@ -67,6 +75,9 @@ const pricingTiers = [
       "Dedicated Support Team",
       "On-premise Deployment",
       "Custom Security Requirements",
+      "Unlimited Data History",
+      "Custom AI Models",
+      "Dedicated Infrastructure",
     ],
     buttonText: "Contact Sales",
     isPopular: false,
@@ -76,14 +87,14 @@ const pricingTiers = [
 export function PricingModal({ isOpen, onClose }: PricingModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl p-0 overflow-auto max-h-[95vh]">
+      <DialogContent className="max-w-6xl p-0 overflow-auto max-h-[95vh]">
         <div className="p-6 space-y-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
-              Upgrade Your Analytics Experience
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
+              Choose Your Plan
             </h2>
-            <p className="text-gray-500">
-              Choose the perfect plan for your business needs
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+              Get the analytics power you need with our flexible pricing options
             </p>
           </div>
 
@@ -106,9 +117,9 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                 )}
 
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold">{tier.name}</h3>
+                  <h3 className="text-2xl font-bold">{tier.name}</h3>
                   <div className="flex items-baseline">
-                    <span className="text-3xl font-bold">{tier.price}</span>
+                    <span className="text-4xl font-bold">{tier.price}</span>
                     {tier.period && (
                       <span className="text-gray-500 ml-1">{tier.period}</span>
                     )}
@@ -119,7 +130,7 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                 <ul className="space-y-3">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-custom-purple-300" />
+                      <Check className="w-5 h-5 text-custom-purple-300 flex-shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -138,6 +149,18 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                 </Button>
               </div>
             ))}
+          </div>
+
+          <div className="text-center text-sm text-gray-500 pt-4">
+            All plans include access to our core features. Need a custom solution?{" "}
+            <button
+              onClick={() => {
+                // Handle contact sales click
+              }}
+              className="text-custom-purple-300 hover:underline"
+            >
+              Contact our sales team
+            </button>
           </div>
         </div>
       </DialogContent>

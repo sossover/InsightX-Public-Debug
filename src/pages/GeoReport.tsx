@@ -2,7 +2,7 @@ import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { GeoMap } from "@/components/GeoMap";
 import { CountryStats } from "@/components/CountryStats";
 import { DeviceStats } from "@/components/DeviceStats";
-import { CalendarDays, Globe, TrendingUp } from "lucide-react";
+import { CalendarDays, Globe, HelpCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,6 +13,8 @@ import { Footer } from "@/components/Footer";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
+import { PricingModal } from "@/components/PricingModal";
+import { HelpDialog } from "@/components/HelpDialog";
 
 const defaultCampaigns = [
   {
@@ -69,6 +71,8 @@ const countryData = [
 
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   return (
     <SidebarProvider>
@@ -83,7 +87,7 @@ const GeoReport = () => {
           <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto">
+                <div className="flex items-center gap-4 sm:gap-8">
                   <div className="flex items-center gap-2">
                     <Globe className="h-5 w-5 text-google-blue" />
                     <div className="text-xl font-bold text-google-blue">Geographic Performance</div>
@@ -108,6 +112,25 @@ const GeoReport = () => {
                       </PopoverContent>
                     </Popover>
                   </div>
+                </div>
+
+                {/* New Right-aligned Options */}
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsPricingOpen(true)}
+                    className="text-gray-600 hover:text-google-blue transition-colors duration-200"
+                  >
+                    Pricing
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsHelpOpen(true)}
+                    className="text-gray-600 hover:text-google-blue transition-colors duration-200"
+                  >
+                    <HelpCircle className="w-5 h-5 mr-2" />
+                    Help
+                  </Button>
                 </div>
               </div>
             </div>
@@ -160,7 +183,15 @@ const GeoReport = () => {
             </div>
           </main>
 
-          <Footer />
+          <PricingModal 
+            isOpen={isPricingOpen}
+            onClose={() => setIsPricingOpen(false)}
+          />
+
+          <HelpDialog
+            open={isHelpOpen}
+            onOpenChange={setIsHelpOpen}
+          />
         </div>
 
         <ChatPanel 
