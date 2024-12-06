@@ -12,6 +12,7 @@ import OptimizationList from "./pages/OptimizationList";
 import ConversionAnalysis from "./pages/ConversionAnalysis";
 import ChannelMix from "./pages/ChannelMix";
 import AudienceInsights from "./pages/AudienceInsights";
+import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
@@ -99,6 +100,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AudienceInsights />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />
