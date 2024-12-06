@@ -31,6 +31,18 @@ export function NavigationSidebar() {
 
       <div className={`transition-all duration-300 ${isCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"}`}>
         <Sidebar className="border-r border-gray-200 group">
+          {/* Upgrade Button */}
+          <div className="absolute top-4 right-4 z-10">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setIsPricingOpen(true)}
+              className="bg-custom-purple-500 hover:bg-custom-purple-600 text-white"
+            >
+              Upgrade Now
+            </Button>
+          </div>
+
           <SidebarContent>
             <SidebarGroup>
               <SidebarHeader />
@@ -45,8 +57,6 @@ export function NavigationSidebar() {
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
-
-          <SidebarFooter onUpgradeClick={() => setIsPricingOpen(true)} />
 
           <FileUploadDialog 
             isOpen={isUploadDialogOpen}
