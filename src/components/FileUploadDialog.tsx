@@ -45,6 +45,19 @@ export function FileUploadDialog({ isOpen, onClose }: FileUploadDialogProps) {
     }
   };
 
+  const handleComputerUpload = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    };
+    fileInput.click();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -70,7 +83,7 @@ export function FileUploadDialog({ isOpen, onClose }: FileUploadDialogProps) {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              onClick={handleComputerUpload}
             >
               <FileUp className="mr-2 h-4 w-4" />
               Computer

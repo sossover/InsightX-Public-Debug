@@ -8,6 +8,8 @@ import { KeywordTable } from "@/components/keyword-analysis/KeywordTable";
 import { KeywordInsights } from "@/components/keyword-analysis/KeywordInsights";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Campaign } from "@/components/campaign-table/types";
+import { MetricCard } from "@/components/MetricCard";
+import { PerformanceChart } from "@/components/PerformanceChart";
 
 const keywordData: Campaign[] = [
   {
@@ -61,6 +63,12 @@ const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(keywordData);
 
+  // Calculate metrics for the cards
+  const totalClicks = campaigns.reduce((sum, campaign) => sum + campaign.clicks, 0);
+  const totalImpressions = campaigns.reduce((sum, campaign) => sum + campaign.impressions, 0);
+  const avgCTR = ((totalClicks / totalImpressions) * 100).toFixed(2) + "%";
+  const totalConversions = campaigns.reduce((sum, campaign) => sum + campaign.conversions, 0);
+
   return (
     <SidebarProvider>
       <div className="relative min-h-screen flex w-full">
@@ -75,12 +83,55 @@ const KeywordAnalysis = () => {
 
           <main className="flex-1 flex flex-col pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <KeywordFilters />
-              <div className="overflow-x-auto">
-                <KeywordTable data={campaigns} />
+              {/* Metrics Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <MetricCard
+                  title="Total Clicks"
+                  value={totalClicks}
+                  trend={12}
+                  description="Total clicks across all keywords"
+                />
+                <MetricCard
+                  title="Impressions"
+                  value={totalImpressions}
+                  trend={8}
+                  description="Total impressions across all keywords"
+                />
+                <MetricCard
+                  title="Average CTR"
+                  value={avgCTR}
+                  trend={-3}
+                  description="Click-through rate across all keywords"
+                />
+                <MetricCard
+                  title="Conversions"
+                  value={totalConversions}
+                  trend={15}
+                  description="Total conversions from keywords"
+                />
               </div>
-              <div className="mt-6">
-                <KeywordInsights campaigns={campaigns} />
+
+              {/* Performance Chart */}
+              <div className="mb-8">
+                <PerformanceChart useSampleData={true} />
+              </div>
+
+              {/* Main Content Area */}
+              <div className="grid lg:grid-cols-3 gap-6">
+                {/* Left Column - Keyword Analysis */}
+                <div className="lg:col-span-2 space-y-6">
+                  <KeywordFilters />
+                  <div className="overflow-x-auto">
+                    <KeywordTable data={campaigns} />
+                  </div>
+                </div>
+
+                {/* Right Column - AI Insights */}
+                <div className="lg:col-span-1">
+                  <div className="sticky top-24">
+                    <KeywordInsights campaigns={campaigns} />
+                  </div>
+                </div>
               </div>
             </div>
           </main>
