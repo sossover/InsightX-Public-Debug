@@ -4,7 +4,7 @@ import { CampaignTable } from "@/components/CampaignTable";
 import { AiInsights } from "@/components/AiInsights";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { ChatPanel } from "@/components/chat/ChatPanel";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, ChevronDown } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,11 +13,17 @@ import { format } from "date-fns";
 import { useState, useMemo } from "react";
 import { Footer } from "@/components/Footer";
 import { Campaign } from "@/components/campaign-table/types";
+import { PricingModal } from "@/components/PricingModal";
+import { HelpDialog } from "@/components/HelpDialog";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [useSampleData, setUseSampleData] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isTopPanelOpen, setIsTopPanelOpen] = useState(false);
 
   const metrics = useMemo(() => {
     const totals = campaigns.reduce(
@@ -51,9 +57,31 @@ const Index = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30 dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
+          {/* Top Sliding Panel */}
+          <div className="fixed w-full z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200 transition-all duration-300 ease-in-out dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
+            <div className={cn(
+              "transition-all duration-300 ease-in-out overflow-hidden",
+              isTopPanelOpen ? "h-32" : "h-0"
+            )}>
+              <div className="p-4 flex justify-end space-x-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsPricingOpen(true)}
+                  className="text-gray-600 hover:text-google-blue transition-colors duration-200"
+                >
+                  Pricing
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsHelpOpen(true)}
+                  className="text-gray-600 hover:text-google-blue transition-colors duration-200"
+                >
+                  Help
+                </Button>
+              </div>
+            </div>
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center">
+              <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -74,9 +102,20 @@ const Index = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsTopPanelOpen(!isTopPanelOpen)}
+                  className="ml-auto"
+                >
+                  <ChevronDown className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isTopPanelOpen ? "transform rotate-180" : ""
+                  )} />
+                </Button>
               </div>
             </div>
-          </nav>
+          </div>
 
           <main className="flex-1 flex flex-col pt-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -137,6 +176,16 @@ const Index = () => {
 
           <Footer />
         </div>
+
+        <PricingModal 
+          isOpen={isPricingOpen}
+          onClose={() => setIsPricingOpen(false)}
+        />
+
+        <HelpDialog
+          open={isHelpOpen}
+          onOpenChange={setIsHelpOpen}
+        />
 
         <ChatPanel campaignData={campaigns} />
       </div>
