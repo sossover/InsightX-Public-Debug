@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Download, Grid, Code, PlusCircle, KeyRound, LogOut, ListChecks, Sparkles } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, Grid, LogOut, ListChecks, Sparkles, ArrowUpRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,12 +14,13 @@ import { ReferFriend } from "./ReferFriend";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { FileUploadDialog } from "./FileUploadDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
   { title: "Campaign Performance", icon: TrendingUp, url: "/" },
   { title: "Geographic Analysis", icon: Globe, url: "/geo-report" },
-  { title: "Keyword Analysis", icon: KeyRound, url: "/keyword-analysis" },
+  { title: "Keyword Analysis", icon: FileText, url: "/keyword-analysis" },
   { title: "Audience Insights", icon: Users, url: "/audience-insights" },
   { title: "Conversion Analysis", icon: BarChart, url: "/conversion-analysis" },
   { title: "Channel Mix", icon: PieChart, url: "/channel-mix" },
@@ -28,17 +29,15 @@ const mainItems = [
 ];
 
 const createItems = [
-  { title: "Create", icon: PlusCircle, url: "#", isCreate: true },
-  { title: "Templates", icon: Grid, url: "#" },
-  { title: "Import", icon: Download, url: "#", isImport: true },
-  { title: "Blank", icon: FileText, url: "#" },
-  { title: "Create with AI", icon: Code, url: "#" },
+  { title: "Templates", icon: Grid, url: "/templates" },
+  { title: "Import", icon: FileText, url: "#", isImport: true },
 ];
 
 export function NavigationSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -51,6 +50,14 @@ export function NavigationSidebar() {
     } else if (item.url.startsWith("/")) {
       navigate(item.url);
     }
+  };
+
+  const handleUpgradeClick = () => {
+    toast({
+      title: "Coming Soon!",
+      description: "The upgrade feature will be available soon.",
+      duration: 3000,
+    });
   };
 
   return (
@@ -98,14 +105,8 @@ export function NavigationSidebar() {
                     isActive={location.pathname === item.url}
                     onClick={() => handleItemClick(item)}
                   >
-                    <a 
-                      className={`flex items-center gap-2 transition-all duration-200 group-hover:cursor-pointer relative ${
-                        item.isCreate 
-                          ? 'bg-custom-purple-300 text-white rounded-lg px-4 py-2 hover:bg-custom-purple-400 hover:text-white' 
-                          : 'hover:text-google-blue hover:translate-x-1 before:content-[\'\'] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left'
-                      }`}
-                    >
-                      <item.icon className={`w-4 h-4 relative z-10 ${item.isCreate ? 'text-white' : ''}`} />
+                    <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
+                      <item.icon className="w-4 h-4 relative z-10" />
                       <span className="relative z-10">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -116,14 +117,14 @@ export function NavigationSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Logout Button */}
+      {/* Upgrade Button */}
       <div className="px-3 mb-4">
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-google-blue transition-colors duration-200 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left"
+          onClick={handleUpgradeClick}
+          className="w-full flex items-center gap-2 px-4 py-2 bg-custom-purple-300 text-white rounded-lg hover:bg-custom-purple-400 transition-colors duration-200"
         >
-          <LogOut className="w-4 h-4 relative z-10" />
-          <span className="relative z-10">Logout</span>
+          <ArrowUpRight className="w-4 h-4" />
+          <span>Upgrade Now</span>
         </button>
       </div>
 
