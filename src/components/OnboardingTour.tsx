@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Joyride, { CallBackProps, Status, Step } from "react-joyride";
+import Joyride, { CallBackProps, Step } from "react-joyride";
 import { useToast } from "./ui/use-toast";
 
 export const OnboardingTour = () => {
@@ -55,7 +55,7 @@ export const OnboardingTour = () => {
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
-    if ([Status.FINISHED, Status.SKIPPED].includes(status)) {
+    if (status === "finished" || status === "skipped") {
       setRun(false);
       localStorage.setItem("hasSeenTour", "true");
       toast({
