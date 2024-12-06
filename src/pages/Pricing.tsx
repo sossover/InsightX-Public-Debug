@@ -1,54 +1,174 @@
-import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { PricingModal } from "@/components/PricingModal";
-import { useState } from "react";
+import { NavigationSidebar } from "@/components/NavigationSidebar";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 
-export default function Pricing() {
-  const [isPricingOpen, setIsPricingOpen] = useState(false);
+const pricingTiers = [
+  {
+    name: "Starter",
+    price: "Free",
+    description: "Perfect for trying out InsightX",
+    features: [
+      "Basic Analytics Dashboard",
+      "Limited Report Generation",
+      "Email Support",
+      "1 Team Member",
+      "Basic Data Export",
+      "7-Day Data History",
+    ],
+    buttonText: "Current Plan",
+    isPopular: false,
+    disabled: true,
+  },
+  {
+    name: "Pro",
+    price: "$49",
+    period: "/month",
+    description: "Ideal for growing businesses",
+    features: [
+      "Advanced Analytics",
+      "Unlimited Reports",
+      "Priority Support",
+      "5 Team Members",
+      "Custom Dashboards",
+      "API Access",
+      "30-Day Data History",
+      "Custom Report Builder",
+      "Advanced Filtering",
+    ],
+    buttonText: "Upgrade to Pro",
+    isPopular: true,
+  },
+  {
+    name: "Business",
+    price: "$99",
+    period: "/month",
+    description: "Best for scaling teams",
+    features: [
+      "Enterprise Analytics",
+      "White-label Reports",
+      "24/7 Phone Support",
+      "Unlimited Team Members",
+      "Custom Integration",
+      "Dedicated Account Manager",
+      "Advanced Security",
+      "90-Day Data History",
+      "Priority Feature Access",
+      "Custom Training Sessions",
+    ],
+    buttonText: "Upgrade to Business",
+    isPopular: false,
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    description: "For large organizations",
+    features: [
+      "Custom Analytics Solution",
+      "Unlimited Everything",
+      "Custom Development",
+      "SLA Agreement",
+      "Dedicated Support Team",
+      "On-premise Deployment",
+      "Custom Security Requirements",
+      "Unlimited Data History",
+      "Custom AI Models",
+      "Dedicated Infrastructure",
+    ],
+    buttonText: "Contact Sales",
+    isPopular: false,
+  },
+];
 
+export default function Pricing() {
   return (
     <SidebarProvider>
-      <div className="relative min-h-screen flex w-full">
+      <div className="relative min-h-screen flex">
         <NavigationSidebar />
         <div className="flex-1 flex flex-col">
-          <main className="flex-1 flex flex-col pt-24">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <h1 className="text-2xl font-bold text-google-blue mb-6">Pricing</h1>
-              <p className="text-gray-600 mb-4">Choose a plan that fits your needs.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-lg font-semibold">Basic Plan</h2>
-                  <p className="text-gray-500">$10/month</p>
-                  <p className="mt-4">Basic features for small teams.</p>
-                  <button
-                    onClick={() => setIsPricingOpen(true)}
-                    className="mt-4 w-full bg-custom-purple-300 text-white py-2 rounded-lg"
-                  >
-                    Select
-                  </button>
+          <main className="flex-1 flex flex-col">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+              <div className="space-y-16">
+                <div className="text-center space-y-8">
+                  <h1 className="text-6xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent animate-fade-in">
+                    Choose Your Plan
+                  </h1>
+                  <p className="text-2xl text-gray-500 max-w-3xl mx-auto animate-fade-in">
+                    Get the analytics power you need with our flexible pricing options
+                  </p>
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-lg font-semibold">Pro Plan</h2>
-                  <p className="text-gray-500">$30/month</p>
-                  <p className="mt-4">Advanced features for growing teams.</p>
-                  <button
-                    onClick={() => setIsPricingOpen(true)}
-                    className="mt-4 w-full bg-custom-purple-300 text-white py-2 rounded-lg"
-                  >
-                    Select
-                  </button>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {pricingTiers.map((tier) => (
+                    <div
+                      key={tier.name}
+                      className={`relative rounded-2xl border p-8 space-y-6 transition-all duration-300 hover:shadow-xl ${
+                        tier.isPopular
+                          ? "border-custom-purple-300 shadow-lg scale-105 bg-gradient-to-b from-white to-custom-purple-50"
+                          : "border-gray-200 hover:border-custom-purple-200"
+                      }`}
+                    >
+                      {tier.isPopular && (
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                          <span className="bg-custom-purple-300 text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-md">
+                            Most Popular
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <h3 className="text-3xl font-bold">{tier.name}</h3>
+                        <div className="flex items-baseline space-x-1">
+                          <span className="text-5xl font-bold tracking-tight">
+                            {tier.price}
+                          </span>
+                          {tier.period && (
+                            <span className="text-gray-500 text-xl">{tier.period}</span>
+                          )}
+                        </div>
+                        <p className="text-lg text-gray-600">{tier.description}</p>
+                      </div>
+
+                      <ul className="space-y-4">
+                        {tier.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-3">
+                            <Check className="w-6 h-6 text-custom-purple-300 flex-shrink-0" />
+                            <span className="text-base text-gray-700">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Button
+                        className={`w-full h-12 text-base font-semibold ${
+                          tier.isPopular
+                            ? "bg-custom-purple-300 hover:bg-custom-purple-400 shadow-md"
+                            : ""
+                        }`}
+                        variant={tier.isPopular ? "default" : "outline"}
+                        disabled={tier.disabled}
+                      >
+                        {tier.buttonText}
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-lg font-semibold">Enterprise Plan</h2>
-                  <p className="text-gray-500">Contact us for pricing</p>
-                  <p className="mt-4">Custom solutions for large organizations.</p>
-                  <button
-                    onClick={() => setIsPricingOpen(true)}
-                    className="mt-4 w-full bg-custom-purple-300 text-white py-2 rounded-lg"
-                  >
-                    Contact Us
-                  </button>
+
+                <div className="text-center space-y-6 pb-8">
+                  <p className="text-lg text-gray-600">
+                    All plans include access to our core features
+                  </p>
+                  <p className="text-base text-gray-500">
+                    Need a custom solution?{" "}
+                    <button
+                      onClick={() => {
+                        // Handle contact sales click
+                      }}
+                      className="text-custom-purple-300 hover:text-custom-purple-400 font-semibold hover:underline transition-colors"
+                    >
+                      Contact our sales team
+                    </button>
+                  </p>
                 </div>
               </div>
             </div>
@@ -56,10 +176,6 @@ export default function Pricing() {
         </div>
         <ChatPanel campaignData={[]} />
       </div>
-      <PricingModal 
-        isOpen={isPricingOpen}
-        onClose={() => setIsPricingOpen(false)}
-      />
     </SidebarProvider>
   );
 }
