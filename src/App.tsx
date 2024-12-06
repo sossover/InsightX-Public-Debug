@@ -17,6 +17,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Templates from "./pages/Templates";
 import Pricing from "./pages/Pricing";
+import WebsitePricing from "./pages/WebsitePricing";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/landing" element={<Landing />} />
+          <Route path="/website-pricing" element={<WebsitePricing />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/"

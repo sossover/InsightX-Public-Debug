@@ -19,16 +19,6 @@ export default function Landing() {
     });
   }, [navigate]);
 
-  useEffect(() => {
-    // Handle scroll to pricing section when hash is present
-    if (window.location.hash === '#pricing') {
-      const pricingSection = document.getElementById('pricing');
-      if (pricingSection) {
-        pricingSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -50,9 +40,9 @@ export default function Landing() {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuLink className="text-gray-600 hover:text-custom-purple-500 transition-colors" href="#pricing">
+                  <Link to="/website-pricing" className="text-gray-600 hover:text-custom-purple-500 transition-colors">
                     Pricing
-                  </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/login" className="text-gray-600 hover:text-custom-purple-500 transition-colors">
@@ -86,7 +76,7 @@ export default function Landing() {
         <TestimonialsSection />
 
         {/* CTA Section */}
-        <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-custom-purple-500">
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-custom-purple-500">
           <div className="max-w-7xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Ready to transform your marketing?

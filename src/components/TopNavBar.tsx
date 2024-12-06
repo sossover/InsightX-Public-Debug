@@ -49,7 +49,7 @@ export function TopNavBar({ date, setDate, onPricingClick, onHelpClick }: TopNav
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => navigate('/landing#pricing')}
+              onClick={() => navigate('/website-pricing')}
               className="text-gray-600 hover:text-google-blue transition-colors duration-200"
             >
               Pricing
