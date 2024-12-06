@@ -5,6 +5,16 @@ import { SettingsTabs } from "@/components/settings/SettingsTabs";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("account");
@@ -31,8 +41,8 @@ export default function Settings() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
                   <Tabs value={activeTab} className="w-full">
+                    <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
                     <TabsContent value="account" className="p-6">
                       <SettingsForm onSave={handleSettingsSave} />
                     </TabsContent>
