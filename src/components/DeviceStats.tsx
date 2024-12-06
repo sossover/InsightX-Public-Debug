@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Smartphone } from "lucide-react";
 
 const data = [
   { name: "DESKTOP", value: 95.1, color: "#4285F4" },
@@ -9,9 +10,12 @@ const data = [
 
 export function DeviceStats() {
   return (
-    <Card>
+    <Card className="hover:shadow-lg transition-all duration-300">
       <CardHeader>
-        <CardTitle>Clicks by Device</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Smartphone className="h-5 w-5 text-google-red" />
+          <span>Device Distribution</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -30,6 +34,7 @@ export function DeviceStats() {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
+              <Tooltip />
               <Legend />
             </PieChart>
           </ResponsiveContainer>

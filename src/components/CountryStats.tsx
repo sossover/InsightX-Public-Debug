@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { MapPin } from "lucide-react";
 
 const countryData = [
   { country: "Brazil", spend: 108.79, impressions: 1322, clicks: 56, conversions: 7 },
@@ -15,33 +16,38 @@ const countryData = [
 
 export function CountryStats() {
   return (
-    <Card>
+    <Card className="hover:shadow-lg transition-all duration-300">
       <CardHeader>
-        <CardTitle>Country Stats</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <MapPin className="h-5 w-5 text-google-green" />
+          <span>Country Performance</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Target Country</TableHead>
-              <TableHead className="text-right">Spend</TableHead>
-              <TableHead className="text-right">Impressions</TableHead>
-              <TableHead className="text-right">Clicks</TableHead>
-              <TableHead className="text-right">Conversions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {countryData.map((row) => (
-              <TableRow key={row.country}>
-                <TableCell>{row.country}</TableCell>
-                <TableCell className="text-right">${row.spend.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{row.impressions.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{row.clicks}</TableCell>
-                <TableCell className="text-right">{row.conversions}</TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Target Country</TableHead>
+                <TableHead className="text-right">Spend</TableHead>
+                <TableHead className="text-right">Impressions</TableHead>
+                <TableHead className="text-right">Clicks</TableHead>
+                <TableHead className="text-right">Conversions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {countryData.map((row) => (
+                <TableRow key={row.country} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{row.country}</TableCell>
+                  <TableCell className="text-right">${row.spend.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{row.impressions.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{row.clicks}</TableCell>
+                  <TableCell className="text-right">{row.conversions}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

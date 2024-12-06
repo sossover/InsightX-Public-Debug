@@ -2,8 +2,7 @@ import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { GeoMap } from "@/components/GeoMap";
 import { CountryStats } from "@/components/CountryStats";
 import { DeviceStats } from "@/components/DeviceStats";
-import { AiInsights } from "@/components/AiInsights";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Globe, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -12,6 +11,8 @@ import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Footer } from "@/components/Footer";
 import { ChatPanel } from "@/components/chat/ChatPanel";
+import { MetricCard } from "@/components/MetricCard";
+import { PerformanceChart } from "@/components/PerformanceChart";
 
 const defaultCampaigns = [
   {
@@ -68,11 +69,10 @@ const countryData = [
 
 const GeoReport = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [campaigns, setCampaigns] = useState(defaultCampaigns);
 
   return (
     <SidebarProvider>
-      <div className="relative min-h-screen flex w-full">
+      <div className="relative min-h-screen flex w-full bg-gray-50">
         {/* Purple Decorative Shapes */}
         <div className="fixed top-0 right-0 w-64 h-64 bg-custom-purple-100 rounded-full blur-3xl opacity-20 -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
         <div className="fixed bottom-0 left-0 w-96 h-96 bg-custom-purple-200 rounded-full blur-3xl opacity-20 -z-10 transform -translate-x-1/2 translate-y-1/2"></div>
@@ -84,7 +84,10 @@ const GeoReport = () => {
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto">
-                  <div className="text-xl font-bold text-google-blue">Yoad</div>
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-5 w-5 text-google-blue" />
+                    <div className="text-xl font-bold text-google-blue">Geographic Performance</div>
+                  </div>
                   <div className="flex items-center gap-4">
                     <Popover>
                       <PopoverTrigger asChild>
@@ -112,19 +115,47 @@ const GeoReport = () => {
 
           <main className="mt-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <GeoMap />
-                <AiInsights 
-                  campaigns={campaigns}
-                  deviceData={deviceData}
-                  countryData={countryData}
+              {/* Metrics Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <MetricCard
+                  title="Total Countries"
+                  value="9"
+                  description="Active campaign regions"
+                  trend={12}
+                />
+                <MetricCard
+                  title="Top Spending"
+                  value="$108.79"
+                  description="Highest country spend (Brazil)"
+                  trend={8}
+                />
+                <MetricCard
+                  title="Total Impressions"
+                  value="15,152"
+                  description="Across all regions"
+                  trend={-3}
+                />
+                <MetricCard
+                  title="Conversion Rate"
+                  value="1.33%"
+                  description="Average across regions"
+                  trend={5}
                 />
               </div>
+
+              {/* Main Content Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 overflow-x-auto">
+                {/* Left Column - Map and Performance */}
+                <div className="lg:col-span-2 space-y-6">
+                  <GeoMap />
+                  <PerformanceChart useSampleData={true} />
+                </div>
+
+                {/* Right Column - Stats */}
+                <div className="space-y-6">
+                  <DeviceStats />
                   <CountryStats />
                 </div>
-                <DeviceStats />
               </div>
             </div>
           </main>
@@ -134,7 +165,7 @@ const GeoReport = () => {
 
         <ChatPanel 
           countryData={countryData}
-          campaignData={campaigns}
+          campaignData={defaultCampaigns}
           deviceData={deviceData}
         />
       </div>
