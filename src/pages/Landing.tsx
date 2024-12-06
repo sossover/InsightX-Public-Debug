@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { AiFeatureShowcase } from "@/components/landing/AiFeatureShowcase";
+import { RealTimeAnalytics } from "@/components/landing/RealTimeAnalytics";
+import { CollaborativeWorkspace } from "@/components/landing/CollaborativeWorkspace";
 import { Footer } from "@/components/Footer";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -28,12 +31,12 @@ export default function Landing() {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
+            <Link to="/landing" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <Sparkles className="w-8 h-8 text-custom-purple-500" />
               <span className="text-xl font-bold bg-gradient-to-r from-custom-purple-500 to-google-blue bg-clip-text text-transparent">
                 InsightX
               </span>
-            </div>
+            </Link>
             
             <NavigationMenu>
               <NavigationMenuList className="hidden md:flex gap-6">
@@ -78,6 +81,9 @@ export default function Landing() {
       <main>
         <HeroSection />
         <FeaturesSection />
+        <AiFeatureShowcase />
+        <RealTimeAnalytics />
+        <CollaborativeWorkspace />
         <TestimonialsSection />
 
         {/* CTA Section */}
