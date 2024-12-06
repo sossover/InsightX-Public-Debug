@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,7 @@ import { TemplateCard } from "@/components/templates/TemplateCard";
 import { TemplateFilters } from "@/components/templates/TemplateFilters";
 import { Footer } from "@/components/Footer";
 import { Search, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const Templates = () => {
