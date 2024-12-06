@@ -12,6 +12,8 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { ReferFriend } from "./ReferFriend";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { FileUploadDialog } from "./FileUploadDialog";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
@@ -28,7 +30,7 @@ const mainItems = [
 const createItems = [
   { title: "Create", icon: PlusCircle, url: "#", isCreate: true },
   { title: "Templates", icon: Grid, url: "#" },
-  { title: "Import", icon: Download, url: "#" },
+  { title: "Import", icon: Download, url: "#", isImport: true },
   { title: "Blank", icon: FileText, url: "#" },
   { title: "Create with AI", icon: Code, url: "#" },
 ];
@@ -36,10 +38,19 @@ const createItems = [
 export function NavigationSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
+  };
+
+  const handleItemClick = (item: any) => {
+    if (item.isImport) {
+      setIsUploadDialogOpen(true);
+    } else if (item.url.startsWith("/")) {
+      navigate(item.url);
+    }
   };
 
   return (
@@ -85,7 +96,7 @@ export function NavigationSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={location.pathname === item.url}
-                    onClick={() => item.url.startsWith("/") && navigate(item.url)}
+                    onClick={() => handleItemClick(item)}
                   >
                     <a 
                       className={`flex items-center gap-2 transition-all duration-200 group-hover:cursor-pointer relative ${
@@ -120,6 +131,12 @@ export function NavigationSidebar() {
       <div className="px-3">
         <ReferFriend />
       </div>
+
+      {/* File Upload Dialog */}
+      <FileUploadDialog 
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+      />
     </Sidebar>
   );
 }
