@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SettingsFormProps {
   onSave: () => void;
@@ -18,6 +21,8 @@ interface SettingsFormProps {
 
 export function SettingsForm({ onSave }: SettingsFormProps) {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +37,24 @@ export function SettingsForm({ onSave }: SettingsFormProps) {
       console.error('Error saving settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Error logging out",
+        description: "There was a problem logging out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -94,13 +117,25 @@ export function SettingsForm({ onSave }: SettingsFormProps) {
         <Switch id="marketing" />
       </div>
 
-      <Button 
-        type="submit" 
-        disabled={loading}
-        className="w-full sm:w-auto bg-custom-purple-300 hover:bg-custom-purple-400 text-white"
-      >
-        {loading ? "Saving..." : "Save Changes"}
-      </Button>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="w-full sm:w-auto bg-custom-purple-300 hover:bg-custom-purple-400 text-white"
+        >
+          {loading ? "Saving..." : "Save Changes"}
+        </Button>
+
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={handleLogout}
+          className="w-full sm:w-auto"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign Out
+        </Button>
+      </div>
     </form>
   );
 }
