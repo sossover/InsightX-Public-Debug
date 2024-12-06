@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Send, Bot } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Campaign } from "../campaign-table/types";
@@ -74,7 +74,7 @@ export function ChatPanel({ countryData, campaignData, deviceData }: ChatPanelPr
         className="absolute -left-3 top-1/2 transform -translate-y-1/2 bg-white border shadow-sm dark:bg-custom-purple-600 dark:border-custom-purple-400 rounded-full hover:scale-110 transition-transform duration-200"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        <Bot className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </Button>
 
       {isOpen && (
