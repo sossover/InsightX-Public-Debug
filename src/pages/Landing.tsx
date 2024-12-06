@@ -2,14 +2,17 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { Footer } from "@/components/Footer";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
@@ -53,11 +56,13 @@ export default function Landing() {
             </NavigationMenu>
 
             <div className="flex items-center gap-4">
-              <Link to="/login">
-                <Button variant="outline" className="hidden md:flex">
-                  Sign In
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                className="hidden md:flex"
+                onClick={() => setIsVideoOpen(true)}
+              >
+                Watch Demo
+              </Button>
               <Link to="/login">
                 <Button className="bg-custom-purple-500 hover:bg-custom-purple-600">
                   Get Started
@@ -93,6 +98,24 @@ export default function Landing() {
           </div>
         </section>
       </main>
+
+      <Footer />
+
+      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+        <DialogContent className="sm:max-w-[800px] p-0">
+          <div className="aspect-video">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Product Demo"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
