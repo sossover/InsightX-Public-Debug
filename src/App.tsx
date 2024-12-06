@@ -14,6 +14,7 @@ import ChannelMix from "./pages/ChannelMix";
 import AudienceInsights from "./pages/AudienceInsights";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
+import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +109,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/templates"
+            element={
+              <ProtectedRoute>
+                <Templates />
               </ProtectedRoute>
             }
           />
