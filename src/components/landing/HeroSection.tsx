@@ -1,8 +1,12 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export function HeroSection() {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
   return (
     <div className="relative overflow-hidden">
       {/* Background gradient */}
@@ -39,7 +43,12 @@ export function HeroSection() {
                 <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto group">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="w-full sm:w-auto group"
+              onClick={() => setIsVideoOpen(true)}
+            >
               Watch Demo
               <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-custom-purple-50 text-custom-purple-500 group-hover:bg-custom-purple-100">
                 2 min
@@ -63,6 +72,22 @@ export function HeroSection() {
           ))}
         </div>
       </div>
+
+      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+        <DialogContent className="sm:max-w-[800px] p-0">
+          <div className="aspect-video">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Product Demo"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
