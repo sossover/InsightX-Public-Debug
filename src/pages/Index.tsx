@@ -67,6 +67,13 @@ const Index = () => {
               <div className="p-4 flex justify-end space-x-4">
                 <Button
                   variant="ghost"
+                  onClick={() => setIsPricingOpen(true)}
+                  className="text-gray-600 hover:text-google-blue transition-colors duration-200"
+                >
+                  Pricing
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setIsHelpOpen(true)}
                   className="text-gray-600 hover:text-google-blue transition-colors duration-200"
                 >
@@ -96,25 +103,17 @@ const Index = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="default"
-                    onClick={() => setIsPricingOpen(true)}
-                    className="bg-custom-purple-500 hover:bg-custom-purple-600 text-white"
-                  >
-                    Upgrade Now
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsTopPanelOpen(!isTopPanelOpen)}
-                  >
-                    <ChevronDown className={cn(
-                      "h-4 w-4 transition-transform duration-200",
-                      isTopPanelOpen ? "transform rotate-180" : ""
-                    )} />
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsTopPanelOpen(!isTopPanelOpen)}
+                  className="ml-auto"
+                >
+                  <ChevronDown className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isTopPanelOpen ? "transform rotate-180" : ""
+                  )} />
+                </Button>
               </div>
             </div>
           </div>
