@@ -2,19 +2,18 @@ import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { GeoMap } from "@/components/GeoMap";
 import { CountryStats } from "@/components/CountryStats";
 import { DeviceStats } from "@/components/DeviceStats";
-import { CalendarDays, Globe, HelpCircle, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Footer } from "@/components/Footer";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
+import { TopNavBar } from "@/components/TopNavBar";
+import { CalendarDays, Globe } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 const defaultCampaigns = [
   {
@@ -84,57 +83,12 @@ const GeoReport = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-4 sm:gap-8">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-google-blue" />
-                    <div className="text-xl font-bold text-google-blue">Geographic Performance</div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-[140px] sm:w-[240px] justify-start text-left font-normal">
-                          <CalendarDays className="mr-2 h-4 w-4" />
-                          <span className="truncate">
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-
-                {/* New Right-aligned Options */}
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setIsPricingOpen(true)}
-                    className="text-gray-600 hover:text-google-blue transition-colors duration-200"
-                  >
-                    Pricing
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setIsHelpOpen(true)}
-                    className="text-gray-600 hover:text-google-blue transition-colors duration-200"
-                  >
-                    <HelpCircle className="w-5 h-5 mr-2" />
-                    Help
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </nav>
+          <TopNavBar 
+            date={date}
+            setDate={setDate}
+            onPricingClick={() => setIsPricingOpen(true)}
+            onHelpClick={() => setIsHelpOpen(true)}
+          />
 
           <main className="mt-16">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
