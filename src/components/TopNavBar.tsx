@@ -3,6 +3,7 @@ import { CalendarDays, Globe, HelpCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface TopNavBarProps {
   date: Date | undefined;
@@ -12,6 +13,8 @@ interface TopNavBarProps {
 }
 
 export function TopNavBar({ date, setDate, onPricingClick, onHelpClick }: TopNavBarProps) {
+  const navigate = useNavigate();
+
   return (
     <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -46,7 +49,7 @@ export function TopNavBar({ date, setDate, onPricingClick, onHelpClick }: TopNav
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={onPricingClick}
+              onClick={() => navigate('/landing#pricing')}
               className="text-gray-600 hover:text-google-blue transition-colors duration-200"
             >
               Pricing
