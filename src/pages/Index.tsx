@@ -15,6 +15,7 @@ import { Footer } from "@/components/Footer";
 import { Campaign } from "@/components/campaign-table/types";
 import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { cn } from "@/lib/utils";
 
 const Index = () => {
@@ -128,7 +129,7 @@ const Index = () => {
                   {useSampleData ? "Use Real Data" : "Sample Data"}
                 </Button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 metrics-cards">
                 <MetricCard
                   title="Total Spend"
                   value={`$${metrics.spend.toLocaleString(undefined, {
@@ -154,11 +155,11 @@ const Index = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-6 mb-6">
+              <div className="grid grid-cols-1 gap-6 mb-6 performance-chart">
                 <PerformanceChart useSampleData={useSampleData} />
               </div>
 
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 campaign-table">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 overflow-x-auto dark:bg-custom-purple-600 dark:border-custom-purple-400">
                   <h2 className="text-lg font-semibold text-google-gray mb-6 dark:text-white">Campaign Performance</h2>
                   <CampaignTable 
@@ -168,7 +169,7 @@ const Index = () => {
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 ai-insights">
                 <AiInsights campaigns={campaigns} />
               </div>
             </div>
@@ -187,7 +188,11 @@ const Index = () => {
           onOpenChange={setIsHelpOpen}
         />
 
-        <ChatPanel campaignData={campaigns} />
+        <div className="chat-panel">
+          <ChatPanel campaignData={campaigns} />
+        </div>
+
+        <OnboardingTour />
       </div>
     </SidebarProvider>
   );
