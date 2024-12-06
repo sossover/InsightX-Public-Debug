@@ -29,8 +29,10 @@ const mainItems = [
 
 const createItems = [
   { title: "Create", icon: PlusCircle, url: "#", isCreate: true },
-  { title: "Templates", icon: Grid, url: "/templates" },
+  { title: "Templates", icon: Grid, url: "#" },
   { title: "Import", icon: Download, url: "#", isImport: true },
+  { title: "Blank", icon: FileText, url: "#" },
+  { title: "Create with AI", icon: Code, url: "#" },
 ];
 
 export function NavigationSidebar() {
