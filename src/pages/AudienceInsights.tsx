@@ -1,13 +1,13 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { ChatPanel } from "@/components/chat/ChatPanel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
 import { useState } from "react";
 import { Campaign } from "@/components/campaign-table/types";
-import { MetricCard } from "@/components/MetricCard";
 import { AiInsights } from "@/components/AiInsights";
-import { Users, Target, TrendingUp, UserCheck } from "lucide-react";
+import { AudienceMetrics } from "@/components/audience/AudienceMetrics";
+import { AgeDistribution } from "@/components/audience/AgeDistribution";
+import { EngagementTrends } from "@/components/audience/EngagementTrends";
+import { EngagementByAge } from "@/components/audience/EngagementByAge";
 
 const audienceData = [
   { age: "18-24", users: 1200, engagement: 3.2, growth: 15 },
@@ -63,179 +63,37 @@ export default function AudienceInsights() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <MetricCard
-                title="Total Users"
-                value={totalUsers.toLocaleString()}
-                trend={15}
-                description="Active users across all age groups"
-              />
-              <MetricCard
-                title="Average Engagement"
-                value={`${avgEngagement.toFixed(1)}%`}
-                trend={8}
-                description="Average engagement rate"
-              />
-              <MetricCard
-                title="Monthly Growth"
-                value={`${totalGrowth.toFixed(1)}%`}
-                trend={totalGrowth}
-                description="Combined growth across segments"
-              />
-              <MetricCard
-                title="Active Segments"
-                value="6"
-                trend={0}
-                description="Number of active age segments"
-              />
-            </div>
+            <AudienceMetrics
+              totalUsers={totalUsers}
+              avgEngagement={avgEngagement}
+              totalGrowth={totalGrowth}
+            />
 
-            <div className="flex flex-1 gap-6">
-              <div className="flex-1 space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="bg-white shadow-lg border-none">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-semibold text-custom-purple-500 flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Age Distribution
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={audienceData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="age" 
-                              stroke="#6E59A5"
-                              tick={{ fill: '#6E59A5' }}
-                            />
-                            <YAxis 
-                              stroke="#4285F4"
-                              tick={{ fill: '#4285F4' }}
-                            />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: 'white',
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                              }}
-                            />
-                            <Bar dataKey="users" fill="#4285F4" name="Users" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-white shadow-lg border-none">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-semibold text-custom-purple-500 flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5" />
-                        Engagement Trends
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={engagementTrends}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="month" 
-                              stroke="#6E59A5"
-                              tick={{ fill: '#6E59A5' }}
-                            />
-                            <YAxis 
-                              yAxisId="left"
-                              stroke="#4285F4"
-                              tick={{ fill: '#4285F4' }}
-                            />
-                            <YAxis 
-                              yAxisId="right"
-                              orientation="right"
-                              stroke="#34A853"
-                              tick={{ fill: '#34A853' }}
-                            />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: 'white',
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                              }}
-                            />
-                            <Legend />
-                            <Line 
-                              yAxisId="left"
-                              type="monotone" 
-                              dataKey="engagement" 
-                              stroke="#4285F4" 
-                              name="Engagement Rate"
-                            />
-                            <Line 
-                              yAxisId="right"
-                              type="monotone" 
-                              dataKey="users" 
-                              stroke="#34A853" 
-                              name="Total Users"
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <AgeDistribution data={data} />
+                  <EngagementTrends data={engagementTrends} />
                 </div>
-
-                <Card className="bg-white shadow-lg border-none">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-custom-purple-500 flex items-center gap-2">
-                      <UserCheck className="h-5 w-5" />
-                      Engagement by Age Group
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {audienceData.map((group) => (
-                        <div
-                          key={group.age}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="space-y-1">
-                            <span className="font-medium text-gray-900">{group.age}</span>
-                            <div className="text-sm text-gray-500">
-                              {group.users.toLocaleString()} users
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-google-blue font-medium">
-                              {group.engagement}% engagement
-                            </div>
-                            <div className="text-sm text-google-green">
-                              +{group.growth}% growth
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <EngagementByAge data={data} />
               </div>
 
-              <div className="w-[400px] flex-shrink-0">
-                <AiInsights 
-                  campaigns={campaignData}
-                  deviceData={[
-                    { name: "Mobile", value: 45.5, color: "#4285F4" },
-                    { name: "Desktop", value: 38.3, color: "#34A853" },
-                    { name: "Tablet", value: 16.2, color: "#EA4335" },
-                  ]}
-                  countryData={[
-                    { country: "United States", spend: 1250.45, impressions: 25000, clicks: 1200, conversions: 85 },
-                    { country: "United Kingdom", spend: 850.32, impressions: 18000, clicks: 850, conversions: 42 },
-                    { country: "Germany", spend: 650.18, impressions: 15000, clicks: 720, conversions: 38 },
-                  ]}
-                />
+              <div className="lg:col-span-1">
+                <div className="sticky top-8">
+                  <AiInsights 
+                    campaigns={campaignData}
+                    deviceData={[
+                      { name: "Mobile", value: 45.5, color: "#4285F4" },
+                      { name: "Desktop", value: 38.3, color: "#34A853" },
+                      { name: "Tablet", value: 16.2, color: "#EA4335" },
+                    ]}
+                    countryData={[
+                      { country: "United States", spend: 1250.45, impressions: 25000, clicks: 1200, conversions: 85 },
+                      { country: "United Kingdom", spend: 850.32, impressions: 18000, clicks: 850, conversions: 42 },
+                      { country: "Germany", spend: 650.18, impressions: 15000, clicks: 720, conversions: 38 },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
           </main>
