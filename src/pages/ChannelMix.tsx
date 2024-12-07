@@ -8,6 +8,7 @@ import { Campaign } from "@/components/campaign-table/types";
 import { AiInsights } from "@/components/AiInsights";
 import { MetricCard } from "@/components/MetricCard";
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, PieChart as PieChartIcon, BarChart as BarChartIcon } from "lucide-react";
+import { DeviceAnalysis } from "@/components/DeviceAnalysis";
 
 const channelData = [
   { name: "Paid Search", value: 45, color: "#4285F4", trend: 5.2 },
@@ -28,7 +29,6 @@ const performanceData = channelData.map(channel => ({
 export default function ChannelMix() {
   const [data] = useState(channelData);
 
-  // Transform channel data to match Campaign type for AI Insights
   const campaignData: Campaign[] = data.map(item => ({
     name: item.name,
     spend: item.value * 100,
@@ -157,6 +157,8 @@ export default function ChannelMix() {
                 </CardContent>
               </Card>
             </div>
+
+            <DeviceAnalysis />
 
             <Card>
               <CardHeader>
