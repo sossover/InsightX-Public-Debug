@@ -11,18 +11,18 @@ import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, PieChart as Pie
 import { DeviceAnalysis } from "@/components/DeviceAnalysis";
 
 const channelData = [
-  { name: "Paid Search", value: 45, color: "#4285F4", trend: 5.2 },
-  { name: "Organic", value: 25, color: "#34A853", trend: 3.1 },
-  { name: "Social", value: 15, color: "#EA4335", trend: -2.3 },
-  { name: "Display", value: 10, color: "#FBBC05", trend: 1.5 },
-  { name: "Email", value: 5, color: "#9b87f5", trend: -0.8 },
+  { name: "Search", value: 42.5, color: "#4285F4", trend: 8.3 },
+  { name: "Display", value: 28.7, color: "#34A853", trend: 3.2 },
+  { name: "Shopping", value: 15.8, color: "#EA4335", trend: 12.5 },
+  { name: "Video", value: 8.4, color: "#FBBC05", trend: 15.7 },
+  { name: "Discovery", value: 4.6, color: "#9b87f5", trend: -2.1 },
 ];
 
 const performanceData = channelData.map(channel => ({
   name: channel.name,
-  conversions: Math.floor(Math.random() * 1000),
-  ctr: (Math.random() * 5).toFixed(2),
-  cpa: Math.floor(Math.random() * 200),
+  conversions: Math.floor(Math.random() * 800 + 200),
+  ctr: (Math.random() * 3 + 1).toFixed(2),
+  cpa: Math.floor(Math.random() * 150 + 50),
   color: channel.color,
 }));
 

@@ -3,15 +3,36 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 import { Smartphone, Monitor, Tablet } from "lucide-react";
 
 const deviceData = [
-  { name: "Desktop", value: 65.3, color: "#4285F4", icon: Monitor },
-  { name: "Mobile", value: 28.5, color: "#34A853", icon: Smartphone },
-  { name: "Tablet", value: 6.2, color: "#EA4335", icon: Tablet },
+  { name: "Desktop", value: 52.8, color: "#4285F4", icon: Monitor },
+  { name: "Mobile", value: 41.3, color: "#34A853", icon: Smartphone },
+  { name: "Tablet", value: 5.9, color: "#EA4335", icon: Tablet },
 ];
 
 const deviceMetrics = [
-  { device: "Desktop", sessions: 12500, bounceRate: 32, avgDuration: 245 },
-  { device: "Mobile", sessions: 5400, bounceRate: 45, avgDuration: 180 },
-  { device: "Tablet", sessions: 1200, bounceRate: 38, avgDuration: 210 },
+  { 
+    device: "Desktop", 
+    sessions: 15420, 
+    bounceRate: 28.5, 
+    avgDuration: 185,
+    conversions: 342,
+    conversionRate: 2.21
+  },
+  { 
+    device: "Mobile", 
+    sessions: 12180, 
+    bounceRate: 42.3, 
+    avgDuration: 145,
+    conversions: 218,
+    conversionRate: 1.78
+  },
+  { 
+    device: "Tablet", 
+    sessions: 1840, 
+    bounceRate: 35.7, 
+    avgDuration: 162,
+    conversions: 35,
+    conversionRate: 1.90
+  },
 ];
 
 export function DeviceAnalysis() {

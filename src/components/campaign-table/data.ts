@@ -2,24 +2,6 @@ import { Campaign } from "./types";
 
 export const defaultCampaigns: Campaign[] = [
   {
-    name: "Performance Max - Competitor KW",
-    spend: 4614.52,
-    impressions: 780417,
-    clicks: 15769,
-    ctr: "2.02%",
-    conversions: 250,
-    cpa: 18.44,
-  },
-  {
-    name: "Performance Max - In-Market",
-    spend: 3962.88,
-    impressions: 70570,
-    clicks: 771,
-    ctr: "1.09%",
-    conversions: 3,
-    cpa: 1062.01,
-  },
-  {
     name: "Search - Brand Terms",
     spend: 2845.65,
     impressions: 125890,
@@ -27,6 +9,15 @@ export const defaultCampaigns: Campaign[] = [
     ctr: "7.12%",
     conversions: 425,
     cpa: 6.70,
+  },
+  {
+    name: "Performance Max - Competitor KW",
+    spend: 4614.52,
+    impressions: 780417,
+    clicks: 15769,
+    ctr: "2.02%",
+    conversions: 250,
+    cpa: 18.44,
   },
   {
     name: "Display - Remarketing",
@@ -37,28 +28,37 @@ export const defaultCampaigns: Campaign[] = [
     conversions: 85,
     cpa: 18.58,
   },
+  {
+    name: "Performance Max - In-Market",
+    spend: 3962.88,
+    impressions: 70570,
+    clicks: 771,
+    ctr: "1.09%",
+    conversions: 3,
+    cpa: 1062.01,
+  },
 ];
 
 export const campaignTypes = [
-  "Smart Shopping - Electronics",
-  "Discovery - New Markets",
-  "Search - Product Terms",
-  "Display - Lookalike",
-  "Performance Max - Seasonal",
-  "Local Campaigns - Retail",
-  "App Campaigns - Install",
-  "Video Action - Awareness",
-  "Search - Competitor Terms",
+  "Search - Brand Terms",
+  "Search - Non-Brand",
+  "Search - Dynamic Search Ads",
+  "Performance Max - General",
+  "Performance Max - Retail",
+  "Display - Remarketing",
   "Display - Custom Intent",
-  "Performance Max - Dynamic",
-  "Shopping - Bestsellers"
+  "Display - Similar Audiences",
+  "Video - Skippable In-Stream",
+  "Video - Discovery",
+  "Shopping - Standard",
+  "Shopping - Smart"
 ];
 
 export const generateRandomCampaign = (usedNames: Set<string>): Campaign => {
-  const spend = Math.random() * 10000 + 1000;
-  const impressions = Math.floor(Math.random() * 1000000 + 50000);
-  const clicks = Math.floor(Math.random() * 30000 + 500);
-  const conversions = Math.floor(Math.random() * 600 + 1);
+  const spend = Math.random() * 5000 + 500; // More realistic spend range
+  const impressions = Math.floor(Math.random() * 1000000 + 10000);
+  const clicks = Math.floor(impressions * (Math.random() * 0.05 + 0.01)); // CTR between 1-6%
+  const conversions = Math.floor(clicks * (Math.random() * 0.05 + 0.01)); // CVR between 1-6%
   const ctr = ((clicks / impressions) * 100).toFixed(2) + "%";
   const cpa = spend / (conversions || 1);
 
