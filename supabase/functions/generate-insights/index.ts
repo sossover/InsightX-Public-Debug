@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -51,6 +52,8 @@ serve(async (req) => {
 3. 2-3 actionable recommendations for improvement
 Format the response as a JSON object with fields: summary (string), observations (array of strings), and recommendations (array of strings).`;
 
+    console.log('Making request to OpenAI with system message:', systemMessage);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -58,7 +61,7 @@ Format the response as a JSON object with fields: summary (string), observations
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: systemMessage },
           { role: 'user', content: userMessage }

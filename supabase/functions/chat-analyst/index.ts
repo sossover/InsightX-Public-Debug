@@ -1,5 +1,5 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,16 +17,23 @@ serve(async (req) => {
   try {
     const { message, messages, context } = await req.json();
 
-    // Create a context-aware system message
-    const systemMessage = `You are an AI marketing analyst assistant. You have access to the following data:
+    // Create system message with context
+    let systemMessage = `You are an AI marketing analyst assistant. Your role is to help analyze marketing data and provide insights.`;
     
-Country Data: ${JSON.stringify(context.countryData)}
-Campaign Data: ${JSON.stringify(context.campaignData)}
-Device Data: ${JSON.stringify(context.deviceData)}
+    if (context) {
+      systemMessage += `\nHere is the current marketing data context:\n`;
+      if (context.campaignData) {
+        systemMessage += `Campaign Data: ${JSON.stringify(context.campaignData)}\n`;
+      }
+      if (context.deviceData) {
+        systemMessage += `Device Data: ${JSON.stringify(context.deviceData)}\n`;
+      }
+      if (context.countryData) {
+        systemMessage += `Country Data: ${JSON.stringify(context.countryData)}\n`;
+      }
+    }
 
-Your role is to analyze this data and provide accurate, data-driven responses to questions about marketing performance.
-Always reference specific numbers and metrics from the data when answering questions.
-If you're asked about rankings or comparisons, make sure to check the actual values in the data provided.`;
+    console.log('Making request to OpenAI with message:', message);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -34,7 +42,7 @@ If you're asked about rankings or comparisons, make sure to check the actual val
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { role: 'system', content: systemMessage },
           ...messages,
@@ -46,15 +54,19 @@ If you're asked about rankings or comparisons, make sure to check the actual val
     const data = await response.json();
     console.log('OpenAI Response:', data);
 
-    return new Response(JSON.stringify({ response: data.choices[0].message.content }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ response: data.choices[0].message.content }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
     console.error('Error in chat-analyst function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
