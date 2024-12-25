@@ -19,14 +19,20 @@ export const initiateGoogleAdsAuth = async () => {
     // Log the redirect URI to help with debugging
     console.log('Redirect URI:', redirectUri);
     
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${data.clientId}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `scope=${encodeURIComponent(GOOGLE_ADS_SCOPES)}&` +
-      `response_type=code&` +
-      `access_type=offline&` +
-      `prompt=consent`;
+    // Construct the auth URL with properly encoded parameters
+    const params = new URLSearchParams({
+      client_id: data.clientId,
+      redirect_uri: redirectUri,
+      scope: GOOGLE_ADS_SCOPES,
+      response_type: 'code',
+      access_type: 'offline',
+      prompt: 'consent'
+    });
 
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    
+    console.log('Full auth URL:', authUrl);
+    
     window.location.href = authUrl;
   } catch (error) {
     console.error('Error initiating Google Ads auth:', error);
