@@ -61,7 +61,7 @@ export default function Login() {
               },
             }}
             providers={["google"]}
-            redirectTo={`${window.location.origin}/`}
+            redirectTo="https://lovable.dev/projects/4cee2fc7-cb82-4330-adcd-28ac08532cd6"
             localization={{
               variables: {
                 sign_in: {
