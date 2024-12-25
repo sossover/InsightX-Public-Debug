@@ -50,7 +50,7 @@ export default function Login() {
               },
             }}
             providers={["google"]}
-            redirectTo={`${window.location.origin}/`}
+            redirectTo="http://localhost:8080"
             localization={{
               variables: {
                 sign_in: {
