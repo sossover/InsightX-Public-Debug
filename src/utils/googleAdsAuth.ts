@@ -19,15 +19,14 @@ export const initiateGoogleAdsAuth = async () => {
     // Log the redirect URI to help with debugging
     console.log('Redirect URI:', redirectUri);
     
-    // Construct the auth URL with properly encoded parameters
-    const params = new URLSearchParams({
-      client_id: data.clientId,
-      redirect_uri: redirectUri,
-      scope: GOOGLE_ADS_SCOPES,
-      response_type: 'code',
-      access_type: 'offline',
-      prompt: 'consent'
-    });
+    // Create URLSearchParams but encode the redirect_uri separately
+    const params = new URLSearchParams();
+    params.append('client_id', data.clientId);
+    params.append('redirect_uri', redirectUri); // This will be automatically encoded
+    params.append('scope', GOOGLE_ADS_SCOPES);
+    params.append('response_type', 'code');
+    params.append('access_type', 'offline');
+    params.append('prompt', 'consent');
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
     
