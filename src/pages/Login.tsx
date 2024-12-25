@@ -43,13 +43,35 @@ export default function Login() {
                   },
                 },
               },
+              className: {
+                container: 'auth-container',
+                button: 'auth-button',
+                label: 'auth-label',
+              },
             }}
             providers={["google"]}
             redirectTo={`${window.location.origin}/`}
             localization={{
               variables: {
                 sign_in: {
-                  social_provider_text: "Continue with {{provider}} to InsightX"
+                  email_label: 'Email address',
+                  password_label: 'Your password',
+                  email_input_placeholder: 'Your email address',
+                  password_input_placeholder: 'Your password',
+                  button_label: 'Sign in with email',
+                  loading_button_label: 'Signing in ...',
+                  social_provider_text: "Continue with {{provider}} to InsightX",
+                  confirmation_text: "Check your email for the confirmation link"
+                },
+                sign_up: {
+                  email_label: 'Email address',
+                  password_label: 'Create a password',
+                  email_input_placeholder: 'Your email address',
+                  password_input_placeholder: 'Your password',
+                  button_label: 'Sign up',
+                  loading_button_label: 'Signing up ...',
+                  social_provider_text: "Sign up with {{provider}} to InsightX",
+                  confirmation_text: "Check your email for the confirmation link"
                 }
               }
             }}
