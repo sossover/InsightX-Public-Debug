@@ -9,12 +9,23 @@ export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.onAuthStateChange((event, session) => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/");
       }
     });
+
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   return (
@@ -50,7 +61,7 @@ export default function Login() {
               },
             }}
             providers={["google"]}
-            redirectTo="http://localhost:8080/"
+            redirectTo={`${window.location.origin}/`}
             localization={{
               variables: {
                 sign_in: {
