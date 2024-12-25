@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { initiateGoogleAdsAuth } from "@/utils/googleAdsAuth";
 
 interface AdAccount {
   id: string;
@@ -48,11 +49,22 @@ export default function Account() {
   };
 
   const handleConnect = async (platform: string) => {
-    // This would typically integrate with the ad platform's OAuth flow
-    toast({
-      title: "Coming Soon",
-      description: `${platform} integration will be available soon!`,
-    });
+    if (platform === 'Google Ads') {
+      try {
+        initiateGoogleAdsAuth();
+      } catch (error) {
+        toast({
+          title: "Connection Error",
+          description: "Failed to initiate Google Ads connection",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Coming Soon",
+        description: `${platform} integration will be available soon!`,
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
