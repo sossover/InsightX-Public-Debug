@@ -60,8 +60,7 @@ export default function Login() {
                   password_input_placeholder: 'Your password',
                   button_label: 'Sign in with email',
                   loading_button_label: 'Signing in ...',
-                  social_provider_text: "Continue with {{provider}} to InsightX",
-                  confirmation_text: "Check your email for the confirmation link"
+                  social_provider_text: "Continue with {{provider}} to InsightX"
                 },
                 sign_up: {
                   email_label: 'Email address',
@@ -70,8 +69,7 @@ export default function Login() {
                   password_input_placeholder: 'Your password',
                   button_label: 'Sign up',
                   loading_button_label: 'Signing up ...',
-                  social_provider_text: "Sign up with {{provider}} to InsightX",
-                  confirmation_text: "Check your email for the confirmation link"
+                  social_provider_text: "Sign up with {{provider}} to InsightX"
                 }
               }
             }}
