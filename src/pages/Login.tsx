@@ -50,7 +50,7 @@ export default function Login() {
               },
             }}
             providers={["google"]}
-            redirectTo={`${window.location.origin}/`}
+            redirectTo={window.location.origin}
             localization={{
               variables: {
                 sign_in: {
