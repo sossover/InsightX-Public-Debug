@@ -53,11 +53,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public routes - accessible whether logged in or not */}
           <Route path="/landing" element={<Landing />} />
           <Route path="/website-pricing" element={<WebsitePricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/terms-of-use" element={<TermsOfUse />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          
+          {/* Protected routes - require authentication */}
           <Route
             path="/"
             element={
