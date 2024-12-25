@@ -1,11 +1,10 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Auth } from "@supabase/auth-ui-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
 
-const Login = () => {
+export default function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +33,7 @@ const Login = () => {
           <Auth
             supabaseClient={supabase}
             appearance={{
-              theme: ThemeSupa,
+              theme: 'default',
               variables: {
                 default: {
                   colors: {
@@ -51,6 +50,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}
