@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import Templates from "./pages/Templates";
 import Pricing from "./pages/Pricing";
 import WebsitePricing from "./pages/WebsitePricing";
+import Account from "./pages/Account";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Index />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
               </ProtectedRoute>
             }
           />
