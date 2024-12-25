@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign, ChevronLeft, Link } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign, ChevronLeft, Link, ExternalLink } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -121,6 +121,18 @@ export function NavigationSidebar() {
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      onClick={() => navigate("/landing")}
+                    >
+                      <a className="flex items-center gap-2 transition-all duration-200 hover:text-google-blue hover:translate-x-1 group-hover:cursor-pointer relative before:content-[''] before:absolute before:-inset-1 before:rounded-lg before:bg-custom-purple-50 before:scale-x-0 before:opacity-0 hover:before:scale-x-100 hover:before:opacity-100 before:transition-all before:duration-300 before:origin-left">
+                        <ExternalLink className="w-4 h-4 relative z-10" />
+                        <span className="relative z-10">Visit Website</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
