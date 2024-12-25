@@ -1,4 +1,4 @@
-import { Facebook, Linkedin, Youtube, Twitter, Instagram, MessageSquare, Accessibility } from "lucide-react";
+import { Facebook, Linkedin, Youtube, Twitter, Instagram, MessageSquare, Accessibility, FileText, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useState } from "react";
@@ -23,8 +23,14 @@ export const Footer = () => {
                 <ul className="space-y-3">
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">About Yoad</Link></li>
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Careers</Link></li>
-                  <li><Link to="/privacy-policy" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link></li>
-                  <li><Link to="/terms-of-use" className="text-gray-600 hover:text-primary transition-colors">Terms of Use</Link></li>
+                  <li><Link to="/privacy-policy" className="text-gray-600 hover:text-primary transition-colors flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Privacy Policy
+                  </Link></li>
+                  <li><Link to="/terms-of-use" className="text-gray-600 hover:text-primary transition-colors flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Terms of Use
+                  </Link></li>
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Contact Us</Link></li>
                 </ul>
               </div>
@@ -72,6 +78,7 @@ export const Footer = () => {
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Status</Link></li>
                 </ul>
               </div>
+
             </div>
 
             {/* Social Media & Copyright */}
