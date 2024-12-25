@@ -13,7 +13,11 @@ export const initiateGoogleAdsAuth = async () => {
 
     if (error) throw error;
 
+    // Use the current origin for the redirect URI
     const redirectUri = `${window.location.origin}/google-ads-callback`;
+    
+    // Log the redirect URI to help with debugging
+    console.log('Redirect URI:', redirectUri);
     
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${data.clientId}&` +
