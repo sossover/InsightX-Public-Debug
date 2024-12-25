@@ -19,6 +19,8 @@ import Templates from "./pages/Templates";
 import Pricing from "./pages/Pricing";
 import WebsitePricing from "./pages/WebsitePricing";
 import Account from "./pages/Account";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,8 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/website-pricing" element={<WebsitePricing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route
             path="/"
             element={

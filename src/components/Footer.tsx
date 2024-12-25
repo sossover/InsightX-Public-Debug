@@ -23,7 +23,8 @@ export const Footer = () => {
                 <ul className="space-y-3">
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">About Yoad</Link></li>
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Careers</Link></li>
-                  <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/privacy-policy" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/terms-of-use" className="text-gray-600 hover:text-primary transition-colors">Terms of Use</Link></li>
                   <li><Link to="/" className="text-gray-600 hover:text-primary transition-colors">Contact Us</Link></li>
                 </ul>
               </div>
@@ -78,6 +79,10 @@ export const Footer = () => {
               <div className="flex flex-col md:flex-row justify-between items-center">
                 <div className="text-gray-600 mb-4 md:mb-0">
                   © 2024 Yoad Analytics. All rights reserved.
+                  <span className="mx-2">|</span>
+                  <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+                  <span className="mx-2">|</span>
+                  <Link to="/terms-of-use" className="hover:text-primary transition-colors">Terms of Use</Link>
                 </div>
                 <div className="flex space-x-6">
                   <a href="#" className="text-gray-600 hover:text-primary transition-colors">
