@@ -15,11 +15,20 @@ interface AdAccount {
 
 export default function Account() {
   const [adAccounts, setAdAccounts] = useState<AdAccount[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchAdAccounts();
+    fetchUserEmail();
   }, []);
+
+  const fetchUserEmail = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserEmail(user.email);
+    }
+  };
 
   const fetchAdAccounts = async () => {
     const { data, error } = await supabase
@@ -79,6 +88,9 @@ export default function Account() {
               <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
                   <h1 className="text-2xl font-bold text-google-blue mb-2">Ad Accounts</h1>
+                  {userEmail && (
+                    <p className="text-gray-600 mb-2">Connected as: {userEmail}</p>
+                  )}
                   <p className="text-gray-500">Connect your advertising accounts to analyze their performance</p>
                 </div>
 
