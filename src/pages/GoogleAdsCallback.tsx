@@ -23,13 +23,23 @@ export default function GoogleAdsCallback() {
       }
 
       try {
-        // We'll need to exchange this code for tokens using a backend function
-        // For now, we'll just show a success message
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('No active session');
+        }
+
+        const { data, error } = await supabase.functions.invoke('google-ads-auth', {
+          body: { code },
+        });
+
+        if (error) throw error;
+
         toast({
           title: "Success",
           description: "Google Ads account connected successfully!",
         });
       } catch (error) {
+        console.error('Error connecting Google Ads account:', error);
         toast({
           title: "Error",
           description: "Failed to connect Google Ads account",
