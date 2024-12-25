@@ -4,7 +4,7 @@ const GOOGLE_ADS_SCOPES = [
 ].join(' ');
 
 export const initiateGoogleAdsAuth = () => {
-  const client_id = "YOUR_GOOGLE_CLIENT_ID"; // Replace with your actual Google Ads client ID
+  const client_id = "345303998707-dbu6..."; // Your Google OAuth client ID
   const redirectUri = `${window.location.origin}/google-ads-callback`;
   
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
