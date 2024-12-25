@@ -9,7 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check current auth status
+    // Check if user is already logged in
     supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate("/");
@@ -18,20 +18,19 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-custom-purple-50 to-white p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="w-8 h-8 text-custom-purple-500" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-custom-purple-500 to-google-blue bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
               InsightX
-            </span>
+            </h1>
+            <Sparkles className="w-6 h-6 text-google-blue animate-pulse" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
-          <p className="text-gray-600">Sign in to your account to continue</p>
+          <p className="text-gray-600">Sign in to access your analytics dashboard</p>
         </div>
 
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -39,14 +38,14 @@ const Login = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: '#9b87f5',
-                    brandAccent: '#7E69AB',
+                    brand: '#6366f1',
+                    brandAccent: '#4f46e5',
                   },
                 },
               },
             }}
-            theme="light"
-            providers={[]}
+            providers={["google"]}
+            redirectTo={window.location.origin}
           />
         </div>
       </div>
