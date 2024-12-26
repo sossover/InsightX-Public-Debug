@@ -13,8 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    const { accountId, dateFrom, dateTo } = await req.json()
-    console.log('Syncing campaigns for account:', accountId, 'from:', dateFrom, 'to:', dateTo)
+    const { accountId } = await req.json()
+    console.log('Syncing campaigns for account:', accountId)
     
     // Create Supabase client
     const supabaseClient = createClient(
@@ -36,14 +36,25 @@ serve(async (req) => {
 
     console.log('Retrieved account data, fetching insights from Facebook')
 
+    // Calculate date range (last 60 days)
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - 60)
+
+    // Format dates for Facebook API
+    const since = startDate.toISOString().split('T')[0]
+    const until = endDate.toISOString().split('T')[0]
+
+    console.log('Fetching data for date range:', { since, until })
+
     // Fetch data from Facebook Marketing API
     const fbResponse = await fetch(
       `https://graph.facebook.com/v18.0/${accountData.account_id}/insights?` +
       new URLSearchParams({
-        fields: 'campaign_name,spend,impressions,clicks,conversions',
+        fields: 'campaign_name,spend,impressions,clicks,actions',
         time_range: JSON.stringify({
-          since: dateFrom,
-          until: dateTo
+          since,
+          until
         }),
         level: 'campaign',
         access_token: accountData.access_token,
@@ -68,16 +79,23 @@ serve(async (req) => {
     }
 
     // Process and insert campaign data
-    const campaignData = fbData.data.map((campaign: any) => ({
-      account_id: accountId,
-      name: campaign.campaign_name,
-      spend: parseFloat(campaign.spend || '0'),
-      impressions: parseInt(campaign.impressions || '0'),
-      clicks: parseInt(campaign.clicks || '0'),
-      conversions: parseInt(campaign.conversions || '0'),
-      created_at: `${dateFrom}T00:00:00`,
-      updated_at: new Date().toISOString()
-    }))
+    const campaignData = fbData.data.map((campaign: any) => {
+      // Find conversions in actions array
+      const conversions = campaign.actions?.find((action: any) => 
+        action.action_type === 'offsite_conversion.fb_pixel_purchase'
+      )?.value || 0
+
+      return {
+        account_id: accountId,
+        name: campaign.campaign_name,
+        spend: parseFloat(campaign.spend || '0'),
+        impressions: parseInt(campaign.impressions || '0'),
+        clicks: parseInt(campaign.clicks || '0'),
+        conversions: parseInt(conversions),
+        created_at: since,
+        updated_at: new Date().toISOString()
+      }
+    })
 
     console.log('Processed campaign data:', JSON.stringify(campaignData))
 
@@ -86,8 +104,8 @@ serve(async (req) => {
       .from('campaigns')
       .delete()
       .eq('account_id', accountId)
-      .gte('created_at', `${dateFrom}T00:00:00`)
-      .lte('created_at', `${dateTo}T23:59:59`)
+      .gte('created_at', `${since}T00:00:00`)
+      .lte('created_at', `${until}T23:59:59`)
 
     if (deleteError) {
       console.error('Error deleting existing campaigns:', deleteError)
