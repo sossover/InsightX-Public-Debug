@@ -19,12 +19,33 @@ serve(async (req) => {
       throw new Error('Facebook access token not configured')
     }
 
-    console.log('Retrieved Facebook access token successfully')
+    // Fetch ad accounts from Facebook Graph API
+    const response = await fetch(
+      `https://graph.facebook.com/v19.0/me/adaccounts?fields=id,name,account_id,currency,timezone_name,account_status&access_token=${accessToken}`
+    );
 
-    // Return the access token
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Facebook API error:', error);
+      throw new Error('Failed to fetch Facebook ad accounts');
+    }
+
+    const data = await response.json();
+    console.log('Facebook API response:', data);
+
+    // Transform the data to match the expected format
+    const accounts = data.data.map((account: any) => ({
+      id: account.id,
+      name: account.name,
+      account_id: account.account_id,
+      currency: account.currency,
+      timezone_name: account.timezone_name,
+      account_status: account.account_status,
+    }));
+
     return new Response(
       JSON.stringify({
-        access_token: accessToken,
+        data: accounts,
         success: true
       }),
       {

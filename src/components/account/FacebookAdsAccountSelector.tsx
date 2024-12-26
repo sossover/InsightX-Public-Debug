@@ -60,19 +60,7 @@ export function FacebookAdsAccountSelector({
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("No authenticated user found");
 
-      // Get the Facebook access token from the edge function
-      const { data: tokenData, error: tokenError } = await supabase.functions.invoke('facebook-ads-auth', {
-        body: { action: 'get-token' }
-      });
-
-      console.log('Token response:', tokenData);
-
-      if (tokenError || !tokenData?.access_token) {
-        console.error('Token error:', tokenError);
-        throw new Error('Failed to get Facebook access token');
-      }
-
-      // Store each selected account with the access token
+      // Store each selected account
       for (const account of selectedAccountsArray) {
         const { error } = await supabase.from('ad_accounts').insert({
           user_id: userData.user.id,
@@ -82,7 +70,6 @@ export function FacebookAdsAccountSelector({
           account_currency: account.currency,
           account_timezone: account.timezone_name,
           account_status: account.account_status,
-          access_token: tokenData.access_token,
           is_active: true,
         });
 
@@ -120,32 +107,36 @@ export function FacebookAdsAccountSelector({
           <DialogTitle>Select Facebook Ads Accounts</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <div className="space-y-4 max-h-[300px] overflow-y-auto">
-            {accounts.map((account) => (
-              <div
-                key={account.id}
-                className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                onClick={() => toggleAccount(account.id)}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedAccounts.has(account.id)}
-                  onChange={() => toggleAccount(account.id)}
-                  className="h-4 w-4 border-gray-300 rounded"
-                />
-                <div className="flex-1">
-                  <p className="font-medium">{account.name}</p>
-                  <p className="text-sm text-gray-500">ID: {account.account_id}</p>
+          {accounts.length === 0 ? (
+            <p className="text-center text-gray-500">No Facebook Ads accounts found. Make sure you have access to ad accounts in your Facebook Business Manager.</p>
+          ) : (
+            <div className="space-y-4 max-h-[300px] overflow-y-auto">
+              {accounts.map((account) => (
+                <div
+                  key={account.id}
+                  className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  onClick={() => toggleAccount(account.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedAccounts.has(account.id)}
+                    onChange={() => toggleAccount(account.id)}
+                    className="h-4 w-4 border-gray-300 rounded"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">{account.name}</p>
+                    <p className="text-sm text-gray-500">ID: {account.account_id}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleConnect} disabled={isLoading}>
+          <Button onClick={handleConnect} disabled={isLoading || accounts.length === 0}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

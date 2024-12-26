@@ -6,11 +6,13 @@ export const handleFacebookAdsConnect = async () => {
     throw new Error('No authenticated session found');
   }
 
-  const response = await supabase.functions.invoke('facebook-ads-auth');
+  const { data, error } = await supabase.functions.invoke('facebook-ads-auth');
   
-  if (!response.data) {
+  if (error || !data?.data) {
+    console.error('Error fetching Facebook ad accounts:', error || 'No accounts data received');
     throw new Error('Failed to fetch Facebook ad accounts');
   }
 
-  return response.data.data || [];
+  console.log('Facebook accounts data:', data);
+  return data.data;
 };
