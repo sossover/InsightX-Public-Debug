@@ -10,6 +10,8 @@ import { ConversionGoals } from "@/components/ConversionGoals";
 import { ConversionSources } from "@/components/ConversionSources";
 import { AiInsights } from "@/components/AiInsights";
 import { ReportHeader } from "@/components/ReportHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
