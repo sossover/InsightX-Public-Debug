@@ -50,7 +50,7 @@ export default function Login() {
     }
 
     // Get the sign-in URL and redirect to it in the top window
-    const { data } = await supabase.auth.getSignInWithOAuth({
+    const { data } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: redirectUrl,
