@@ -13,11 +13,17 @@ serve(async (req) => {
 
   try {
     const { accountId, dateFrom, dateTo } = await req.json()
-    console.log('Syncing campaigns for account:', accountId, 'date range:', { dateFrom, dateTo })
+    console.log('Received request with:', { accountId, dateFrom, dateTo })
     
-    if (!dateFrom || !dateTo) {
-      throw new Error('Date range is required')
+    if (!accountId) {
+      throw new Error('Account ID is required')
     }
+
+    // Format dates for the Facebook API
+    const since = dateFrom ? new Date(dateFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+    const until = dateTo ? new Date(dateTo).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+
+    console.log('Using formatted dates:', { since, until })
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -40,12 +46,6 @@ serve(async (req) => {
       console.error('No access token found for account')
       throw new Error('No Facebook access token found for this account')
     }
-
-    // Format dates for Facebook API
-    const since = `${dateFrom}T00:00:00+0000`
-    const until = `${dateTo}T23:59:59+0000`
-
-    console.log('Fetching data with time range:', { since, until })
 
     // Fetch campaign data from Facebook API with date range
     const fbResponse = await fetch(
@@ -92,7 +92,7 @@ serve(async (req) => {
           impressions: parseInt(insights.impressions || '0'),
           clicks: parseInt(insights.clicks || '0'),
           conversions: conversions,
-          created_at: new Date(since).toISOString(), // Use the start date of the range
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }
       })
