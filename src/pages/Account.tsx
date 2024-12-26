@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { initiateGoogleAdsAuth } from "@/utils/googleAdsAuth";
 import { AdAccountsList } from "@/components/account/AdAccountsList";
 import { PlatformCard } from "@/components/account/PlatformCard";
+import { GoogleAdsAccountSelector } from "@/components/account/GoogleAdsAccountSelector";
 
 interface AdAccount {
   id: string;
@@ -15,16 +16,46 @@ interface AdAccount {
   account_name: string | null;
 }
 
+interface GoogleAdsAccount {
+  id: string;
+  name: string;
+  customerId: string;
+}
+
 export default function Account() {
   const [adAccounts, setAdAccounts] = useState<AdAccount[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isAccountSelectorOpen, setIsAccountSelectorOpen] = useState(false);
+  const [googleAdsAccounts, setGoogleAdsAccounts] = useState<GoogleAdsAccount[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchAdAccounts();
     fetchUserEmail();
-  }, []);
+
+    // Check URL parameters for success message and accounts data
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      const accountsData = params.get('accounts');
+      if (accountsData) {
+        try {
+          const accounts = JSON.parse(decodeURIComponent(accountsData));
+          setGoogleAdsAccounts(accounts);
+          setIsAccountSelectorOpen(true);
+        } catch (error) {
+          console.error('Error parsing accounts data:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load Google Ads accounts",
+            variant: "destructive",
+          });
+        }
+      }
+      // Clean up URL parameters
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [toast]);
 
   const fetchUserEmail = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -69,19 +100,6 @@ export default function Account() {
     }
   };
 
-  // Check URL parameters for success message
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('success') === 'true') {
-      toast({
-        title: "Success",
-        description: "Google Ads account connected successfully!",
-      });
-      window.history.replaceState({}, '', window.location.pathname);
-      fetchAdAccounts();
-    }
-  }, [toast]);
-
   const platforms = [
     { name: 'Google Ads', description: 'Connect your Google Ads account' },
     { name: 'Facebook Ads', description: 'Connect your Facebook Ads account' },
@@ -118,6 +136,13 @@ export default function Account() {
                 <AdAccountsList 
                   adAccounts={adAccounts}
                   onAccountsChange={fetchAdAccounts}
+                />
+
+                <GoogleAdsAccountSelector
+                  isOpen={isAccountSelectorOpen}
+                  onClose={() => setIsAccountSelectorOpen(false)}
+                  accounts={googleAdsAccounts}
+                  onAccountsSelected={fetchAdAccounts}
                 />
               </div>
             </div>

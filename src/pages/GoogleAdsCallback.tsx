@@ -1,68 +1,68 @@
-import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function GoogleAdsCallback() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const handleCallback = async () => {
-      const code = searchParams.get("code");
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
       if (!code) {
         toast({
           title: "Error",
-          description: "No authorization code received from Google",
+          description: "No authorization code received",
           variant: "destructive",
         });
-        navigate("/account");
+        navigate('/account-setup');
         return;
       }
 
       try {
-        const { error } = await supabase.functions.invoke('google-ads-callback', {
-          body: { code },
+        const response = await fetch('https://tetpfwhzydrcoseyvhaw.functions.supabase.co/google-ads-auth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('supabase.auth.token')}`,
+          },
+          body: JSON.stringify({ code }),
         });
 
-        if (error) throw error;
+        const data = await response.json();
 
-        toast({
-          title: "Success",
-          description: "Google Ads account connected successfully!",
-        });
-        
-        navigate("/account?success=true");
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to connect to Google Ads');
+        }
+
+        // Redirect to account page with accounts data
+        const encodedAccounts = encodeURIComponent(JSON.stringify(data.accounts));
+        navigate(`/account?success=true&accounts=${encodedAccounts}`);
       } catch (error) {
-        console.error("Error in Google Ads callback:", error);
+        console.error('Error in callback:', error);
         toast({
           title: "Error",
-          description: "Failed to connect Google Ads account. Please try again.",
+          description: error instanceof Error ? error.message : "Failed to connect to Google Ads",
           variant: "destructive",
         });
-        navigate("/account");
+        navigate('/account');
       }
     };
 
     handleCallback();
-  }, [searchParams, navigate, toast]);
+  }, [navigate, toast]);
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
-        <NavigationSidebar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Connecting Google Ads...
-            </h1>
-            <p className="text-gray-600">
-              Please wait while we complete the connection process.
-            </p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-custom-purple-50 to-white">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-custom-purple-300 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-2">Connecting to Google Ads</h1>
+          <p className="text-gray-600">Please wait while we process your connection...</p>
         </div>
       </div>
     </SidebarProvider>

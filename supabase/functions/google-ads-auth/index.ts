@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     const { resourceNames } = await googleAdsResponse.json();
     console.log('Found Google Ads accounts:', resourceNames);
 
-    // For each account, get the details and store them
+    // For each account, get the details
     const accountPromises = resourceNames.map(async (resourceName: string) => {
       const accountId = resourceName.split('/')[1];
       
@@ -118,37 +118,20 @@ Deno.serve(async (req) => {
       const accountData = await accountResponse.json();
       console.log('Account details:', accountData);
 
-      // Store the account in Supabase
-      const { error: insertError } = await supabaseClient
-        .from('ad_accounts')
-        .upsert({
-          user_id: user.id,
-          platform: 'Google Ads',
-          account_id: accountId,
-          account_name: accountData.customer.descriptiveName || accountId,
-          account_currency: accountData.customer.currencyCode,
-          account_timezone: accountData.customer.timeZone,
-          access_token: tokenData.access_token,
-          refresh_token: tokenData.refresh_token,
-          is_active: true,
-          account_status: 'ACTIVE',
-        });
-
-      if (insertError) {
-        console.error('Database insertion error:', insertError);
-        return null;
-      }
-
-      return accountData;
+      return {
+        id: accountId,
+        name: accountData.customer.descriptiveName || accountId,
+        customerId: accountId,
+      };
     });
 
-    const accounts = await Promise.all(accountPromises);
-    const validAccounts = accounts.filter(Boolean);
+    const accounts = (await Promise.all(accountPromises)).filter(Boolean);
 
+    // Instead of automatically inserting accounts, return them to the client
     return new Response(
       JSON.stringify({ 
         success: true, 
-        accountsCount: validAccounts.length 
+        accounts: accounts
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
