@@ -5,18 +5,34 @@ const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
 const TAB_NAME = 'Sheet1';
 const RANGE = 'A:G'; // Columns A through G
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-account-id',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Content-Type': 'application/json',
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
+    console.log('Fetching data from Google Sheets...');
+    
     // Fetch data from Google Sheets
     const response = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${Deno.env.get('GOOGLE_SHEETS_API_KEY')}`
     );
 
     if (!response.ok) {
+      console.error('Google Sheets API Error:', response.statusText);
       throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('Received data from Google Sheets:', data.values?.length, 'rows');
     
     if (!data.values || data.values.length < 2) {
       throw new Error('No data found in sheet');
@@ -33,44 +49,59 @@ serve(async (req) => {
       cpa: parseFloat(row[6]) || 0
     }));
 
+    console.log('Transformed campaigns:', campaigns.length);
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Clear existing campaign data
+    const accountId = req.headers.get('x-account-id');
+    if (!accountId) {
+      throw new Error('No account ID provided');
+    }
+
+    console.log('Using account ID:', accountId);
+
+    // Clear existing campaign data for this account
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+      .eq('account_id', accountId);
 
     if (deleteError) {
+      console.error('Delete Error:', deleteError);
       throw new Error(`Failed to clear existing data: ${deleteError.message}`);
     }
+
+    console.log('Cleared existing campaigns for account');
 
     // Insert new campaign data
     const { error: insertError } = await supabaseClient
       .from('campaigns')
       .insert(campaigns.map(campaign => ({
         ...campaign,
-        account_id: req.headers.get('x-account-id'), // Get account_id from request header
+        account_id: accountId,
       })));
 
     if (insertError) {
+      console.error('Insert Error:', insertError);
       throw new Error(`Failed to insert new data: ${insertError.message}`);
     }
 
+    console.log('Successfully inserted new campaign data');
+
     return new Response(
       JSON.stringify({ success: true, message: 'Data synced successfully' }),
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: corsHeaders }
     );
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in fetch-google-sheets function:', error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: corsHeaders }
     );
   }
 });
