@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -68,29 +69,89 @@ export default function Login() {
     }
   };
 
+  const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-custom-purple-50 to-white p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-custom-purple-300 to-google-blue bg-clip-text text-transparent">
               InsightX
             </h1>
-            <Sparkles className="w-6 h-6 text-google-blue animate-pulse" />
+            <Sparkles className="w-8 h-8 text-google-blue animate-pulse" />
           </div>
-          <p className="text-gray-600">Sign in to access your analytics dashboard</p>
+          <p className="text-gray-600 text-lg">Sign in to access your analytics dashboard</p>
         </div>
 
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <img src="/google.svg" alt="Google" className="w-5 h-5" />
-            Continue with Google
-          </button>
+        <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-100">
+          <form onSubmit={handleEmailSignIn} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                className="w-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+                className="w-full"
+              />
+            </div>
 
-          <div className="mt-4 text-center text-sm text-gray-500">
+            <Button type="submit" className="w-full bg-custom-purple-300 hover:bg-custom-purple-400">
+              Sign in with Email
+            </Button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="outline"
+            className="w-full border-gray-200 hover:bg-gray-50"
+          >
+            <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
+            Continue with Google
+          </Button>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
             By continuing, you agree to our{" "}
             <a href="/terms-of-use" className="text-custom-purple-300 hover:underline">
               Terms of Service
