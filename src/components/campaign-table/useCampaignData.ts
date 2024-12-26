@@ -16,19 +16,24 @@ export function useCampaignData(
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async () => {
-    if (useSampleData || !selectedAccountId || !dateRange?.from || !dateRange?.to) return;
+    if (useSampleData || !selectedAccountId) return;
     
     setIsFetching(true);
     try {
-      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
-      const toDate = format(dateRange.to, 'yyyy-MM-dd');
-      
-      const { data, error } = await supabase
+      let query = supabase
         .from('campaigns')
         .select('*')
-        .eq('account_id', selectedAccountId)
-        .gte('created_at', `${fromDate}T00:00:00`)
-        .lte('created_at', `${toDate}T23:59:59`);
+        .eq('account_id', selectedAccountId);
+
+      if (dateRange?.from && dateRange?.to) {
+        const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+        const toDate = format(dateRange.to, 'yyyy-MM-dd');
+        query = query
+          .gte('created_at', `${fromDate}T00:00:00`)
+          .lte('created_at', `${toDate}T23:59:59`);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching campaigns:', error);
@@ -79,8 +84,9 @@ export function useCampaignData(
 
     setIsSyncing(true);
     try {
-      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
-      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+      const today = new Date();
+      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
+      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
 
       const { data, error } = await supabase.functions.invoke('sync-facebook-campaigns', {
         body: {

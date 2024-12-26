@@ -35,7 +35,7 @@ export function CampaignTable({
   const totals = calculateTotals(campaigns);
 
   useEffect(() => {
-    if (selectedAccountId && dateRange?.from && dateRange?.to) {
+    if (selectedAccountId) {
       fetchCampaignData();
     }
   }, [selectedAccountId, dateRange, fetchCampaignData]);
