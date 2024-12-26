@@ -143,11 +143,13 @@ export default function Account() {
                   ))}
                 </div>
 
+                {/* Display connected accounts */}
                 <AdAccountsList 
                   adAccounts={adAccounts}
                   onAccountsChange={fetchAdAccounts}
                 />
 
+                {/* Google Ads Account Selector */}
                 <GoogleAdsAccountSelector
                   isOpen={isAccountSelectorOpen}
                   onClose={() => setIsAccountSelectorOpen(false)}
