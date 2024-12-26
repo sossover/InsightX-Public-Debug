@@ -15,6 +15,7 @@ import { calculateTotals } from "./campaign-table/CampaignTableTotals";
 import { exportToCSV } from "./campaign-table/CampaignExport";
 import { useToast } from "./ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 export function CampaignTable({ 
   useSampleData = false, 
@@ -46,17 +47,28 @@ export function CampaignTable({
     }
 
     try {
+      console.log('Starting sync with date range:', dateRange);
+      
+      const formattedDateRange = dateRange ? {
+        from: dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
+        to: dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
+      } : undefined;
+
+      console.log('Formatted date range:', formattedDateRange);
+
       const { data, error } = await supabase.functions.invoke('fetch-google-sheets', {
         body: {
           accountId: selectedAccountId,
-          dateRange: dateRange ? {
-            from: dateRange.from?.toISOString(),
-            to: dateRange.to?.toISOString(),
-          } : undefined,
+          dateRange: formattedDateRange,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Sync error:', error);
+        throw error;
+      }
+
+      console.log('Sync response:', data);
 
       toast({
         title: "Success",

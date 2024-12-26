@@ -1,18 +1,35 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { corsHeaders, handleCors } from "./utils/cors.ts";
-import { fetchSheetData, aggregateCampaignData } from "./utils/sheets.ts";
-import { updateCampaigns } from "./utils/database.ts";
+import { format, parse, isWithinInterval } from "https://esm.sh/date-fns@2.30.0";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface Campaign {
+  date: string;
+  name: string;
+  spend: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
+}
+
+interface DateRange {
+  from?: string;
+  to?: string;
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  const corsResponse = handleCors(req);
-  if (corsResponse) return corsResponse;
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
     console.log('Starting fetch-google-sheets function');
     
-    // Parse request body
     const { accountId, dateRange } = await req.json();
     console.log('Received request with accountId:', accountId);
     console.log('Date range:', dateRange);
@@ -29,12 +46,24 @@ serve(async (req) => {
     }
 
     // Fetch data from Google Sheets
-    const rows = await fetchSheetData(apiKey);
-    console.log('Received data from Google Sheets:', rows.length, 'rows');
+    const SHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
+    const TAB_NAME = 'Class Data';
+    const RANGE = 'A2:F31';
+    
+    const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
+    console.log('Fetching from Google Sheets URL:', sheetsUrl);
 
-    // Transform and aggregate the data
-    const aggregatedCampaigns = aggregateCampaignData(rows, dateRange);
-    console.log('Transformed campaigns:', aggregatedCampaigns.length);
+    const response = await fetch(sheetsUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Raw data from sheets:', data);
+
+    if (!data.values || !Array.isArray(data.values)) {
+      throw new Error('Invalid data format from Google Sheets');
+    }
 
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -43,14 +72,88 @@ serve(async (req) => {
     );
     console.log('Supabase client created');
 
-    // Update campaigns in database
-    await updateCampaigns(supabaseClient, accountId, aggregatedCampaigns);
+    // Clear existing campaigns for this account
+    const { error: deleteError } = await supabaseClient
+      .from('campaigns')
+      .delete()
+      .eq('account_id', accountId);
+
+    if (deleteError) {
+      console.error('Error clearing existing campaigns:', deleteError);
+      throw deleteError;
+    }
+    console.log('Cleared existing campaigns for account');
+
+    // Transform and filter the data
+    const campaigns: Campaign[] = [];
+    let processedCount = 0;
+
+    for (const row of data.values) {
+      if (!row || row.length < 6) {
+        console.log('Skipping invalid row:', row);
+        continue;
+      }
+
+      const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
+      
+      try {
+        // Parse the date from the sheet (assuming MM/dd/yyyy format)
+        const date = parse(dateStr, 'MM/dd/yyyy', new Date());
+        
+        // Check if date is within selected range
+        if (dateRange?.from && dateRange?.to) {
+          const fromDate = new Date(dateRange.from);
+          const toDate = new Date(dateRange.to);
+          
+          if (!isWithinInterval(date, { start: fromDate, end: toDate })) {
+            console.log(`Skipping row with date ${dateStr} - outside range ${dateRange.from} to ${dateRange.to}`);
+            continue;
+          }
+        }
+
+        const campaign = {
+          date: format(date, 'yyyy-MM-dd'),
+          name,
+          spend: parseFloat(spendStr) || 0,
+          impressions: parseInt(impressionsStr) || 0,
+          clicks: parseInt(clicksStr) || 0,
+          conversions: parseInt(conversionsStr) || 0,
+        };
+
+        campaigns.push(campaign);
+        processedCount++;
+        
+      } catch (error) {
+        console.error(`Error processing row: ${JSON.stringify(row)}`, error);
+      }
+    }
+
+    console.log(`Transformed ${processedCount} campaigns:`, campaigns);
+
+    // Insert campaign data
+    if (campaigns.length > 0) {
+      const { error: insertError } = await supabaseClient
+        .from('campaigns')
+        .insert(campaigns.map(campaign => ({
+          account_id: accountId,
+          name: campaign.name,
+          spend: campaign.spend,
+          impressions: campaign.impressions,
+          clicks: campaign.clicks,
+          conversions: campaign.conversions,
+          created_at: campaign.date,
+        })));
+
+      if (insertError) {
+        console.error('Error inserting campaigns:', insertError);
+        throw insertError;
+      }
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        rowCount: aggregatedCampaigns.length,
-        message: `Successfully synced ${aggregatedCampaigns.length} campaigns`,
+        message: `Successfully synced ${campaigns.length} campaigns`,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
