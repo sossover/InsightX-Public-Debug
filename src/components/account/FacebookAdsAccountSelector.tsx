@@ -12,6 +12,7 @@ interface FacebookAdsAccount {
   currency: string;
   timezone_name: string;
   account_status: string;
+  access_token: string;
 }
 
 interface FacebookAdsAccountSelectorProps {
@@ -62,6 +63,8 @@ export function FacebookAdsAccountSelector({
 
       // Store each selected account
       for (const account of selectedAccountsArray) {
+        console.log('Storing account with access token:', { accountId: account.account_id, hasToken: !!account.access_token });
+        
         const { error } = await supabase.from('ad_accounts').insert({
           user_id: userData.user.id,
           platform: 'Facebook Ads',
@@ -70,6 +73,7 @@ export function FacebookAdsAccountSelector({
           account_currency: account.currency,
           account_timezone: account.timezone_name,
           account_status: account.account_status,
+          access_token: account.access_token, // Store the access token
           is_active: true,
         });
 
