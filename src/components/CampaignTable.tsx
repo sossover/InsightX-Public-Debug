@@ -88,38 +88,33 @@ export function CampaignTable({
   };
 
   const syncCampaignData = async () => {
+    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) {
+      toast({
+        title: "Error",
+        description: "Please select a date range and account before syncing",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSyncing(true);
     try {
-      // First, get the Facebook ad account ID
-      const { data: accountData, error: accountError } = await supabase
-        .from('ad_accounts')
-        .select('id')
-        .eq('platform', 'Facebook Ads')
-        .single();
+      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+      const toDate = format(dateRange.to, 'yyyy-MM-dd');
 
-      if (accountError || !accountData) {
-        console.error('Error getting Facebook account:', accountError);
-        toast({
-          title: "Error",
-          description: "No Facebook Ads account found",
-          variant: "destructive",
-        });
-        return;
-      }
+      console.log('Syncing with date range:', { fromDate, toDate });
 
-      // Call the sync function with the account ID
       const { data, error } = await supabase.functions.invoke('sync-facebook-campaigns', {
-        body: { accountId: accountData.id }
+        body: {
+          accountId: selectedAccountId,
+          dateFrom: fromDate,
+          dateTo: toDate
+        }
       });
 
       if (error) {
         console.error('Error syncing campaigns:', error);
-        toast({
-          title: "Error",
-          description: "Failed to sync campaign data",
-          variant: "destructive",
-        });
-        return;
+        throw error;
       }
 
       toast({
@@ -252,7 +247,7 @@ export function CampaignTable({
           </Button>
           <Button
             onClick={syncCampaignData}
-            disabled={isSyncing}
+            disabled={isSyncing || !dateRange?.from || !dateRange?.to}
             className="flex items-center gap-2"
           >
             {isSyncing ? (
