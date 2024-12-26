@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check initial session
@@ -18,6 +20,7 @@ export default function Login() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session);
       if (session) {
         navigate("/");
       }
@@ -28,18 +31,35 @@ export default function Login() {
 
   // Custom function to handle Google sign-in
   const handleGoogleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      }
-    });
+    try {
+      console.log("Initiating Google sign-in...");
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        }
+      });
 
-    if (error) {
-      console.error('Google sign-in error:', error);
+      if (error) {
+        console.error('Google sign-in error:', error);
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('Google sign-in successful:', data);
+      }
+    } catch (err) {
+      console.error('Unexpected error during sign-in:', err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred during sign-in",
+        variant: "destructive",
+      });
     }
   };
 
