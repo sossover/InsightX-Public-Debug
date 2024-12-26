@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles } from "lucide-react";
 
@@ -52,7 +50,7 @@ export default function Login() {
     }
 
     // Get the sign-in URL and redirect to it in the top window
-    const { data: { url } } = await supabase.auth.getOAuthSignInUrl({
+    const { data } = await supabase.auth.getSignInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: redirectUrl,
@@ -63,9 +61,9 @@ export default function Login() {
       }
     });
 
-    if (url) {
+    if (data.url) {
       // Force top-level navigation to avoid iframe restrictions
-      window.top.location.href = url;
+      window.top.location.href = data.url;
     }
   };
 
