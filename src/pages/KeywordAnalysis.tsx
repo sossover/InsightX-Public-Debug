@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { MetricsSidebar } from "@/components/MetricsSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { KeywordHeader } from "@/components/keyword-analysis/KeywordHeader";
 import { KeywordFilters } from "@/components/keyword-analysis/KeywordFilters";
@@ -14,62 +13,19 @@ import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
 import { ReportHeader } from "@/components/ReportHeader";
 import { DateRange } from "react-day-picker";
-
-const keywordData: Campaign[] = [
-  {
-    name: "supermetrics",
-    spend: 62.31,
-    impressions: 484,
-    clicks: 9,
-    ctr: "1.86%",
-    conversions: 2,
-    cpa: 31.15,
-  },
-  {
-    name: "looker studio meta ads",
-    spend: 43.66,
-    impressions: 190,
-    clicks: 13,
-    ctr: "6.84%",
-    conversions: 1,
-    cpa: 1062.01,
-  },
-  {
-    name: "salesforce bigquery",
-    spend: 33.55,
-    impressions: 141,
-    clicks: 9,
-    ctr: "6.38%",
-    conversions: 0,
-    cpa: 0,
-  },
-  {
-    name: "meta looker studio",
-    spend: 22.05,
-    impressions: 149,
-    clicks: 9,
-    ctr: "6.04%",
-    conversions: 0,
-    cpa: 0,
-  },
-  {
-    name: "powerbi google ads",
-    spend: 18.45,
-    impressions: 61,
-    clicks: 6,
-    ctr: "9.84%",
-    conversions: 2,
-    cpa: 9.23,
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: new Date()
   });
-  const [campaigns, setCampaigns] = useState(keywordData);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   // Calculate metrics for the cards
   const totalClicks = campaigns.reduce((sum, campaign) => sum + campaign.clicks, 0);
@@ -77,9 +33,73 @@ const KeywordAnalysis = () => {
   const avgCTR = ((totalClicks / totalImpressions) * 100).toFixed(2) + "%";
   const totalConversions = campaigns.reduce((sum, campaign) => sum + campaign.conversions, 0);
 
+  const fetchCampaignData = async () => {
+    if (!selectedAccountId || !date?.from || !date?.to) return;
+    
+    setIsLoading(true);
+    try {
+      const fromDate = format(date.from, 'yyyy-MM-dd');
+      const toDate = format(date.to, 'yyyy-MM-dd');
+      
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('account_id', selectedAccountId)
+        .gte('created_at', `${fromDate}T00:00:00`)
+        .lte('created_at', `${toDate}T23:59:59`);
+
+      if (error) {
+        console.error('Error fetching campaigns:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch campaign data. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const formattedCampaigns: Campaign[] = data.map(campaign => ({
+        name: campaign.name,
+        spend: campaign.spend,
+        impressions: campaign.impressions,
+        clicks: campaign.clicks,
+        conversions: campaign.conversions,
+        get ctr() {
+          return ((this.clicks / this.impressions) * 100).toFixed(2) + "%";
+        },
+        get cpa() {
+          return this.conversions > 0 ? this.spend / this.conversions : 0;
+        }
+      }));
+
+      setCampaigns(formattedCampaigns);
+      
+      if (formattedCampaigns.length === 0) {
+        toast({
+          title: "No Data",
+          description: "No campaign data found for the selected date range.",
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAccountId && date?.from && date?.to) {
+      fetchCampaignData();
+    }
+  }, [selectedAccountId, date]);
+
   const handleAccountChange = (accountId: string) => {
     setSelectedAccountId(accountId);
-    // Here you can add logic to fetch keywords for the selected account
   };
 
   return (
@@ -132,7 +152,7 @@ const KeywordAnalysis = () => {
 
               {/* Performance Chart */}
               <div className="mb-8">
-                <PerformanceChart useSampleData={true} />
+                <PerformanceChart useSampleData={!selectedAccountId} />
               </div>
 
               {/* Main Content Area */}
