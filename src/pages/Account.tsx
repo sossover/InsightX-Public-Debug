@@ -68,26 +68,50 @@ export default function Account() {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from('ad_accounts')
-      .delete()
-      .eq('id', id);
+    try {
+      // First, delete all campaigns associated with this account
+      const { error: campaignsError } = await supabase
+        .from('campaigns')
+        .delete()
+        .eq('account_id', id);
 
-    if (error) {
+      if (campaignsError) {
+        toast({
+          title: "Error deleting campaigns",
+          description: campaignsError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Then delete the ad account
+      const { error: accountError } = await supabase
+        .from('ad_accounts')
+        .delete()
+        .eq('id', id);
+
+      if (accountError) {
+        toast({
+          title: "Error deleting ad account",
+          description: accountError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        title: "Error deleting ad account",
-        description: error.message,
+        title: "Success",
+        description: "Ad account and associated campaigns removed successfully",
+      });
+      
+      fetchAdAccounts();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Success",
-      description: "Ad account removed successfully",
-    });
-    
-    fetchAdAccounts();
   };
 
   // Check URL parameters for success message
