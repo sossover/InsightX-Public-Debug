@@ -84,34 +84,25 @@ export function useCampaignData(
 
     setIsSyncing(true);
     try {
-      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
-      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
-
-      console.log('Syncing with dates:', { fromDate, toDate });
-
-      const { data, error } = await supabase.functions.invoke('sync-facebook-campaigns', {
-        body: {
-          accountId: selectedAccountId,
-          dateFrom: fromDate,
-          dateTo: toDate
-        }
+      const response = await supabase.functions.invoke('fetch-google-sheets', {
+        headers: { 'x-account-id': selectedAccountId }
       });
 
-      if (error) throw error;
-
-      console.log('Sync response:', data);
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'Failed to sync data');
+      }
 
       toast({
         title: "Success",
-        description: "Campaign data synced successfully",
+        description: "Campaign data synced successfully from Google Sheets",
       });
 
       await fetchCampaignData();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error syncing campaigns:', error);
       toast({
         title: "Error",
-        description: "Failed to sync campaign data",
+        description: "Failed to sync campaign data. Please try again.",
         variant: "destructive",
       });
     } finally {
