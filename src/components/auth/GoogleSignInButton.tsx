@@ -11,12 +11,12 @@ export const GoogleSignInButton = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          scopes: 'https://www.googleapis.com/auth/adwords',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo: window.location.origin + '/google-ads-callback',
-          skipBrowserRedirect: true
+          redirectTo: `${window.location.origin}/google-ads-callback`,
         }
       });
 
@@ -28,8 +28,8 @@ export const GoogleSignInButton = () => {
           variant: "destructive",
         });
       } else if (data?.url) {
-        console.log('Opening auth URL in new window:', data.url);
-        window.open(data.url, '_blank', 'width=800,height=600');
+        console.log('Redirecting to auth URL:', data.url);
+        window.location.href = data.url;
       }
     } catch (err) {
       console.error('Unexpected error during sign-in:', err);
