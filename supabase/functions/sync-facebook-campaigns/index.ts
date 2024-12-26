@@ -22,16 +22,26 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get Facebook access token for the account
+    // Get Facebook access token and account ID for the account
     const { data: accountData, error: accountError } = await supabaseClient
       .from('ad_accounts')
       .select('access_token, account_id')
       .eq('id', accountId)
       .single()
 
-    if (accountError || !accountData?.access_token) {
+    if (accountError) {
       console.error('Failed to get account data:', accountError)
-      throw new Error('Failed to get account access token')
+      throw new Error('Failed to get account data from database')
+    }
+
+    if (!accountData?.access_token) {
+      console.error('No access token found for account')
+      throw new Error('No Facebook access token found for this account. Please reconnect your Facebook account.')
+    }
+
+    if (!accountData?.account_id) {
+      console.error('No Facebook account ID found')
+      throw new Error('No Facebook account ID found for this account')
     }
 
     console.log('Retrieved account data, fetching insights from Facebook')
@@ -145,7 +155,7 @@ serve(async (req) => {
     console.error('Sync error:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error.message || 'An unexpected error occurred',
         details: error.stack
       }),
       { 
