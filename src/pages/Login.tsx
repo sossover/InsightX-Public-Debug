@@ -34,7 +34,25 @@ export default function Login() {
 
   // Custom function to handle Google sign-in
   const handleGoogleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        skipBrowserRedirect: true, // Don't automatically redirect
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
+    });
+
+    if (error) {
+      console.error('Google sign-in error:', error);
+      return;
+    }
+
+    // Get the sign-in URL and redirect to it in the top window
+    const { data: { url } } = await supabase.auth.getOAuthSignInUrl({
       provider: 'google',
       options: {
         redirectTo: redirectUrl,
@@ -45,8 +63,9 @@ export default function Login() {
       }
     });
 
-    if (error) {
-      console.error('Google sign-in error:', error);
+    if (url) {
+      // Force top-level navigation to avoid iframe restrictions
+      window.top.location.href = url;
     }
   };
 
@@ -64,38 +83,13 @@ export default function Login() {
         </div>
 
         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-          <Auth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#6366f1',
-                    brandAccent: '#4f46e5',
-                  },
-                },
-              },
-              className: {
-                container: 'auth-container',
-                button: 'auth-button',
-                label: 'auth-label',
-              },
-            }}
-            providers={["google"]}
-            redirectTo={redirectUrl}
-            onlyThirdPartyProviders={true}
-            localization={{
-              variables: {
-                sign_in: {
-                  social_provider_text: "Continue with {{provider}} to InsightX"
-                },
-                sign_up: {
-                  social_provider_text: "Sign up with {{provider}} to InsightX"
-                }
-              }
-            }}
-          />
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <img src="/google.svg" alt="Google" className="w-5 h-5" />
+            Continue with Google
+          </button>
         </div>
       </div>
     </div>
