@@ -19,14 +19,14 @@ serve(async (req) => {
       throw new Error('Account ID is required')
     }
 
-    // Format dates for the Facebook API - use current date if no range provided
-    const today = new Date()
-    const since = dateFrom ? new Date(dateFrom) : today
-    const until = dateTo ? new Date(dateTo) : today
-    
-    // Format to YYYY-MM-DD
-    const sinceStr = since.toISOString().split('T')[0]
-    const untilStr = until.toISOString().split('T')[0]
+    // Format dates for the Facebook API
+    const formatDate = (date: string) => {
+      const d = new Date(date)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    }
+
+    const sinceStr = dateFrom ? formatDate(dateFrom) : formatDate(new Date().toISOString())
+    const untilStr = dateTo ? formatDate(dateTo) : formatDate(new Date().toISOString())
 
     console.log('Using date range:', { sinceStr, untilStr })
 
@@ -66,7 +66,7 @@ serve(async (req) => {
     }
 
     const fbData = await fbResponse.json()
-    console.log('Received Facebook data:', JSON.stringify(fbData, null, 2))
+    console.log('Received Facebook data:', fbData)
 
     if (!fbData.data || fbData.data.length === 0) {
       console.log('No campaign data found')

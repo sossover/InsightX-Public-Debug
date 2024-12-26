@@ -29,8 +29,8 @@ export function useCampaignData(
         const fromDate = format(dateRange.from, 'yyyy-MM-dd');
         const toDate = format(dateRange.to, 'yyyy-MM-dd');
         query = query
-          .gte('created_at', `${fromDate}T00:00:00`)
-          .lte('created_at', `${toDate}T23:59:59`);
+          .gte('created_at', fromDate)
+          .lte('created_at', toDate);
       }
 
       const { data, error } = await query;
@@ -84,9 +84,8 @@ export function useCampaignData(
 
     setIsSyncing(true);
     try {
-      const today = new Date();
-      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
-      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
+      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
 
       console.log('Syncing with dates:', { fromDate, toDate });
 
