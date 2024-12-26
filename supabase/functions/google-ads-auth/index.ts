@@ -6,8 +6,10 @@ const corsHeaders = {
 }
 
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GOOGLE_ADS_API_VERSION = 'v14';
 const CLIENT_ID = Deno.env.get('GOOGLE_ADS_CLIENT_ID');
 const CLIENT_SECRET = Deno.env.get('GOOGLE_ADS_CLIENT_SECRET');
+const DEVELOPER_TOKEN = Deno.env.get('GOOGLE_ADS_DEVELOPER_TOKEN');
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -74,25 +76,80 @@ Deno.serve(async (req) => {
     const userInfo = await userInfoResponse.json();
     console.log('Got user info:', userInfo.email);
 
-    // Store the tokens in Supabase using the service role client
-    const { error: insertError } = await supabaseClient
-      .from('ad_accounts')
-      .insert({
-        user_id: user.id,
-        platform: 'Google Ads',
-        account_id: userInfo.email,
-        account_name: userInfo.email,
-        access_token: tokenData.access_token,
-        refresh_token: tokenData.refresh_token,
-      });
+    // Fetch Google Ads accounts
+    const googleAdsResponse = await fetch(
+      `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers`,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          'developer-token': DEVELOPER_TOKEN!,
+        },
+      }
+    );
 
-    if (insertError) {
-      console.error('Database insertion error:', insertError);
-      throw new Error(`Failed to store account credentials: ${insertError.message}`);
+    if (!googleAdsResponse.ok) {
+      console.error('Google Ads API error:', await googleAdsResponse.text());
+      throw new Error('Failed to fetch Google Ads accounts');
     }
 
+    const { resourceNames } = await googleAdsResponse.json();
+    console.log('Found Google Ads accounts:', resourceNames);
+
+    // For each account, get the details and store them
+    const accountPromises = resourceNames.map(async (resourceName: string) => {
+      const accountId = resourceName.split('/')[1];
+      
+      // Get account details
+      const accountResponse = await fetch(
+        `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${accountId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+            'developer-token': DEVELOPER_TOKEN!,
+          },
+        }
+      );
+
+      if (!accountResponse.ok) {
+        console.error(`Failed to fetch details for account ${accountId}:`, await accountResponse.text());
+        return null;
+      }
+
+      const accountData = await accountResponse.json();
+      console.log('Account details:', accountData);
+
+      // Store the account in Supabase
+      const { error: insertError } = await supabaseClient
+        .from('ad_accounts')
+        .upsert({
+          user_id: user.id,
+          platform: 'Google Ads',
+          account_id: accountId,
+          account_name: accountData.customer.descriptiveName || accountId,
+          account_currency: accountData.customer.currencyCode,
+          account_timezone: accountData.customer.timeZone,
+          access_token: tokenData.access_token,
+          refresh_token: tokenData.refresh_token,
+          is_active: true,
+          account_status: 'ACTIVE',
+        });
+
+      if (insertError) {
+        console.error('Database insertion error:', insertError);
+        return null;
+      }
+
+      return accountData;
+    });
+
+    const accounts = await Promise.all(accountPromises);
+    const validAccounts = accounts.filter(Boolean);
+
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ 
+        success: true, 
+        accountsCount: validAccounts.length 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
