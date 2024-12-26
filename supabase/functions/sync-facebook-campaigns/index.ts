@@ -38,15 +38,29 @@ serve(async (req) => {
     }
 
     // Format the date range for Facebook API (ensuring UTC timezone)
-    const since = dateFrom + 'T00:00:00+0000'
-    const until = dateTo + 'T23:59:59+0000'
+    const since = dateFrom ? `${dateFrom}T00:00:00+0000` : undefined
+    const until = dateTo ? `${dateTo}T23:59:59+0000` : undefined
+
+    // If no date range is provided, use last 30 days
+    if (!since || !until) {
+      const endDate = new Date()
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - 30)
+      since = startDate.toISOString().replace('Z', '+0000')
+      until = endDate.toISOString().replace('Z', '+0000')
+    }
 
     console.log('Fetching data with UTC time range:', { since, until })
 
-    // Fetch campaign data with insights from Facebook API
-    const fbResponse = await fetch(
-      `https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns?fields=name,status,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions}&limit=500&access_token=${accountData.access_token}`
-    )
+    // Construct the Facebook API URL with proper date range parameters
+    const apiUrl = new URL(`https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns`)
+    apiUrl.searchParams.append('fields', 'name,status,insights.time_range({"since":"' + since + '","until":"' + until + '"}){spend,impressions,clicks,actions}')
+    apiUrl.searchParams.append('limit', '500')
+    apiUrl.searchParams.append('access_token', accountData.access_token)
+
+    console.log('API URL:', apiUrl.toString())
+
+    const fbResponse = await fetch(apiUrl.toString())
 
     if (!fbResponse.ok) {
       const errorData = await fbResponse.json()
@@ -89,7 +103,8 @@ serve(async (req) => {
           impressions: insights.impressions,
           clicks: insights.clicks,
           conversions: conversions,
-          status: campaign.status
+          status: campaign.status,
+          timeRange: insights.date_start ? `${insights.date_start} to ${insights.date_stop}` : 'No date range'
         })
 
         return {
