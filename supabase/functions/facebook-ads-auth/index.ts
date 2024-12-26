@@ -20,6 +20,8 @@ serve(async (req) => {
         throw new Error('Facebook access token not configured')
       }
 
+      console.log('Retrieved Facebook access token successfully')
+
       return new Response(
         JSON.stringify({ access_token: accessToken }),
         {
