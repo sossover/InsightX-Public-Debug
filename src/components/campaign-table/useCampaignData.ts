@@ -73,10 +73,10 @@ export function useCampaignData(
   }, [selectedAccountId, dateRange, useSampleData, toast]);
 
   const syncCampaignData = async () => {
-    if (!selectedAccountId) {
+    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) {
       toast({
         title: "Error",
-        description: "Please select an account before syncing",
+        description: "Please select an account and date range before syncing",
         variant: "destructive",
       });
       return;
@@ -85,6 +85,8 @@ export function useCampaignData(
     setIsSyncing(true);
     try {
       console.log('Starting sync with account ID:', selectedAccountId);
+      console.log('Date range:', dateRange);
+      
       const response = await supabase.functions.invoke('fetch-google-sheets', {
         headers: { 'x-account-id': selectedAccountId }
       });

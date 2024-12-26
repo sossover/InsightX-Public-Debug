@@ -19,11 +19,13 @@ export function TableActions({
   dateRange,
   selectedAccountId
 }: TableActionsProps) {
+  const isDisabled = !selectedAccountId || isSyncing || !dateRange?.from || !dateRange?.to;
+
   return (
     <div className="flex justify-between">
-      <Button
+      <Button 
         onClick={onExport}
-        variant="outline"
+        variant="outline" 
         className="flex items-center gap-2"
       >
         <Download className="w-4 h-4" />
@@ -31,8 +33,8 @@ export function TableActions({
       </Button>
       <Button
         onClick={onSync}
-        disabled={!selectedAccountId || isSyncing}
-        className="flex items-center gap-2 bg-violet-500 hover:bg-violet-600"
+        disabled={isDisabled}
+        className="flex items-center gap-2 bg-violet-500 hover:bg-violet-600 text-white"
       >
         {isSyncing ? (
           <Loader2 className="w-4 h-4 animate-spin" />
