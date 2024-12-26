@@ -28,8 +28,27 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const redirectUrl = `${window.location.origin}/`;
-  console.log('Auth redirect URL:', redirectUrl); // For debugging
+  // Get the current origin for the redirect URL
+  const redirectUrl = window.location.origin;
+  console.log('Auth redirect URL:', redirectUrl);
+
+  // Custom function to handle Google sign-in
+  const handleGoogleSignIn = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
+    });
+
+    if (error) {
+      console.error('Google sign-in error:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-custom-purple-50 to-white p-4">
@@ -65,24 +84,13 @@ export default function Login() {
             }}
             providers={["google"]}
             redirectTo={redirectUrl}
+            onlyThirdPartyProviders={true}
             localization={{
               variables: {
                 sign_in: {
-                  email_label: 'Email address',
-                  password_label: 'Your password',
-                  email_input_placeholder: 'Your email address',
-                  password_input_placeholder: 'Your password',
-                  button_label: 'Sign in with email',
-                  loading_button_label: 'Signing in ...',
                   social_provider_text: "Continue with {{provider}} to InsightX"
                 },
                 sign_up: {
-                  email_label: 'Email address',
-                  password_label: 'Create a password',
-                  email_input_placeholder: 'Your email address',
-                  password_input_placeholder: 'Your password',
-                  button_label: 'Sign up',
-                  loading_button_label: 'Signing up ...',
                   social_provider_text: "Sign up with {{provider}} to InsightX"
                 }
               }
