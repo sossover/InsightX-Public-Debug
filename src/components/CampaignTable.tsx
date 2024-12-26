@@ -24,8 +24,6 @@ export function CampaignTable({
   const {
     campaigns: realCampaigns,
     isFetching,
-    isSyncing,
-    syncCampaignData,
     fetchCampaignData
   } = useCampaignData(selectedAccountId, dateRange, useSampleData);
 
@@ -59,10 +57,6 @@ export function CampaignTable({
         <TableActions
           useSampleData={useSampleData}
           onExport={() => exportToCSV(sortedCampaigns, totals)}
-          onSync={syncCampaignData}
-          isSyncing={isSyncing}
-          dateRange={dateRange}
-          selectedAccountId={selectedAccountId}
         />
       )}
       

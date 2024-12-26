@@ -12,7 +12,6 @@ export function useCampaignData(
 ) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async () => {
@@ -72,54 +71,9 @@ export function useCampaignData(
     }
   }, [selectedAccountId, dateRange, useSampleData, toast]);
 
-  const syncCampaignData = async () => {
-    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) {
-      toast({
-        title: "Error",
-        description: "Please select an account and date range before syncing",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSyncing(true);
-    try {
-      console.log('Starting sync with account ID:', selectedAccountId);
-      console.log('Date range:', dateRange);
-      
-      const response = await supabase.functions.invoke('fetch-google-sheets', {
-        headers: { 'x-account-id': selectedAccountId }
-      });
-
-      console.log('Sync response:', response);
-
-      if (!response.data?.success) {
-        throw new Error(response.data?.error || 'Failed to sync data');
-      }
-
-      toast({
-        title: "Success",
-        description: "Campaign data synced successfully from Google Sheets",
-      });
-
-      await fetchCampaignData();
-    } catch (error) {
-      console.error('Error syncing campaigns:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sync campaign data. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   return {
     campaigns,
     isFetching,
-    isSyncing,
-    fetchCampaignData,
-    syncCampaignData
+    fetchCampaignData
   };
 }
