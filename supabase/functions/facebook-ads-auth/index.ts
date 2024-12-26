@@ -8,13 +8,26 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { action } = await req.json()
-    
-    if (action === 'get-token') {
+    // Parse the request body
+    let body;
+    try {
+      body = await req.json()
+    } catch (e) {
+      console.error('Error parsing request body:', e)
+      throw new Error('Invalid request body')
+    }
+
+    console.log('Received request with body:', body)
+
+    if (!body || !body.action) {
+      throw new Error('Missing required action parameter')
+    }
+
+    if (body.action === 'get-token') {
       const accessToken = Deno.env.get('FACEBOOK_ACCESS_TOKEN')
       if (!accessToken) {
         throw new Error('Facebook access token not configured')
@@ -23,9 +36,9 @@ serve(async (req) => {
       console.log('Retrieved Facebook access token successfully')
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           access_token: accessToken,
-          success: true 
+          success: true
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -38,9 +51,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Function error:', error)
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
-        success: false 
+        success: false
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
