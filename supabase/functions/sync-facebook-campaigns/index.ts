@@ -36,7 +36,7 @@ serve(async (req) => {
 
     if (!accountData?.access_token) {
       console.error('No access token found for account')
-      throw new Error('No Facebook access token found for this account. Please reconnect your Facebook account.')
+      throw new Error('No Facebook access token found for this account')
     }
 
     if (!accountData?.account_id) {
@@ -46,10 +46,10 @@ serve(async (req) => {
 
     console.log('Retrieved account data, fetching insights from Facebook')
 
-    // Calculate date range (last 60 days)
+    // Calculate date range (last 30 days)
     const endDate = new Date()
     const startDate = new Date()
-    startDate.setDate(startDate.getDate() - 60)
+    startDate.setDate(startDate.getDate() - 30)
 
     // Format dates for Facebook API
     const since = startDate.toISOString().split('T')[0]
@@ -59,13 +59,10 @@ serve(async (req) => {
 
     // Fetch data from Facebook Marketing API
     const fbResponse = await fetch(
-      `https://graph.facebook.com/v18.0/${accountData.account_id}/insights?` +
+      `https://graph.facebook.com/v18.0/act_${accountData.account_id}/insights?` +
       new URLSearchParams({
         fields: 'campaign_name,spend,impressions,clicks,actions',
-        time_range: JSON.stringify({
-          since,
-          until
-        }),
+        time_range: JSON.stringify({ since, until }),
         level: 'campaign',
         access_token: accountData.access_token,
       })
@@ -80,10 +77,13 @@ serve(async (req) => {
     const fbData = await fbResponse.json()
     console.log('Received Facebook data:', JSON.stringify(fbData))
 
-    if (!fbData.data) {
+    if (!fbData.data || fbData.data.length === 0) {
       console.log('No campaign data returned from Facebook')
       return new Response(
-        JSON.stringify({ success: true, message: 'No campaign data found' }),
+        JSON.stringify({ 
+          success: true, 
+          message: 'No campaign data found for the specified date range' 
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -102,20 +102,18 @@ serve(async (req) => {
         impressions: parseInt(campaign.impressions || '0'),
         clicks: parseInt(campaign.clicks || '0'),
         conversions: parseInt(conversions),
-        created_at: since,
+        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
     })
 
     console.log('Processed campaign data:', JSON.stringify(campaignData))
 
-    // Delete existing data for this date range and account
+    // Delete existing data for this account
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
       .eq('account_id', accountId)
-      .gte('created_at', `${since}T00:00:00`)
-      .lte('created_at', `${until}T23:59:59`)
 
     if (deleteError) {
       console.error('Error deleting existing campaigns:', deleteError)
