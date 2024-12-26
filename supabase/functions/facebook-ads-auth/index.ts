@@ -50,7 +50,6 @@ serve(async (req) => {
     const response = await fetch(
       `https://graph.facebook.com/v18.0/me/adaccounts?fields=name,account_id,currency,timezone_name,account_status&access_token=${accessToken}`,
       {
-        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -65,8 +64,18 @@ serve(async (req) => {
       throw new Error(data.error?.message || 'Failed to fetch Facebook ad accounts')
     }
 
+    // Transform the data to match our expected format
+    const transformedData = data.data.map((account: any) => ({
+      id: account.id,
+      name: account.name,
+      account_id: account.account_id,
+      currency: account.currency,
+      timezone_name: account.timezone_name,
+      account_status: account.account_status.toString()
+    }))
+
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({ data: transformedData }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

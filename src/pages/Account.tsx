@@ -8,6 +8,7 @@ import { initiateGoogleAdsAuth } from "@/utils/googleAdsAuth";
 import { AdAccountsList } from "@/components/account/AdAccountsList";
 import { PlatformCard } from "@/components/account/PlatformCard";
 import { GoogleAdsAccountSelector } from "@/components/account/GoogleAdsAccountSelector";
+import { FacebookAdsAccountSelector } from "@/components/account/FacebookAdsAccountSelector";
 
 interface AdAccount {
   id: string;
@@ -22,11 +23,22 @@ interface GoogleAdsAccount {
   customerId: string;
 }
 
+interface FacebookAdsAccount {
+  id: string;
+  name: string;
+  account_id: string;
+  currency: string;
+  timezone_name: string;
+  account_status: string;
+}
+
 export default function Account() {
   const [adAccounts, setAdAccounts] = useState<AdAccount[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isAccountSelectorOpen, setIsAccountSelectorOpen] = useState(false);
+  const [isGoogleAccountSelectorOpen, setIsGoogleAccountSelectorOpen] = useState(false);
+  const [isFacebookAccountSelectorOpen, setIsFacebookAccountSelectorOpen] = useState(false);
   const [googleAdsAccounts, setGoogleAdsAccounts] = useState<GoogleAdsAccount[]>([]);
+  const [facebookAdsAccounts, setFacebookAdsAccounts] = useState<FacebookAdsAccount[]>([]);
   const [loadingPlatform, setLoadingPlatform] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,7 +55,7 @@ export default function Account() {
           const accounts = JSON.parse(decodeURIComponent(accountsData));
           console.log('Parsed accounts:', accounts);
           setGoogleAdsAccounts(accounts);
-          setIsAccountSelectorOpen(true);
+          setIsGoogleAccountSelectorOpen(true);
           window.history.replaceState({}, '', window.location.pathname);
         } catch (error) {
           console.error('Error parsing accounts data:', error);
@@ -96,7 +108,6 @@ export default function Account() {
       try {
         setLoadingPlatform('Facebook Ads');
         
-        // Get the current session
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           throw new Error('No authenticated session found');
@@ -112,32 +123,8 @@ export default function Account() {
           throw new Error('Failed to fetch Facebook ad accounts');
         }
 
-        const { data: userData } = await supabase.auth.getUser();
-        if (!userData.user) throw new Error('No authenticated user found');
-
-        for (const account of response.data.data) {
-          const { error } = await supabase.from('ad_accounts').insert({
-            user_id: userData.user.id,
-            platform: 'Facebook Ads',
-            account_id: account.account_id,
-            account_name: account.name,
-            is_active: true,
-            account_currency: account.currency,
-            account_timezone: account.timezone_name,
-            account_status: account.account_status.toString(),
-          });
-
-          if (error) throw error;
-        }
-
-        toast({
-          title: "Success",
-          description: `Successfully connected ${response.data.data.length} Facebook Ads ${
-            response.data.data.length === 1 ? 'account' : 'accounts'
-          }`,
-        });
-
-        fetchAdAccounts();
+        setFacebookAdsAccounts(response.data.data);
+        setIsFacebookAccountSelectorOpen(true);
       } catch (error) {
         console.error('Error connecting Facebook Ads:', error);
         toast({
@@ -205,9 +192,16 @@ export default function Account() {
                 />
 
                 <GoogleAdsAccountSelector
-                  isOpen={isAccountSelectorOpen}
-                  onClose={() => setIsAccountSelectorOpen(false)}
+                  isOpen={isGoogleAccountSelectorOpen}
+                  onClose={() => setIsGoogleAccountSelectorOpen(false)}
                   accounts={googleAdsAccounts}
+                  onAccountsSelected={fetchAdAccounts}
+                />
+
+                <FacebookAdsAccountSelector
+                  isOpen={isFacebookAccountSelectorOpen}
+                  onClose={() => setIsFacebookAccountSelectorOpen(false)}
+                  accounts={facebookAdsAccounts}
                   onAccountsSelected={fetchAdAccounts}
                 />
               </div>
