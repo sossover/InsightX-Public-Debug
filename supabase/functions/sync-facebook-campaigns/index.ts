@@ -13,17 +13,22 @@ serve(async (req) => {
 
   try {
     const { accountId, dateFrom, dateTo } = await req.json()
-    console.log('Received request with:', { accountId, dateFrom, dateTo })
+    console.log('Sync request received:', { accountId, dateFrom, dateTo })
     
     if (!accountId) {
       throw new Error('Account ID is required')
     }
 
-    // Format dates for the Facebook API
-    const since = dateFrom ? new Date(dateFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-    const until = dateTo ? new Date(dateTo).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+    // Format dates for the Facebook API - use current date if no range provided
+    const today = new Date()
+    const since = dateFrom ? new Date(dateFrom) : today
+    const until = dateTo ? new Date(dateTo) : today
+    
+    // Format to YYYY-MM-DD
+    const sinceStr = since.toISOString().split('T')[0]
+    const untilStr = until.toISOString().split('T')[0]
 
-    console.log('Using formatted dates:', { since, until })
+    console.log('Using date range:', { sinceStr, untilStr })
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -47,9 +52,11 @@ serve(async (req) => {
       throw new Error('No Facebook access token found for this account')
     }
 
-    // Fetch campaign data from Facebook API with date range
+    console.log('Fetching Facebook campaign data...')
+
+    // Fetch campaign data from Facebook API
     const fbResponse = await fetch(
-      `https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns?fields=name,status,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions}&limit=500&access_token=${accountData.access_token}`
+      `https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns?fields=name,status,insights.time_range({"since":"${sinceStr}","until":"${untilStr}"}){spend,impressions,clicks,actions}&limit=500&access_token=${accountData.access_token}`
     )
 
     if (!fbResponse.ok) {
@@ -59,10 +66,10 @@ serve(async (req) => {
     }
 
     const fbData = await fbResponse.json()
-    console.log('Raw Facebook campaign data:', JSON.stringify(fbData, null, 2))
+    console.log('Received Facebook data:', JSON.stringify(fbData, null, 2))
 
     if (!fbData.data || fbData.data.length === 0) {
-      console.log('No campaign data returned from Facebook')
+      console.log('No campaign data found')
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -92,21 +99,21 @@ serve(async (req) => {
           impressions: parseInt(insights.impressions || '0'),
           clicks: parseInt(insights.clicks || '0'),
           conversions: conversions,
-          created_at: new Date().toISOString(),
+          created_at: sinceStr,
           updated_at: new Date().toISOString()
         }
       })
       .filter(campaign => campaign.impressions > 0)
 
-    console.log('Processed campaign data:', JSON.stringify(campaignData, null, 2))
+    console.log('Processed campaign data:', campaignData)
 
     // Delete existing data for this account and date range
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
       .eq('account_id', accountId)
-      .gte('created_at', since)
-      .lte('created_at', until)
+      .gte('created_at', sinceStr)
+      .lte('created_at', untilStr)
 
     if (deleteError) {
       console.error('Error deleting existing campaigns:', deleteError)
