@@ -1,9 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
+import { format, isWithinInterval, parseISO } from 'https://esm.sh/date-fns@2.30.0'
 
 const SHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
 const TAB_NAME = 'Class Data';
 const RANGE = 'A2:F31';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface Campaign {
   date: string;
@@ -15,23 +21,30 @@ interface Campaign {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const { accountId, dateRange } = await req.json();
+    console.log('Starting fetch-google-sheets function');
+    
+    // Parse request body
+    let { accountId, dateRange } = await req.json();
+    console.log('Received request with accountId:', accountId);
+    console.log('Date range:', dateRange);
+
     if (!accountId) {
       throw new Error('Account ID is required');
     }
 
-    console.log('Account ID:', accountId);
-    console.log('Date Range:', dateRange);
-
-    // Fetch data from Google Sheets using the new API key
+    // Fetch data from Google Sheets
     const apiKey = Deno.env.get('Google Sheets API v2');
     if (!apiKey) {
       console.error('Google Sheets API key not found');
       throw new Error('Google Sheets API key not configured');
     }
 
-    console.log('API Key found, proceeding with fetch...');
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
     console.log('Fetching from Google Sheets URL:', sheetsUrl);
 
@@ -43,52 +56,70 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Raw data from sheets:', data);
 
+    if (!data.values || !Array.isArray(data.values)) {
+      throw new Error('Invalid data format from Google Sheets');
+    }
+
     // Transform and aggregate the data
-    const campaigns = new Map<string, Campaign>();
+    const campaignMap = new Map<string, Campaign>();
     
     data.values.forEach((row: any[]) => {
-      const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
-      const date = new Date(dateStr);
-
-      // Check if date is within selected range
-      if (dateRange?.from && dateRange?.to) {
-        const fromDate = new Date(dateRange.from);
-        const toDate = new Date(dateRange.to);
-        if (date < fromDate || date > toDate) {
-          return; // Skip this row if outside date range
-        }
+      if (!row || row.length < 6) {
+        console.log('Skipping invalid row:', row);
+        return;
       }
 
-      const spend = parseFloat(spendStr) || 0;
-      const impressions = parseInt(impressionsStr) || 0;
-      const clicks = parseInt(clicksStr) || 0;
-      const conversions = parseInt(conversionsStr) || 0;
+      const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
+      
+      try {
+        const date = parseISO(dateStr);
+        
+        // Check if date is within selected range
+        if (dateRange?.from && dateRange?.to) {
+          const fromDate = parseISO(dateRange.from);
+          const toDate = parseISO(dateRange.to);
+          
+          if (!isWithinInterval(date, { start: fromDate, end: toDate })) {
+            console.log(`Skipping row with date ${dateStr} - outside range`);
+            return;
+          }
+        }
 
-      if (campaigns.has(name)) {
-        // Aggregate metrics for existing campaign
-        const existing = campaigns.get(name)!;
-        campaigns.set(name, {
-          ...existing,
-          spend: existing.spend + spend,
-          impressions: existing.impressions + impressions,
-          clicks: existing.clicks + clicks,
-          conversions: existing.conversions + conversions,
-        });
-      } else {
-        // Create new campaign entry
-        campaigns.set(name, {
-          date: dateStr,
-          name,
-          spend,
-          impressions,
-          clicks,
-          conversions,
-        });
+        const spend = parseFloat(spendStr) || 0;
+        const impressions = parseInt(impressionsStr) || 0;
+        const clicks = parseInt(clicksStr) || 0;
+        const conversions = parseInt(conversionsStr) || 0;
+
+        if (campaignMap.has(name)) {
+          // Aggregate metrics for existing campaign
+          const existing = campaignMap.get(name)!;
+          campaignMap.set(name, {
+            ...existing,
+            spend: existing.spend + spend,
+            impressions: existing.impressions + impressions,
+            clicks: existing.clicks + clicks,
+            conversions: existing.conversions + conversions,
+          });
+          console.log(`Updated aggregated data for campaign: ${name}`);
+        } else {
+          // Create new campaign entry
+          campaignMap.set(name, {
+            date: dateStr,
+            name,
+            spend,
+            impressions,
+            clicks,
+            conversions,
+          });
+          console.log(`Added new campaign: ${name}`);
+        }
+      } catch (error) {
+        console.error(`Error processing row: ${JSON.stringify(row)}`, error);
       }
     });
 
     // Convert aggregated data to array
-    const aggregatedCampaigns = Array.from(campaigns.values());
+    const aggregatedCampaigns = Array.from(campaignMap.values());
     console.log('Aggregated campaigns:', aggregatedCampaigns);
 
     // Initialize Supabase client
@@ -153,7 +184,7 @@ serve(async (req) => {
         message: `Successfully synced ${aggregatedCampaigns.length} campaigns`,
       }),
       {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     );
 
@@ -166,7 +197,7 @@ serve(async (req) => {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     );
   }
