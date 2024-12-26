@@ -27,7 +27,10 @@ export default function Settings() {
             <div className="grid gap-6">
               <div className="bg-white/60 backdrop-blur-xl shadow-sm border rounded-lg">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <SettingsTabs />
+                  <SettingsTabs 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab}
+                  />
                   <TabsContent value="account" className="p-6">
                     <SettingsForm onSave={handleSettingsSave} />
                   </TabsContent>
