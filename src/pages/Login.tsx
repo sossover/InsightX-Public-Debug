@@ -27,7 +27,7 @@ export default function Login() {
   }, [navigate]);
 
   // Get the current origin for the redirect URL
-  const redirectUrl = window.location.origin;
+  const redirectUrl = `${window.location.origin}/google-ads-callback`;
   console.log('Auth redirect URL:', redirectUrl);
 
   // Custom function to handle Google sign-in
