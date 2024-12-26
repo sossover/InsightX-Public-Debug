@@ -41,8 +41,11 @@ export default function Account() {
       if (accountsData) {
         try {
           const accounts = JSON.parse(decodeURIComponent(accountsData));
+          console.log('Parsed accounts:', accounts);
           setGoogleAdsAccounts(accounts);
           setIsAccountSelectorOpen(true);
+          // Clean up URL parameters
+          window.history.replaceState({}, '', window.location.pathname);
         } catch (error) {
           console.error('Error parsing accounts data:', error);
           toast({
@@ -52,8 +55,6 @@ export default function Account() {
           });
         }
       }
-      // Clean up URL parameters
-      window.history.replaceState({}, '', window.location.pathname);
     }
   }, [toast]);
 
@@ -101,9 +102,18 @@ export default function Account() {
   };
 
   const platforms = [
-    { name: 'Google Ads', description: 'Connect your Google Ads account' },
-    { name: 'Facebook Ads', description: 'Connect your Facebook Ads account' },
-    { name: 'TikTok Ads', description: 'Connect your TikTok Ads account' }
+    { 
+      name: 'Google Ads', 
+      description: 'Connect your Google Ads account to analyze performance' 
+    },
+    { 
+      name: 'Facebook Ads', 
+      description: 'Connect your Facebook Ads account to analyze performance' 
+    },
+    { 
+      name: 'TikTok Ads', 
+      description: 'Connect your TikTok Ads account to analyze performance' 
+    }
   ];
 
   return (

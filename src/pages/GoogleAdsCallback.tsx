@@ -19,7 +19,7 @@ export default function GoogleAdsCallback() {
           description: "No authorization code received",
           variant: "destructive",
         });
-        navigate('/account-setup');
+        navigate('/account');
         return;
       }
 
@@ -33,13 +33,18 @@ export default function GoogleAdsCallback() {
           body: JSON.stringify({ code }),
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to connect to Google Ads');
+          throw new Error('Failed to connect to Google Ads');
         }
 
-        // Redirect to account page with accounts data
+        const data = await response.json();
+        console.log('Received accounts data:', data);
+
+        if (!data.accounts || !Array.isArray(data.accounts)) {
+          throw new Error('No accounts data received');
+        }
+
+        // Encode the accounts data and redirect to account page
         const encodedAccounts = encodeURIComponent(JSON.stringify(data.accounts));
         navigate(`/account?success=true&accounts=${encodedAccounts}`);
       } catch (error) {
