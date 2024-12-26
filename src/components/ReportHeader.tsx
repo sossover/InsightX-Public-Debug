@@ -4,12 +4,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { AdAccountSelector } from "./AdAccountSelector";
+import { DateRange } from "react-day-picker";
 
 interface ReportHeaderProps {
   title: string;
   description?: string;
-  date?: Date;
-  setDate?: (date: Date | undefined) => void;
+  date?: DateRange | undefined;
+  setDate?: (date: DateRange | undefined) => void;
   showDateSelector?: boolean;
   onAccountChange?: (accountId: string) => void;
 }
@@ -40,18 +41,30 @@ export function ReportHeader({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-[250px] justify-start text-left font-normal"
+                className="w-[280px] justify-start text-left font-normal"
               >
                 <CalendarDays className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : "Pick a date"}
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                mode="single"
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
                 selected={date}
                 onSelect={setDate}
-                initialFocus
+                numberOfMonths={2}
               />
             </PopoverContent>
           </Popover>

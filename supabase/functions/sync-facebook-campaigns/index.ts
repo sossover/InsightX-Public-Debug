@@ -22,7 +22,7 @@ serve(async (req) => {
   }
 
   try {
-    const { accountId, date } = await req.json()
+    const { accountId, dateFrom, dateTo } = await req.json()
     
     // Create Supabase client
     const supabaseClient = createClient(
@@ -41,17 +41,14 @@ serve(async (req) => {
       throw new Error('Failed to get account data')
     }
 
-    // Format date for Facebook API
-    const formattedDate = date.split('T')[0]
-
     // Fetch data from Facebook Marketing API
     const response = await fetch(
       `https://graph.facebook.com/v18.0/${accountData.account_id}/insights?` +
       new URLSearchParams({
         fields: 'campaign_name,spend,impressions,clicks,actions',
         time_range: JSON.stringify({
-          since: formattedDate,
-          until: formattedDate
+          since: dateFrom,
+          until: dateTo
         }),
         access_token: accountData.access_token,
       })
@@ -67,17 +64,17 @@ serve(async (req) => {
       impressions: parseInt(campaign.impressions),
       clicks: parseInt(campaign.clicks),
       conversions: parseInt(campaign.conversions),
-      created_at: `${formattedDate}T00:00:00`,
+      created_at: `${dateFrom}T00:00:00`,
       updated_at: new Date().toISOString()
     }))
 
-    // Delete existing data for this date and account
+    // Delete existing data for this date range and account
     await supabaseClient
       .from('campaigns')
       .delete()
       .eq('account_id', accountId)
-      .gte('created_at', `${formattedDate}T00:00:00`)
-      .lte('created_at', `${formattedDate}T23:59:59`)
+      .gte('created_at', `${dateFrom}T00:00:00`)
+      .lte('created_at', `${dateTo}T23:59:59`)
 
     // Insert new data
     const { error: insertError } = await supabaseClient

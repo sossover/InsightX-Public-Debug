@@ -11,28 +11,33 @@ import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 export default function CampaignPerformance() {
-  const [date, setDate] = useState<Date>(new Date());
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
-  const fetchCampaignData = useCallback(async (accountId: string, selectedDate: Date) => {
-    if (!accountId) return;
+  const fetchCampaignData = useCallback(async () => {
+    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) return;
     
     setIsLoading(true);
     try {
-      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+      const toDate = format(dateRange.to, 'yyyy-MM-dd');
       
       const { data, error } = await supabase
         .from('campaigns')
         .select('*')
-        .eq('account_id', accountId)
-        .gte('created_at', `${formattedDate}T00:00:00`)
-        .lte('created_at', `${formattedDate}T23:59:59`);
+        .eq('account_id', selectedAccountId)
+        .gte('created_at', `${fromDate}T00:00:00`)
+        .lte('created_at', `${toDate}T23:59:59`);
 
       if (error) {
         console.error('Error fetching campaigns:', error);
@@ -63,7 +68,7 @@ export default function CampaignPerformance() {
       if (formattedCampaigns.length === 0) {
         toast({
           title: "No Data",
-          description: "No campaign data found for the selected date.",
+          description: "No campaign data found for the selected date range.",
         });
       }
     } catch (error) {
@@ -76,13 +81,16 @@ export default function CampaignPerformance() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [selectedAccountId, dateRange, toast]);
 
   const handleSync = async () => {
-    if (!selectedAccountId || isSyncing) return;
+    if (!selectedAccountId || !dateRange?.from || !dateRange?.to || isSyncing) return;
 
     setIsSyncing(true);
     try {
+      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+      const toDate = format(dateRange.to, 'yyyy-MM-dd');
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-facebook-campaigns`,
         {
@@ -93,7 +101,8 @@ export default function CampaignPerformance() {
           },
           body: JSON.stringify({
             accountId: selectedAccountId,
-            date: format(date, 'yyyy-MM-dd'),
+            dateFrom: fromDate,
+            dateTo: toDate,
           }),
         }
       );
@@ -108,7 +117,7 @@ export default function CampaignPerformance() {
       });
 
       // Refresh the data
-      await fetchCampaignData(selectedAccountId, date);
+      await fetchCampaignData();
     } catch (error) {
       console.error('Error syncing campaigns:', error);
       toast({
@@ -122,10 +131,10 @@ export default function CampaignPerformance() {
   };
 
   useEffect(() => {
-    if (selectedAccountId && date) {
-      fetchCampaignData(selectedAccountId, date);
+    if (selectedAccountId && dateRange?.from && dateRange?.to) {
+      fetchCampaignData();
     }
-  }, [selectedAccountId, date, fetchCampaignData]);
+  }, [selectedAccountId, dateRange, fetchCampaignData]);
 
   return (
     <SidebarProvider>
@@ -137,14 +146,14 @@ export default function CampaignPerformance() {
             <ReportHeader
               title="Campaign Performance"
               description="Track and analyze your campaign metrics"
-              date={date}
-              setDate={setDate}
+              date={dateRange}
+              setDate={setDateRange}
               onAccountChange={setSelectedAccountId}
             />
             
             <Button
               onClick={handleSync}
-              disabled={!selectedAccountId || isSyncing}
+              disabled={!selectedAccountId || isSyncing || !dateRange?.from || !dateRange?.to}
               className="ml-4"
             >
               {isSyncing ? (
