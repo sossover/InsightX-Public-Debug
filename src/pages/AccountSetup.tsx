@@ -1,28 +1,52 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MockAccountsList } from "@/components/account-setup/MockAccountsList";
+import { GoogleAdsAccountsList } from "@/components/account-setup/GoogleAdsAccountsList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface AdAccount {
+interface Account {
   id: string;
   name: string;
   currencyCode: string;
   timeZone: string;
 }
 
+const mockAccounts: Account[] = [
+  { 
+    id: 'mock-1', 
+    name: 'Sample Marketing Account', 
+    currencyCode: 'USD', 
+    timeZone: 'America/New_York' 
+  },
+  { 
+    id: 'mock-2', 
+    name: 'Sample E-commerce Account', 
+    currencyCode: 'EUR', 
+    timeZone: 'Europe/London' 
+  },
+  { 
+    id: 'mock-3', 
+    name: 'Sample B2B Account', 
+    currencyCode: 'USD', 
+    timeZone: 'America/Los_Angeles' 
+  },
+];
+
 export default function AccountSetup() {
   const [loading, setLoading] = useState(true);
-  const [accounts, setAccounts] = useState<AdAccount[]>([]);
+  const [googleAccounts, setGoogleAccounts] = useState<Account[]>([]);
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<string>("mock");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     checkAuth();
-    fetchAdAccounts();
+    fetchGoogleAdsAccounts();
   }, []);
 
   const checkAuth = async () => {
@@ -32,16 +56,23 @@ export default function AccountSetup() {
     }
   };
 
-  const fetchAdAccounts = async () => {
+  const fetchGoogleAdsAccounts = async () => {
     try {
-      // In a real implementation, this would fetch accounts from Google Ads API
-      // For now, we'll use mock data
-      const mockAccounts: AdAccount[] = [
-        { id: '1234567890', name: 'Main Marketing Account', currencyCode: 'USD', timeZone: 'America/New_York' },
-        { id: '2345678901', name: 'Secondary Campaign Account', currencyCode: 'EUR', timeZone: 'Europe/London' },
-        { id: '3456789012', name: 'Test Account', currencyCode: 'USD', timeZone: 'America/Los_Angeles' },
-      ];
-      setAccounts(mockAccounts);
+      const { data: adAccounts } = await supabase
+        .from('ad_accounts')
+        .select('*')
+        .eq('platform', 'Google Ads')
+        .eq('is_active', true);
+
+      if (adAccounts) {
+        const formattedAccounts: Account[] = adAccounts.map(account => ({
+          id: account.account_id,
+          name: account.account_name || 'Unnamed Account',
+          currencyCode: account.account_currency || 'USD',
+          timeZone: account.account_timezone || 'UTC',
+        }));
+        setGoogleAccounts(formattedAccounts);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching accounts:', error);
@@ -76,25 +107,63 @@ export default function AccountSetup() {
 
     setLoading(true);
     try {
-      // Save selected accounts to Supabase
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
 
       const promises = Array.from(selectedAccounts).map(accountId => {
-        const account = accounts.find(a => a.id === accountId);
+        const isMock = accountId.startsWith('mock-');
+        const account = isMock 
+          ? mockAccounts.find(a => a.id === accountId)
+          : googleAccounts.find(a => a.id === accountId);
+
+        if (!account) return null;
+
         return supabase.from('ad_accounts').upsert({
           user_id: user.id,
           platform: 'Google Ads',
           account_id: accountId,
-          account_name: account?.name,
+          account_name: account.name,
           is_active: true,
-          account_currency: account?.currencyCode,
-          account_timezone: account?.timeZone,
+          account_currency: account.currencyCode,
+          account_timezone: account.timeZone,
           account_status: 'ACTIVE',
         });
       });
 
-      await Promise.all(promises);
+      await Promise.all(promises.filter(Boolean));
+
+      // If using mock data, insert sample campaign data
+      for (const accountId of selectedAccounts) {
+        if (accountId.startsWith('mock-')) {
+          const { data: adAccount } = await supabase
+            .from('ad_accounts')
+            .select('id')
+            .eq('account_id', accountId)
+            .single();
+
+          if (adAccount) {
+            // Insert mock campaign data
+            await supabase.from('campaigns').insert([
+              {
+                account_id: adAccount.id,
+                name: 'Sample Search Campaign',
+                spend: 1500.50,
+                impressions: 50000,
+                clicks: 2500,
+                conversions: 125
+              },
+              {
+                account_id: adAccount.id,
+                name: 'Sample Display Campaign',
+                spend: 750.25,
+                impressions: 100000,
+                clicks: 1500,
+                conversions: 45
+              }
+            ]);
+          }
+        }
+      }
 
       toast({
         title: "Success",
@@ -126,55 +195,41 @@ export default function AccountSetup() {
     <div className="min-h-screen bg-gradient-to-br from-custom-purple-50 to-white p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Select Your Google Ads Accounts</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Select Your Accounts</h1>
           <p className="text-gray-600">Choose the accounts you want to analyze in InsightX</p>
         </div>
 
-        <div className="grid gap-4">
-          {accounts.map((account) => (
-            <Card 
-              key={account.id}
-              className={`transition-all duration-200 ${
-                selectedAccounts.has(account.id) 
-                  ? 'border-custom-purple-300 shadow-md' 
-                  : 'hover:border-gray-300'
-              }`}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg font-medium">{account.name}</CardTitle>
-                <Button
-                  variant={selectedAccounts.has(account.id) ? "default" : "outline"}
-                  onClick={() => toggleAccountSelection(account.id)}
-                  className="gap-2"
-                >
-                  {selectedAccounts.has(account.id) ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      Selected
-                    </>
-                  ) : (
-                    "Select Account"
-                  )}
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="mock">Mock Accounts</TabsTrigger>
+            <TabsTrigger value="google">Google Ads Accounts</TabsTrigger>
+          </TabsList>
+          <TabsContent value="mock">
+            <MockAccountsList
+              accounts={mockAccounts}
+              selectedAccounts={selectedAccounts}
+              onToggleAccount={toggleAccountSelection}
+            />
+          </TabsContent>
+          <TabsContent value="google">
+            {googleAccounts.length > 0 ? (
+              <GoogleAdsAccountsList
+                accounts={googleAccounts}
+                selectedAccounts={selectedAccounts}
+                onToggleAccount={toggleAccountSelection}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-600 mb-4">No Google Ads accounts found.</p>
+                <Button onClick={() => window.location.href = '/google-ads-auth'}>
+                  Connect Google Ads
                 </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>
-                    <span className="font-medium">Account ID:</span> {account.id}
-                  </div>
-                  <div>
-                    <span className="font-medium">Currency:</span> {account.currencyCode}
-                  </div>
-                  <div className="col-span-2">
-                    <span className="font-medium">Time Zone:</span> {account.timeZone}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
-        <div className="mt-8 flex justify-end">
+        <div className="flex justify-end">
           <Button
             onClick={handleContinue}
             disabled={selectedAccounts.size === 0 || loading}

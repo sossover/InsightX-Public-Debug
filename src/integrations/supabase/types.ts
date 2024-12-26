@@ -60,6 +60,50 @@ export type Database = {
         }
         Relationships: []
       }
+      campaigns: {
+        Row: {
+          account_id: string
+          clicks: number
+          conversions: number
+          created_at: string
+          id: string
+          impressions: number
+          name: string
+          spend: number
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          name: string
+          spend?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          impressions?: number
+          name?: string
+          spend?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "ad_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
