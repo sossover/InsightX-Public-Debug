@@ -26,16 +26,11 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Get the current origin for the redirect URL
-  const redirectUrl = `${window.location.origin}/google-ads-callback?flowName=GeneralOAuthFlow`;
-  console.log('Auth redirect URL:', redirectUrl);
-
   // Custom function to handle Google sign-in
   const handleGoogleSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
