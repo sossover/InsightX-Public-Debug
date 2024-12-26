@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 interface FacebookAdsAccount {
   id: string;
@@ -64,7 +65,10 @@ export function FacebookAdsAccountSelector({
         body: { action: 'get-token' }
       });
 
+      console.log('Token response:', tokenData);
+
       if (tokenError || !tokenData?.access_token) {
+        console.error('Token error:', tokenError);
         throw new Error('Failed to get Facebook access token');
       }
 
@@ -101,7 +105,7 @@ export function FacebookAdsAccountSelector({
       console.error('Error connecting accounts:', error);
       toast({
         title: "Error",
-        description: "Failed to connect the selected accounts. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to connect the selected accounts. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -142,7 +146,14 @@ export function FacebookAdsAccountSelector({
             Cancel
           </Button>
           <Button onClick={handleConnect} disabled={isLoading}>
-            {isLoading ? "Connecting..." : "Connect Selected"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              "Connect Selected"
+            )}
           </Button>
         </div>
       </DialogContent>

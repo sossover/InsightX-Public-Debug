@@ -23,7 +23,10 @@ serve(async (req) => {
       console.log('Retrieved Facebook access token successfully')
 
       return new Response(
-        JSON.stringify({ access_token: accessToken }),
+        JSON.stringify({ 
+          access_token: accessToken,
+          success: true 
+        }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -35,7 +38,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Function error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        success: false 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
