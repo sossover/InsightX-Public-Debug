@@ -40,6 +40,8 @@ export default function Login() {
             access_type: 'offline',
             prompt: 'consent',
           },
+          redirectTo: window.location.origin + '/google-ads-callback',
+          skipBrowserRedirect: true // This prevents the automatic redirect
         }
       });
 
@@ -50,8 +52,10 @@ export default function Login() {
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        console.log('Google sign-in successful:', data);
+      } else if (data?.url) {
+        console.log('Opening auth URL in new window:', data.url);
+        // Open in a new window instead of redirecting in the iframe
+        window.open(data.url, '_blank', 'width=800,height=600');
       }
     } catch (err) {
       console.error('Unexpected error during sign-in:', err);
