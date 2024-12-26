@@ -97,14 +97,21 @@ serve(async (req) => {
       const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
       
       try {
-        // Parse the date from the sheet (assuming MM/dd/yyyy format)
-        const date = parse(dateStr, 'MM/dd/yyyy', new Date());
+        // Parse the date from the sheet (assuming DD/MM/YYYY format)
+        const date = parse(dateStr, 'dd/MM/yyyy', new Date());
+        console.log('Parsed date:', date, 'from string:', dateStr);
         
         // Check if date is within selected range
         if (dateRange?.from && dateRange?.to) {
           const fromDate = new Date(dateRange.from);
           const toDate = new Date(dateRange.to);
           
+          console.log('Checking date range:', {
+            date: date.toISOString(),
+            fromDate: fromDate.toISOString(),
+            toDate: toDate.toISOString()
+          });
+
           if (!isWithinInterval(date, { start: fromDate, end: toDate })) {
             console.log(`Skipping row with date ${dateStr} - outside range ${dateRange.from} to ${dateRange.to}`);
             continue;
@@ -122,6 +129,7 @@ serve(async (req) => {
 
         campaigns.push(campaign);
         processedCount++;
+        console.log('Processed campaign:', campaign);
         
       } catch (error) {
         console.error(`Error processing row: ${JSON.stringify(row)}`, error);
