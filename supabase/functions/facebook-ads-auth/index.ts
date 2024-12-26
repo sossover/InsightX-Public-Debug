@@ -7,27 +7,45 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    console.log('Starting Facebook Ads auth process...')
+    
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
+    // Verify user authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('No authorization header')
+    }
+
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
-      req.headers.get('Authorization')!
+      authHeader.replace('Bearer ', '')
     )
 
     if (userError || !user) {
+      console.error('Auth error:', userError)
       throw new Error('Unauthorized')
     }
 
+    console.log('User authenticated:', user.id)
+
+    // Get Facebook credentials from environment
     const accessToken = Deno.env.get('FACEBOOK_ACCESS_TOKEN')
-    const appId = Deno.env.get('FACEBOOK_APP_ID')
+    if (!accessToken) {
+      throw new Error('Facebook access token not configured')
+    }
     
+    console.log('Fetching Facebook ad accounts...')
+
     // Fetch ad accounts from Facebook Marketing API
     const response = await fetch(
       `https://graph.facebook.com/v18.0/me/adaccounts?fields=name,account_id,currency,timezone_name,account_status&access_token=${accessToken}`,
@@ -40,8 +58,10 @@ serve(async (req) => {
     )
 
     const data = await response.json()
+    console.log('Facebook API response:', JSON.stringify(data))
 
     if (!response.ok) {
+      console.error('Facebook API error:', data.error)
       throw new Error(data.error?.message || 'Failed to fetch Facebook ad accounts')
     }
 
@@ -53,6 +73,7 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Function error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
