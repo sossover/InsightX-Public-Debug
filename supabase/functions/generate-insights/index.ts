@@ -16,6 +16,17 @@ serve(async (req) => {
 
   try {
     const { campaignData, deviceData, countryData, keywordData } = await req.json();
+    console.log('Received request with data:', { 
+      campaigns: campaignData?.length,
+      devices: deviceData?.length,
+      countries: countryData?.length,
+      keywords: keywordData?.length
+    });
+
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not found');
+      throw new Error('OpenAI API key not configured');
+    }
 
     // Calculate totals for the system message
     const totals = campaignData.reduce((acc: any, campaign: any) => ({
@@ -25,11 +36,11 @@ serve(async (req) => {
       conversions: acc.conversions + campaign.conversions,
     }), { spend: 0, impressions: 0, clicks: 0, conversions: 0 });
 
-    // Create a context-aware system message based on available data
+    // Create a context-aware system message
     let systemMessage = `You are an AI marketing analyst. Analyze the following data:\n`;
     
     if (campaignData?.length > 0) {
-      systemMessage += `Campaign Data: ${JSON.stringify(campaignData)}\n`;
+      systemMessage += `Campaign Performance Data: ${JSON.stringify(campaignData)}\n`;
     }
     
     if (deviceData?.length > 0) {
@@ -46,13 +57,13 @@ serve(async (req) => {
 
     systemMessage += `\nTotals - Spend: $${totals.spend.toFixed(2)}, Impressions: ${totals.impressions}, Clicks: ${totals.clicks}, Conversions: ${totals.conversions}`;
 
+    console.log('Making request to OpenAI with system message length:', systemMessage.length);
+
     const userMessage = `Based on the provided data, please provide:
 1. A brief summary of overall performance
 2. 3-4 key observations focusing on the most relevant metrics and patterns
 3. 2-3 actionable recommendations for improvement
 Format the response as a JSON object with fields: summary (string), observations (array of strings), and recommendations (array of strings).`;
-
-    console.log('Making request to OpenAI with system message:', systemMessage);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -61,7 +72,7 @@ Format the response as a JSON object with fields: summary (string), observations
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemMessage },
           { role: 'user', content: userMessage }
@@ -69,6 +80,12 @@ Format the response as a JSON object with fields: summary (string), observations
         response_format: { type: "json_object" },
       }),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+    }
 
     const data = await response.json();
     console.log('OpenAI Response:', data);
@@ -83,6 +100,7 @@ Format the response as a JSON object with fields: summary (string), observations
 
     // Validate the response format
     if (!insights.summary || !Array.isArray(insights.observations) || !Array.isArray(insights.recommendations)) {
+      console.error('Invalid response structure:', insights);
       throw new Error('Invalid response structure from AI');
     }
 
@@ -92,7 +110,10 @@ Format the response as a JSON object with fields: summary (string), observations
 
   } catch (error) {
     console.error('Error in generate-insights function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      details: error.stack
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
