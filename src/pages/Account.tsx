@@ -95,22 +95,27 @@ export default function Account() {
     } else if (platform === 'Facebook Ads') {
       try {
         setLoadingPlatform('Facebook Ads');
-        const response = await fetch('https://tetpfwhzydrcoseyvhaw.functions.supabase.co/facebook-ads-auth', {
+        
+        // Get the current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('No authenticated session found');
+        }
+
+        const response = await supabase.functions.invoke('facebook-ads-auth', {
           headers: {
-            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
         });
 
-        if (!response.ok) {
+        if (!response.data) {
           throw new Error('Failed to fetch Facebook ad accounts');
         }
 
-        const data = await response.json();
-        
         const { data: userData } = await supabase.auth.getUser();
         if (!userData.user) throw new Error('No authenticated user found');
 
-        for (const account of data.data) {
+        for (const account of response.data.data) {
           const { error } = await supabase.from('ad_accounts').insert({
             user_id: userData.user.id,
             platform: 'Facebook Ads',
@@ -127,8 +132,8 @@ export default function Account() {
 
         toast({
           title: "Success",
-          description: `Successfully connected ${data.data.length} Facebook Ads ${
-            data.data.length === 1 ? 'account' : 'accounts'
+          description: `Successfully connected ${response.data.data.length} Facebook Ads ${
+            response.data.data.length === 1 ? 'account' : 'accounts'
           }`,
         });
 
