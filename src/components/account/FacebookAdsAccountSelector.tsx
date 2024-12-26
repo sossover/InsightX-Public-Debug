@@ -11,6 +11,7 @@ interface FacebookAdsAccount {
   currency: string;
   timezone_name: string;
   account_status: string;
+  access_token?: string;
 }
 
 interface FacebookAdsAccountSelectorProps {
@@ -59,6 +60,15 @@ export function FacebookAdsAccountSelector({
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("No authenticated user found");
 
+      // Get the Facebook access token from environment
+      const { data: tokenData, error: tokenError } = await supabase.functions.invoke('facebook-ads-auth', {
+        body: { action: 'get-token' }
+      });
+
+      if (tokenError || !tokenData?.access_token) {
+        throw new Error('Failed to get Facebook access token');
+      }
+
       for (const account of selectedAccountsArray) {
         const { error } = await supabase.from('ad_accounts').insert({
           user_id: userData.user.id,
@@ -68,6 +78,7 @@ export function FacebookAdsAccountSelector({
           account_currency: account.currency,
           account_timezone: account.timezone_name,
           account_status: account.account_status,
+          access_token: tokenData.access_token,
           is_active: true,
         });
 
