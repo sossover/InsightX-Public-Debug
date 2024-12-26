@@ -32,7 +32,7 @@ export function TableActions({
       <Button
         onClick={onSync}
         disabled={isSyncing || !selectedAccountId}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-violet-500 hover:bg-violet-600"
       >
         {isSyncing ? (
           <Loader2 className="w-4 h-4 animate-spin" />
