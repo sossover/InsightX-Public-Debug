@@ -27,6 +27,7 @@ export default function Account() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isAccountSelectorOpen, setIsAccountSelectorOpen] = useState(false);
   const [googleAdsAccounts, setGoogleAdsAccounts] = useState<GoogleAdsAccount[]>([]);
+  const [loadingPlatform, setLoadingPlatform] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,7 +35,6 @@ export default function Account() {
     fetchAdAccounts();
     fetchUserEmail();
 
-    // Check URL parameters for success message and accounts data
     const params = new URLSearchParams(window.location.search);
     if (params.get('success') === 'true') {
       const accountsData = params.get('accounts');
@@ -44,7 +44,6 @@ export default function Account() {
           console.log('Parsed accounts:', accounts);
           setGoogleAdsAccounts(accounts);
           setIsAccountSelectorOpen(true);
-          // Clean up URL parameters
           window.history.replaceState({}, '', window.location.pathname);
         } catch (error) {
           console.error('Error parsing accounts data:', error);
@@ -93,6 +92,57 @@ export default function Account() {
           variant: "destructive",
         });
       }
+    } else if (platform === 'Facebook Ads') {
+      try {
+        setLoadingPlatform('Facebook Ads');
+        const response = await fetch('https://tetpfwhzydrcoseyvhaw.functions.supabase.co/facebook-ads-auth', {
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch Facebook ad accounts');
+        }
+
+        const data = await response.json();
+        
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData.user) throw new Error('No authenticated user found');
+
+        for (const account of data.data) {
+          const { error } = await supabase.from('ad_accounts').insert({
+            user_id: userData.user.id,
+            platform: 'Facebook Ads',
+            account_id: account.account_id,
+            account_name: account.name,
+            is_active: true,
+            account_currency: account.currency,
+            account_timezone: account.timezone_name,
+            account_status: account.account_status.toString(),
+          });
+
+          if (error) throw error;
+        }
+
+        toast({
+          title: "Success",
+          description: `Successfully connected ${data.data.length} Facebook Ads ${
+            data.data.length === 1 ? 'account' : 'accounts'
+          }`,
+        });
+
+        fetchAdAccounts();
+      } catch (error) {
+        console.error('Error connecting Facebook Ads:', error);
+        toast({
+          title: "Connection Error",
+          description: "Failed to connect Facebook Ads accounts",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingPlatform(null);
+      }
     } else {
       toast({
         title: "Coming Soon",
@@ -139,17 +189,16 @@ export default function Account() {
                       name={platform.name}
                       description={platform.description}
                       onConnect={() => handleConnect(platform.name)}
+                      isLoading={loadingPlatform === platform.name}
                     />
                   ))}
                 </div>
 
-                {/* Display connected accounts */}
                 <AdAccountsList 
                   adAccounts={adAccounts}
                   onAccountsChange={fetchAdAccounts}
                 />
 
-                {/* Google Ads Account Selector */}
                 <GoogleAdsAccountSelector
                   isOpen={isAccountSelectorOpen}
                   onClose={() => setIsAccountSelectorOpen(false)}

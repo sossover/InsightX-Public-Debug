@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 interface PlatformCardProps {
   name: string;
   description: string;
   onConnect: () => void;
+  isLoading?: boolean;
 }
 
-export function PlatformCard({ name, description, onConnect }: PlatformCardProps) {
+export function PlatformCard({ name, description, onConnect, isLoading = false }: PlatformCardProps) {
   return (
     <div className="p-6 border rounded-lg bg-white shadow-sm flex justify-between items-center">
       <div>
@@ -18,9 +20,14 @@ export function PlatformCard({ name, description, onConnect }: PlatformCardProps
         onClick={onConnect}
         variant="outline"
         className="flex items-center gap-2"
+        disabled={isLoading}
       >
-        <Plus className="w-4 h-4" />
-        Connect
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Plus className="w-4 h-4" />
+        )}
+        {isLoading ? "Connecting..." : "Connect"}
       </Button>
     </div>
   );
