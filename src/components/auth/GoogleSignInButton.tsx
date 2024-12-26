@@ -13,8 +13,9 @@ export const GoogleSignInButton = () => {
       setIsLoading(true);
       console.log("Initiating Google sign-in...");
       
-      const redirectTo = `${window.location.origin}/google-ads-callback`;
-      console.log("Redirect URI:", redirectTo);
+      // Use the preview URL as the redirect URI
+      const redirectTo = 'https://preview--insightx.lovable.app/google-ads-callback';
+      console.log("Using redirect URI:", redirectTo);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -30,6 +31,11 @@ export const GoogleSignInButton = () => {
 
       if (error) {
         console.error('Google sign-in error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         toast({
           title: "Authentication Error",
           description: error.message || "Failed to connect to Google. Please try again.",
