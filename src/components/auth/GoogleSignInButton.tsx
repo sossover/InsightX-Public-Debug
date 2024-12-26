@@ -13,6 +13,9 @@ export const GoogleSignInButton = () => {
       setIsLoading(true);
       console.log("Initiating Google sign-in...");
       
+      const redirectTo = `${window.location.origin}/google-ads-callback`;
+      console.log("Redirect URI:", redirectTo);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -21,7 +24,7 @@ export const GoogleSignInButton = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo: `${window.location.origin}/google-ads-callback`,
+          redirectTo,
         }
       });
 
@@ -29,7 +32,7 @@ export const GoogleSignInButton = () => {
         console.error('Google sign-in error:', error);
         toast({
           title: "Authentication Error",
-          description: "Failed to connect to Google. Please try again.",
+          description: error.message || "Failed to connect to Google. Please try again.",
           variant: "destructive",
         });
       } else if (data?.url) {
