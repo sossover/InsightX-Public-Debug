@@ -10,6 +10,7 @@ import OptimizationList from "./pages/OptimizationList";
 import Account from "./pages/Account";
 import Settings from "./pages/Settings";
 import GoogleAdsCallback from "./pages/GoogleAdsCallback";
+import CampaignPerformance from "./pages/CampaignPerformance";
 import { ChatPanel } from "./components/chat/ChatPanel";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/campaign-performance" element={<CampaignPerformance />} />
         <Route path="/audience-insights" element={<AudienceInsights />} />
         <Route path="/geo-report" element={<GeoReport />} />
         <Route path="/conversion-analysis" element={<ConversionAnalysis />} />

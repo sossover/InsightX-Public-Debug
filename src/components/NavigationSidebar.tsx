@@ -20,7 +20,7 @@ import { Button } from "./ui/button";
 
 const mainItems = [
   { title: "Overview", icon: Home, url: "/" },
-  { title: "Campaign Performance", icon: TrendingUp, url: "/" },
+  { title: "Campaign Performance", icon: TrendingUp, url: "/campaign-performance" },
   { title: "Geographic Analysis", icon: Globe, url: "/geo-report" },
   { title: "Keyword Analysis", icon: FileText, url: "/keyword-analysis" },
   { title: "Audience Insights", icon: Users, url: "/audience-insights" },
