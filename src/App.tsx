@@ -8,6 +8,7 @@ import ChannelMix from "./pages/ChannelMix";
 import OptimizationList from "./pages/OptimizationList";
 import Account from "./pages/Account";
 import Settings from "./pages/Settings";
+import GoogleAdsCallback from "./pages/GoogleAdsCallback";
 import { ChatPanel } from "./components/chat/ChatPanel";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/optimization-list" element={<OptimizationList />} />
         <Route path="/account" element={<Account />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/google-ads-callback" element={<GoogleAdsCallback />} />
       </Routes>
       <ChatPanel />
     </Router>
