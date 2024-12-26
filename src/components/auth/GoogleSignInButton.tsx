@@ -13,10 +13,6 @@ export const GoogleSignInButton = () => {
       setIsLoading(true);
       console.log("Initiating Google sign-in...");
       
-      // Use the preview URL as the redirect URI
-      const redirectTo = 'https://preview--insightx.lovable.app/google-ads-callback';
-      console.log("Using redirect URI:", redirectTo);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -25,7 +21,7 @@ export const GoogleSignInButton = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo,
+          redirectTo: 'https://preview--insightx.lovable.app/google-ads-callback'
         }
       });
 
@@ -43,7 +39,10 @@ export const GoogleSignInButton = () => {
         });
       } else if (data?.url) {
         console.log('Redirecting to auth URL:', data.url);
-        window.location.href = data.url;
+        // Add a small delay before redirect to ensure logs are sent
+        setTimeout(() => {
+          window.location.href = data.url;
+        }, 100);
       }
     } catch (err) {
       console.error('Unexpected error during sign-in:', err);
