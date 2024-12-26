@@ -19,15 +19,30 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Fetching data from Google Sheets...');
+    console.log('Starting Google Sheets fetch process...');
     
-    // Fetch data from Google Sheets
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${Deno.env.get('GOOGLE_SHEETS_API_KEY')}`
-    );
+    const accountId = req.headers.get('x-account-id');
+    if (!accountId) {
+      console.error('No account ID provided in headers');
+      throw new Error('No account ID provided');
+    }
+    console.log('Account ID:', accountId);
 
+    // Fetch data from Google Sheets
+    const apiKey = Deno.env.get('GOOGLE_SHEETS_API_KEY');
+    if (!apiKey) {
+      console.error('Google Sheets API key not found');
+      throw new Error('Google Sheets API key not configured');
+    }
+
+    const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
+    console.log('Fetching from Google Sheets URL:', sheetsUrl);
+
+    const response = await fetch(sheetsUrl);
     if (!response.ok) {
-      console.error('Google Sheets API Error:', response.statusText);
+      console.error('Google Sheets API Error:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error details:', errorText);
       throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
     }
 
@@ -35,6 +50,7 @@ serve(async (req) => {
     console.log('Received data from Google Sheets:', data.values?.length, 'rows');
     
     if (!data.values || data.values.length < 2) {
+      console.error('No data found in sheet or insufficient rows');
       throw new Error('No data found in sheet');
     }
 
@@ -52,17 +68,16 @@ serve(async (req) => {
     console.log('Transformed campaigns:', campaigns.length);
 
     // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    const accountId = req.headers.get('x-account-id');
-    if (!accountId) {
-      throw new Error('No account ID provided');
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Supabase credentials not found');
+      throw new Error('Supabase configuration missing');
     }
 
-    console.log('Using account ID:', accountId);
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    console.log('Supabase client created');
 
     // Clear existing campaign data for this account
     const { error: deleteError } = await supabaseClient
@@ -93,15 +108,26 @@ serve(async (req) => {
     console.log('Successfully inserted new campaign data');
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Data synced successfully' }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Data synced successfully',
+        rowCount: campaigns.length 
+      }),
       { headers: corsHeaders }
     );
 
   } catch (error) {
     console.error('Error in fetch-google-sheets function:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: corsHeaders }
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: error.stack 
+      }),
+      { 
+        status: 500, 
+        headers: corsHeaders 
+      }
     );
   }
 });

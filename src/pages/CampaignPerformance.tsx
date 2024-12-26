@@ -7,7 +7,7 @@ import { PerformanceChart } from "@/components/PerformanceChart";
 import { AiInsights } from "@/components/AiInsights";
 import { ReportHeader } from "@/components/ReportHeader";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
@@ -23,6 +23,49 @@ export default function CampaignPerformance() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
+
+  const handleSync = async () => {
+    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) {
+      toast({
+        title: "Error",
+        description: "Please select an account and date range before syncing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSyncing(true);
+    try {
+      console.log('Starting sync with account ID:', selectedAccountId);
+      
+      const response = await supabase.functions.invoke('fetch-google-sheets', {
+        headers: { 'x-account-id': selectedAccountId }
+      });
+
+      console.log('Sync response:', response);
+
+      if (!response.data?.success) {
+        throw new Error(response.data?.error || 'Failed to sync data');
+      }
+
+      toast({
+        title: "Success",
+        description: `Successfully synced ${response.data.rowCount} campaigns from Google Sheets`,
+      });
+
+      // Refresh the campaign data after successful sync
+      await fetchCampaignData();
+    } catch (error) {
+      console.error('Error syncing campaigns:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sync campaign data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const fetchCampaignData = useCallback(async () => {
     if (!selectedAccountId || !dateRange?.from || !dateRange?.to) return;
@@ -83,45 +126,6 @@ export default function CampaignPerformance() {
     }
   }, [selectedAccountId, dateRange, toast]);
 
-  const handleSync = async () => {
-    if (!selectedAccountId || !dateRange?.from || !dateRange?.to || isSyncing) return;
-
-    setIsSyncing(true);
-    try {
-      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
-      const toDate = format(dateRange.to, 'yyyy-MM-dd');
-
-      const response = await supabase.functions.invoke('sync-facebook-campaigns', {
-        body: {
-          accountId: selectedAccountId,
-          dateFrom: fromDate,
-          dateTo: toDate
-        }
-      });
-
-      if (!response.data) {
-        throw new Error('Failed to sync campaign data');
-      }
-
-      toast({
-        title: "Success",
-        description: "Campaign data synced successfully.",
-      });
-
-      // Refresh the data
-      await fetchCampaignData();
-    } catch (error) {
-      console.error('Error syncing campaigns:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sync campaign data. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   useEffect(() => {
     if (selectedAccountId && dateRange?.from && dateRange?.to) {
       fetchCampaignData();
@@ -146,7 +150,7 @@ export default function CampaignPerformance() {
             <Button
               onClick={handleSync}
               disabled={!selectedAccountId || isSyncing || !dateRange?.from || !dateRange?.to}
-              className="ml-4"
+              className="ml-4 bg-violet-500 hover:bg-violet-600 text-white"
             >
               {isSyncing ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -166,6 +170,8 @@ export default function CampaignPerformance() {
                 useSampleData={!selectedAccountId} 
                 onCampaignsChange={setCampaigns}
                 isLoading={isLoading}
+                dateRange={dateRange}
+                selectedAccountId={selectedAccountId}
               />
             </div>
           </main>
