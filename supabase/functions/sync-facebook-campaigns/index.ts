@@ -39,11 +39,6 @@ serve(async (req) => {
       throw new Error('No Facebook access token found for this account')
     }
 
-    if (!accountData?.account_id) {
-      console.error('No Facebook account ID found')
-      throw new Error('No Facebook account ID found for this account')
-    }
-
     console.log('Retrieved account data, fetching insights from Facebook')
 
     // Calculate date range (last 30 days)
@@ -57,15 +52,9 @@ serve(async (req) => {
 
     console.log('Fetching data for date range:', { since, until })
 
-    // Fetch data from Facebook Marketing API
+    // Fetch campaign data from Facebook Marketing API
     const fbResponse = await fetch(
-      `https://graph.facebook.com/v18.0/act_${accountData.account_id}/insights?` +
-      new URLSearchParams({
-        fields: 'campaign_name,spend,impressions,clicks,actions',
-        time_range: JSON.stringify({ since, until }),
-        level: 'campaign',
-        access_token: accountData.access_token,
-      })
+      `https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns?fields=name,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions}&access_token=${accountData.access_token}`
     )
 
     if (!fbResponse.ok) {
@@ -75,7 +64,7 @@ serve(async (req) => {
     }
 
     const fbData = await fbResponse.json()
-    console.log('Received Facebook data:', JSON.stringify(fbData))
+    console.log('Raw Facebook campaign data:', JSON.stringify(fbData, null, 2))
 
     if (!fbData.data || fbData.data.length === 0) {
       console.log('No campaign data returned from Facebook')
@@ -90,24 +79,30 @@ serve(async (req) => {
 
     // Process and insert campaign data
     const campaignData = fbData.data.map((campaign: any) => {
-      // Find conversions in actions array
-      const conversions = campaign.actions?.find((action: any) => 
-        action.action_type === 'offsite_conversion.fb_pixel_purchase'
-      )?.value || 0
+      const insights = campaign.insights?.data?.[0] || {}
+      
+      // Find purchase conversions in actions array
+      const conversions = insights.actions?.reduce((total: number, action: any) => {
+        if (action.action_type === 'purchase' || 
+            action.action_type === 'offsite_conversion.fb_pixel_purchase') {
+          return total + parseInt(action.value || '0')
+        }
+        return total
+      }, 0) || 0
 
       return {
         account_id: accountId,
-        name: campaign.campaign_name,
-        spend: parseFloat(campaign.spend || '0'),
-        impressions: parseInt(campaign.impressions || '0'),
-        clicks: parseInt(campaign.clicks || '0'),
-        conversions: parseInt(conversions),
+        name: campaign.name,
+        spend: parseFloat(insights.spend || '0'),
+        impressions: parseInt(insights.impressions || '0'),
+        clicks: parseInt(insights.clicks || '0'),
+        conversions: conversions,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
     })
 
-    console.log('Processed campaign data:', JSON.stringify(campaignData))
+    console.log('Processed campaign data:', JSON.stringify(campaignData, null, 2))
 
     // Delete existing data for this account
     const { error: deleteError } = await supabaseClient
