@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { format } from "https://esm.sh/date-fns@2.30.0";
+import { format, parseISO } from "https://esm.sh/date-fns@2.30.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -82,6 +82,15 @@ serve(async (req) => {
     const campaigns: Campaign[] = [];
     let processedCount = 0;
 
+    // Parse the date range boundaries once
+    const rangeStart = dateRange?.from ? parseISO(dateRange.from) : null;
+    const rangeEnd = dateRange?.to ? parseISO(dateRange.to) : null;
+    
+    console.log('Date range boundaries:', {
+      rangeStart: rangeStart?.toISOString(),
+      rangeEnd: rangeEnd?.toISOString()
+    });
+
     for (const row of data.values) {
       if (!row || row.length < 6) {
         console.log('Skipping invalid row:', row);
@@ -91,25 +100,29 @@ serve(async (req) => {
       const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
       
       try {
-        // Convert date string to YYYY-MM-DD format if needed
-        const dateParts = dateStr.split('-');
-        const formattedDate = dateParts.length === 3 ? dateStr : format(new Date(dateStr), 'yyyy-MM-dd');
-        console.log('Processing date:', formattedDate);
+        // Parse the date from the sheet
+        const rowDate = new Date(dateStr);
+        if (isNaN(rowDate.getTime())) {
+          console.log(`Invalid date format for row: ${dateStr}`);
+          continue;
+        }
+
+        const formattedDate = format(rowDate, 'yyyy-MM-dd');
+        console.log('Processing date:', formattedDate, 'Original:', dateStr);
         
         // Check if date is within selected range
-        if (dateRange?.from && dateRange?.to) {
-          const fromDate = dateRange.from;
-          const toDate = dateRange.to;
+        if (rangeStart && rangeEnd) {
+          const currentDate = parseISO(formattedDate);
           
-          console.log('Checking date range:', {
-            date: formattedDate,
-            fromDate,
-            toDate
+          console.log('Comparing dates:', {
+            current: currentDate.toISOString(),
+            start: rangeStart.toISOString(),
+            end: rangeEnd.toISOString()
           });
 
-          // Compare dates as strings in YYYY-MM-DD format
-          if (formattedDate < fromDate || formattedDate > toDate) {
-            console.log(`Skipping row with date ${formattedDate} - outside range ${fromDate} to ${toDate}`);
+          // Compare actual Date objects
+          if (currentDate < rangeStart || currentDate > rangeEnd) {
+            console.log(`Skipping row with date ${formattedDate} - outside range`);
             continue;
           }
         }
