@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { initiateGoogleAdsAuth } from "@/utils/googleAdsAuth";
 
 interface AdAccount {
@@ -83,12 +83,27 @@ export default function Account() {
     }
 
     toast({
-      title: "Ad account removed",
-      description: "The ad account has been successfully removed.",
+      title: "Success",
+      description: "Ad account removed successfully",
     });
     
     fetchAdAccounts();
   };
+
+  // Check URL parameters for success message
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      toast({
+        title: "Success",
+        description: "Google Ads account connected successfully!",
+      });
+      // Remove the success parameter from the URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Refresh the ad accounts list
+      fetchAdAccounts();
+    }
+  }, [toast]);
 
   return (
     <SidebarProvider>
@@ -106,15 +121,20 @@ export default function Account() {
                   <p className="text-gray-500">Connect your advertising accounts to analyze their performance</p>
                 </div>
 
-                <div className="grid gap-4 mb-8">
-                  {['Google Ads', 'Facebook Ads', 'TikTok Ads'].map((platform) => (
-                    <div key={platform} className="p-4 border rounded-lg bg-white shadow-sm flex justify-between items-center">
+                <div className="space-y-4 mb-8">
+                  {[
+                    { name: 'Google Ads', description: 'Connect your Google Ads account' },
+                    { name: 'Facebook Ads', description: 'Connect your Facebook Ads account' },
+                    { name: 'TikTok Ads', description: 'Connect your TikTok Ads account' }
+                  ].map((platform) => (
+                    <div key={platform.name} 
+                         className="p-6 border rounded-lg bg-white shadow-sm flex justify-between items-center">
                       <div>
-                        <h3 className="font-semibold">{platform}</h3>
-                        <p className="text-sm text-gray-500">Connect your {platform} account</p>
+                        <h3 className="font-semibold text-gray-900">{platform.name}</h3>
+                        <p className="text-sm text-gray-500">{platform.description}</p>
                       </div>
                       <Button
-                        onClick={() => handleConnect(platform)}
+                        onClick={() => handleConnect(platform.name)}
                         variant="outline"
                         className="flex items-center gap-2"
                       >
@@ -128,11 +148,14 @@ export default function Account() {
                 {adAccounts.length > 0 && (
                   <div>
                     <h2 className="text-xl font-semibold mb-4">Connected Accounts</h2>
-                    <div className="grid gap-4">
+                    <div className="space-y-4">
                       {adAccounts.map((account) => (
-                        <div key={account.id} className="p-4 border rounded-lg bg-white shadow-sm flex justify-between items-center">
+                        <div key={account.id} 
+                             className="p-6 border rounded-lg bg-white shadow-sm flex justify-between items-center">
                           <div>
-                            <h3 className="font-semibold">{account.account_name || account.account_id}</h3>
+                            <h3 className="font-semibold text-gray-900">
+                              {account.account_name || account.account_id}
+                            </h3>
                             <p className="text-sm text-gray-500">{account.platform}</p>
                           </div>
                           <Button

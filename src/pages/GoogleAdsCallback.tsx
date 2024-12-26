@@ -43,12 +43,8 @@ export default function GoogleAdsCallback() {
 
         if (error) throw error;
 
-        toast({
-          title: "Success",
-          description: "Google Ads account connected successfully!",
-        });
-        
-        navigate('/account');
+        // Redirect to account page with success parameter
+        navigate('/account?success=true');
       } catch (error) {
         console.error('Error connecting Google Ads account:', error);
         setError(error.message || "Failed to connect Google Ads account");
