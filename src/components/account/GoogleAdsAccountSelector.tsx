@@ -53,7 +53,6 @@ export function GoogleAdsAccountSelector({
         selectedAccounts.has(account.id)
       );
 
-      // Insert selected accounts into Supabase
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("No authenticated user found");
 

@@ -44,8 +44,9 @@ export default function GoogleAdsCallback() {
           throw new Error('No accounts data received');
         }
 
-        // Encode the accounts data and redirect to account page
+        // Encode the accounts data and redirect to account page with the correct URL
         const encodedAccounts = encodeURIComponent(JSON.stringify(data.accounts));
+        const currentUrl = window.location.origin;
         navigate(`/account?success=true&accounts=${encodedAccounts}`);
       } catch (error) {
         console.error('Error in callback:', error);
