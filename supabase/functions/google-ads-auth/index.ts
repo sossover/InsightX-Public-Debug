@@ -17,9 +17,11 @@ Deno.serve(async (req) => {
 
   try {
     const { code } = await req.json();
+    console.log('Received authorization code:', code);
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     // Get user from auth header
@@ -33,8 +35,11 @@ Deno.serve(async (req) => {
     );
 
     if (userError || !user) {
+      console.error('User authentication error:', userError);
       throw new Error('Invalid user');
     }
+
+    console.log('Authenticated user:', user.id);
 
     // Exchange the authorization code for tokens
     const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
@@ -52,26 +57,38 @@ Deno.serve(async (req) => {
     });
 
     const tokenData = await tokenResponse.json();
+    console.log('Token exchange response status:', tokenResponse.status);
 
     if (!tokenResponse.ok) {
-      console.error('Token exchange failed:', tokenData);
+      console.error('Token exchange error:', tokenData);
       throw new Error('Failed to exchange authorization code');
     }
 
-    // Store the tokens in Supabase
+    // Get user info from Google
+    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
+    });
+
+    const userInfo = await userInfoResponse.json();
+    console.log('Got user info:', userInfo.email);
+
+    // Store the tokens in Supabase using the service role client
     const { error: insertError } = await supabaseClient
       .from('ad_accounts')
       .insert({
         user_id: user.id,
         platform: 'Google Ads',
-        account_id: tokenData.sub || 'pending',
+        account_id: userInfo.email,
+        account_name: userInfo.email,
         access_token: tokenData.access_token,
         refresh_token: tokenData.refresh_token,
       });
 
     if (insertError) {
-      console.error('Database insertion failed:', insertError);
-      throw new Error('Failed to store account credentials');
+      console.error('Database insertion error:', insertError);
+      throw new Error(`Failed to store account credentials: ${insertError.message}`);
     }
 
     return new Response(
