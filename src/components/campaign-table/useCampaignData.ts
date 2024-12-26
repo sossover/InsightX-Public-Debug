@@ -84,9 +84,12 @@ export function useCampaignData(
 
     setIsSyncing(true);
     try {
+      console.log('Starting sync with account ID:', selectedAccountId);
       const response = await supabase.functions.invoke('fetch-google-sheets', {
         headers: { 'x-account-id': selectedAccountId }
       });
+
+      console.log('Sync response:', response);
 
       if (!response.data?.success) {
         throw new Error(response.data?.error || 'Failed to sync data');
