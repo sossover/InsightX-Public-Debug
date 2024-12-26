@@ -21,6 +21,7 @@ import WebsitePricing from "./pages/WebsitePricing";
 import Account from "./pages/Account";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import GoogleAdsCallback from "./pages/GoogleAdsCallback";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/terms-of-use" element={<TermsOfUse />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/google-ads-callback" element={<GoogleAdsCallback />} />
           
           {/* Protected routes - require authentication */}
           <Route
