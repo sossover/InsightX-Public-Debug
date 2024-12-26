@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -87,6 +89,17 @@ export default function Login() {
             <img src="/google.svg" alt="Google" className="w-5 h-5" />
             Continue with Google
           </button>
+
+          <div className="mt-4 text-center text-sm text-gray-500">
+            By continuing, you agree to our{" "}
+            <a href="/terms-of-use" className="text-custom-purple-300 hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="/privacy-policy" className="text-custom-purple-300 hover:underline">
+              Privacy Policy
+            </a>
+          </div>
         </div>
       </div>
     </div>
