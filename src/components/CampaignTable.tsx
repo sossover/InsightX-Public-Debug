@@ -7,8 +7,9 @@ import { CampaignTableHeader } from "./campaign-table/CampaignTableHeader";
 import { CampaignTableRow } from "./campaign-table/CampaignTableRow";
 import { Campaign, CampaignTableProps } from "./campaign-table/types";
 import { defaultCampaigns, generateSampleData } from "./campaign-table/data";
+import { Loader2 } from "lucide-react";
 
-export function CampaignTable({ useSampleData = false, onCampaignsChange }: CampaignTableProps) {
+export function CampaignTable({ useSampleData = false, onCampaignsChange, isLoading = false }: CampaignTableProps) {
   const [sampleData, setSampleData] = useState(generateSampleData());
   const campaigns = useSampleData ? sampleData : defaultCampaigns;
 
@@ -17,7 +18,7 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange }: Camp
       setSampleData(generateSampleData());
     }
     onCampaignsChange?.(campaigns);
-  }, [useSampleData]); // Only regenerate when useSampleData changes
+  }, [useSampleData, campaigns, onCampaignsChange]);
 
   // Calculate totals
   const totals: Campaign = {
@@ -33,6 +34,14 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange }: Camp
       return this.conversions > 0 ? this.spend / this.conversions : 0;
     },
   };
+
+  if (isLoading) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-8 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">

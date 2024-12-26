@@ -3,13 +3,13 @@ export interface Campaign {
   spend: number;
   impressions: number;
   clicks: number;
-  ctr: string;
   conversions: number;
+  ctr: string;
   cpa: number;
-  keyword?: string; // Added to fix KeywordAnalysis component
 }
 
 export interface CampaignTableProps {
   useSampleData?: boolean;
   onCampaignsChange?: (campaigns: Campaign[]) => void;
+  isLoading?: boolean;
 }

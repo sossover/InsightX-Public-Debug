@@ -8,12 +8,14 @@ import { PerformanceChart } from "@/components/PerformanceChart";
 import { AiInsights } from "@/components/AiInsights";
 import { ReportHeader } from "@/components/ReportHeader";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CampaignPerformance() {
   const [date, setDate] = useState<Date>(new Date());
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (selectedAccountId) {
@@ -31,6 +33,11 @@ export default function CampaignPerformance() {
 
       if (error) {
         console.error('Error fetching campaigns:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch campaign data. Please try again.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -51,6 +58,11 @@ export default function CampaignPerformance() {
       setCampaigns(formattedCampaigns);
     } catch (error) {
       console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +88,7 @@ export default function CampaignPerformance() {
               <CampaignTable 
                 useSampleData={!selectedAccountId} 
                 onCampaignsChange={setCampaigns}
+                isLoading={isLoading}
               />
             </div>
           </main>
