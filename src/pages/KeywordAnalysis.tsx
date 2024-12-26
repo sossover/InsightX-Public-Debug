@@ -10,6 +10,7 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Campaign } from "@/components/campaign-table/types";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
+import { ReportHeader } from "@/components/ReportHeader";
 
 const keywordData: Campaign[] = [
   {
@@ -62,12 +63,18 @@ const keywordData: Campaign[] = [
 const KeywordAnalysis = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [campaigns, setCampaigns] = useState(keywordData);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   // Calculate metrics for the cards
   const totalClicks = campaigns.reduce((sum, campaign) => sum + campaign.clicks, 0);
   const totalImpressions = campaigns.reduce((sum, campaign) => sum + campaign.impressions, 0);
   const avgCTR = ((totalClicks / totalImpressions) * 100).toFixed(2) + "%";
   const totalConversions = campaigns.reduce((sum, campaign) => sum + campaign.conversions, 0);
+
+  const handleAccountChange = (accountId: string) => {
+    setSelectedAccountId(accountId);
+    // Here you can add logic to fetch keywords for the selected account
+  };
 
   return (
     <SidebarProvider>
@@ -79,9 +86,15 @@ const KeywordAnalysis = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          <KeywordHeader date={date} setDate={setDate} />
+          <ReportHeader 
+            title="Keyword Analysis"
+            description="Analyze your keyword performance and trends"
+            date={date}
+            setDate={setDate}
+            onAccountChange={handleAccountChange}
+          />
 
-          <main className="flex-1 flex flex-col pt-24">
+          <main className="flex-1 flex flex-col">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Metrics Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

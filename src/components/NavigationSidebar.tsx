@@ -1,4 +1,4 @@
-import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign, ChevronLeft, Link, ExternalLink } from "lucide-react";
+import { Home, BarChart, Users, Settings, PieChart, TrendingUp, Globe, FileText, LayoutTemplate, ListChecks, Sparkles, ArrowUpRight, DollarSign, ChevronLeft, Link, ExternalLink, Palette } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +26,7 @@ const mainItems = [
   { title: "Audience Insights", icon: Users, url: "/audience-insights" },
   { title: "Conversion Analysis", icon: BarChart, url: "/conversion-analysis" },
   { title: "Channel Mix", icon: PieChart, url: "/channel-mix" },
+  { title: "Canvas", icon: Palette, url: "/canvas" },
   { title: "Optimization List", icon: ListChecks, url: "/optimization-list" },
   { title: "Account", icon: Link, url: "/account" },
   { title: "Settings", icon: Settings, url: "/settings" },

@@ -5,6 +5,7 @@ import GeoReport from "./pages/GeoReport";
 import ConversionAnalysis from "./pages/ConversionAnalysis";
 import KeywordAnalysis from "./pages/KeywordAnalysis";
 import ChannelMix from "./pages/ChannelMix";
+import Canvas from "./pages/Canvas";
 import OptimizationList from "./pages/OptimizationList";
 import Account from "./pages/Account";
 import Settings from "./pages/Settings";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/conversion-analysis" element={<ConversionAnalysis />} />
         <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
         <Route path="/channel-mix" element={<ChannelMix />} />
+        <Route path="/canvas" element={<Canvas />} />
         <Route path="/optimization-list" element={<OptimizationList />} />
         <Route path="/account" element={<Account />} />
         <Route path="/settings" element={<Settings />} />
