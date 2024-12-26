@@ -3,9 +3,13 @@ import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ReportHeader } from "@/components/ReportHeader";
 import { ChatPanel } from "@/components/chat/ChatPanel";
+import { DateRange } from "react-day-picker";
 
 const Canvas = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   const handleAccountChange = (accountId: string) => {

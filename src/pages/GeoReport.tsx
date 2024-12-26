@@ -10,6 +10,7 @@ import { PerformanceChart } from "@/components/PerformanceChart";
 import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
 import { ReportHeader } from "@/components/ReportHeader";
+import { DateRange } from "react-day-picker";
 
 const defaultCampaigns = [
   {
@@ -65,7 +66,10 @@ const countryData = [
 ];
 
 const GeoReport = () => {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);

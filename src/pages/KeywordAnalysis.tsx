@@ -10,7 +10,10 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { Campaign } from "@/components/campaign-table/types";
 import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
+import { PricingModal } from "@/components/PricingModal";
+import { HelpDialog } from "@/components/HelpDialog";
 import { ReportHeader } from "@/components/ReportHeader";
+import { DateRange } from "react-day-picker";
 
 const keywordData: Campaign[] = [
   {
@@ -61,7 +64,10 @@ const keywordData: Campaign[] = [
 ];
 
 const KeywordAnalysis = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [campaigns, setCampaigns] = useState(keywordData);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 

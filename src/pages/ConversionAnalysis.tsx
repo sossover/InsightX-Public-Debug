@@ -12,6 +12,7 @@ import { AiInsights } from "@/components/AiInsights";
 import { ReportHeader } from "@/components/ReportHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { DateRange } from "react-day-picker";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
@@ -23,7 +24,10 @@ const conversionData = [
 ];
 
 export default function ConversionAnalysis() {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [data] = useState(conversionData);
 

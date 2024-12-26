@@ -9,6 +9,7 @@ import { ReportHeader } from "@/components/ReportHeader";
 import { ChannelMetrics } from "@/components/channel-mix/ChannelMetrics";
 import { ChannelDistribution } from "@/components/channel-mix/ChannelDistribution";
 import { ChannelPerformance } from "@/components/channel-mix/ChannelPerformance";
+import { DateRange } from "react-day-picker";
 
 const channelData = [
   { name: "Search", value: 42.5, color: "#4285F4", trend: 8.3 },
@@ -27,7 +28,10 @@ const performanceData = channelData.map(channel => ({
 }));
 
 export default function ChannelMix() {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   const campaignData: Campaign[] = channelData.map(item => ({

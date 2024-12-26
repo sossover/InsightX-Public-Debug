@@ -9,6 +9,7 @@ import { AgeDistribution } from "@/components/audience/AgeDistribution";
 import { EngagementTrends } from "@/components/audience/EngagementTrends";
 import { EngagementByAge } from "@/components/audience/EngagementByAge";
 import { ReportHeader } from "@/components/ReportHeader";
+import { DateRange } from "react-day-picker";
 
 const audienceData = [
   { age: "18-24", users: 1200, engagement: 3.2, growth: 15 },
@@ -30,7 +31,10 @@ const engagementTrends = [
 
 export default function AudienceInsights() {
   const [data] = useState(audienceData);
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: new Date()
+  });
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   // Transform audience data to match Campaign type for AI Insights
