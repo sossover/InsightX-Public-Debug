@@ -1,22 +1,14 @@
-import { MetricCard } from "@/components/MetricCard";
-import { PerformanceChart } from "@/components/PerformanceChart";
-import { CampaignTable } from "@/components/CampaignTable";
-import { AiInsights } from "@/components/AiInsights";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { ChatPanel } from "@/components/chat/ChatPanel";
-import { CalendarDays, ChevronDown } from "lucide-react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { useState, useMemo } from "react";
 import { Footer } from "@/components/Footer";
-import { Campaign } from "@/components/campaign-table/types";
 import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
 import { OnboardingTour } from "@/components/OnboardingTour";
-import { cn } from "@/lib/utils";
+import { useState, useMemo } from "react";
+import { Campaign } from "@/components/campaign-table/types";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 
 const Index = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -58,121 +50,23 @@ const Index = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Top Sliding Panel */}
-          <div className="fixed w-full z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200 transition-all duration-300 ease-in-out dark:bg-custom-purple-600/80 dark:border-custom-purple-400">
-            <div className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              isTopPanelOpen ? "h-32" : "h-0"
-            )}>
-              <div className="p-4 flex justify-end space-x-4">
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsPricingOpen(true)}
-                  className="text-gray-600 hover:text-google-blue transition-colors duration-200"
-                >
-                  Pricing
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsHelpOpen(true)}
-                  className="text-gray-600 hover:text-google-blue transition-colors duration-200"
-                >
-                  Help
-                </Button>
-              </div>
-            </div>
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-[140px] sm:w-[240px] justify-start text-left font-normal">
-                        <CalendarDays className="mr-2 h-4 w-4" />
-                        <span className="truncate">
-                          {date ? format(date, "PPP") : <span>Pick a date</span>}
-                        </span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsTopPanelOpen(!isTopPanelOpen)}
-                  className="ml-auto"
-                >
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    isTopPanelOpen ? "transform rotate-180" : ""
-                  )} />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <DashboardHeader
+            date={date}
+            setDate={setDate}
+            isTopPanelOpen={isTopPanelOpen}
+            setIsTopPanelOpen={setIsTopPanelOpen}
+            setIsPricingOpen={setIsPricingOpen}
+            setIsHelpOpen={setIsHelpOpen}
+          />
 
           <main className="flex-1 flex flex-col pt-24">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="mb-4">
-                <Button 
-                  variant="outline" 
-                  onClick={handleSampleDataToggle}
-                  className="mb-2 w-full sm:w-auto"
-                >
-                  {useSampleData ? "Use Real Data" : "Sample Data"}
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 metrics-cards">
-                <MetricCard
-                  title="Total Spend"
-                  value={`$${metrics.spend.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`}
-                  trend={12}
-                />
-                <MetricCard
-                  title="Impressions"
-                  value={metrics.impressions.toLocaleString()}
-                  trend={-5}
-                />
-                <MetricCard
-                  title="Clicks"
-                  value={metrics.clicks.toLocaleString()}
-                  trend={8}
-                />
-                <MetricCard
-                  title="Conversions"
-                  value={metrics.conversions.toLocaleString()}
-                  trend={15}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 mb-6 performance-chart">
-                <PerformanceChart useSampleData={useSampleData} />
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 campaign-table">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 overflow-x-auto dark:bg-custom-purple-600 dark:border-custom-purple-400">
-                  <h2 className="text-lg font-semibold text-google-gray mb-6 dark:text-white">Campaign Performance</h2>
-                  <CampaignTable 
-                    useSampleData={useSampleData} 
-                    onCampaignsChange={handleCampaignsChange}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6 ai-insights">
-                <AiInsights campaigns={campaigns} />
-              </div>
-            </div>
+            <DashboardContent
+              useSampleData={useSampleData}
+              handleSampleDataToggle={handleSampleDataToggle}
+              campaigns={campaigns}
+              metrics={metrics}
+              onCampaignsChange={handleCampaignsChange}
+            />
           </main>
 
           <Footer />
