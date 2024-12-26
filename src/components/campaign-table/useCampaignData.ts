@@ -88,6 +88,8 @@ export function useCampaignData(
       const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
       const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(today, 'yyyy-MM-dd');
 
+      console.log('Syncing with dates:', { fromDate, toDate });
+
       const { data, error } = await supabase.functions.invoke('sync-facebook-campaigns', {
         body: {
           accountId: selectedAccountId,
@@ -97,6 +99,8 @@ export function useCampaignData(
       });
 
       if (error) throw error;
+
+      console.log('Sync response:', data);
 
       toast({
         title: "Success",

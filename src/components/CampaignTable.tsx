@@ -36,6 +36,7 @@ export function CampaignTable({
 
   useEffect(() => {
     if (selectedAccountId) {
+      console.log('Fetching campaign data for account:', selectedAccountId);
       fetchCampaignData();
     }
   }, [selectedAccountId, dateRange, fetchCampaignData]);
