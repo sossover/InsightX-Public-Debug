@@ -8,6 +8,7 @@ import { AudienceMetrics } from "@/components/audience/AudienceMetrics";
 import { AgeDistribution } from "@/components/audience/AgeDistribution";
 import { EngagementTrends } from "@/components/audience/EngagementTrends";
 import { EngagementByAge } from "@/components/audience/EngagementByAge";
+import { ReportHeader } from "@/components/ReportHeader";
 
 const audienceData = [
   { age: "18-24", users: 1200, engagement: 3.2, growth: 15 },
@@ -29,6 +30,8 @@ const engagementTrends = [
 
 export default function AudienceInsights() {
   const [data] = useState(audienceData);
+  const [date, setDate] = useState<Date>(new Date());
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
 
   // Transform audience data to match Campaign type for AI Insights
   const campaignData: Campaign[] = data.map(item => ({
@@ -55,14 +58,15 @@ export default function AudienceInsights() {
         <NavigationSidebar />
         
         <div className="flex-1 overflow-auto bg-gray-50">
-          <main className="p-8 space-y-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-custom-purple-500">Audience Insights</h1>
-                <p className="text-gray-600 mt-2">Understand your audience demographics and behavior</p>
-              </div>
-            </div>
+          <ReportHeader
+            title="Audience Insights"
+            description="Understand your audience demographics and behavior"
+            date={date}
+            setDate={setDate}
+            onAccountChange={setSelectedAccountId}
+          />
 
+          <main className="p-8 space-y-8">
             <AudienceMetrics
               totalUsers={totalUsers}
               avgEngagement={avgEngagement}
