@@ -7,11 +7,11 @@ import { CampaignTableHeader } from "./campaign-table/CampaignTableHeader";
 import { CampaignTableRow } from "./campaign-table/CampaignTableRow";
 import { Campaign, CampaignTableProps } from "./campaign-table/types";
 import { defaultCampaigns, generateSampleData } from "./campaign-table/data";
-import { Loader2, RefreshCw, Download } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { TableActions } from "./campaign-table/TableActions";
 
 export function CampaignTable({ 
   useSampleData = false, 
@@ -53,13 +53,7 @@ export function CampaignTable({
         return;
       }
 
-      if (!data || data.length === 0) {
-        console.log('No campaign data found');
-        setRealCampaigns([]);
-        return;
-      }
-
-      const formattedCampaigns: Campaign[] = data.map(campaign => ({
+      const formattedCampaigns: Campaign[] = data?.map(campaign => ({
         name: campaign.name,
         spend: campaign.spend,
         impressions: campaign.impressions,
@@ -71,15 +65,14 @@ export function CampaignTable({
         get cpa() {
           return this.conversions > 0 ? this.spend / this.conversions : 0;
         }
-      }));
+      })) || [];
 
-      console.log('Fetched campaigns:', formattedCampaigns);
       setRealCampaigns(formattedCampaigns);
     } catch (error) {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred while fetching campaign data",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -88,10 +81,10 @@ export function CampaignTable({
   };
 
   const syncCampaignData = async () => {
-    if (!selectedAccountId || !dateRange?.from || !dateRange?.to) {
+    if (!selectedAccountId) {
       toast({
         title: "Error",
-        description: "Please select a date range and account before syncing",
+        description: "Please select an account before syncing",
         variant: "destructive",
       });
       return;
@@ -99,8 +92,8 @@ export function CampaignTable({
 
     setIsSyncing(true);
     try {
-      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
-      const toDate = format(dateRange.to, 'yyyy-MM-dd');
+      const fromDate = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+      const toDate = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
 
       console.log('Syncing with date range:', { fromDate, toDate });
 
@@ -112,17 +105,13 @@ export function CampaignTable({
         }
       });
 
-      if (error) {
-        console.error('Error syncing campaigns:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "Campaign data synced successfully",
       });
 
-      // Refresh the campaign data
       await fetchCampaignData();
     } catch (error) {
       console.error('Error:', error);
@@ -164,7 +153,6 @@ export function CampaignTable({
     let aValue = a[sortColumn as keyof Campaign];
     let bValue = b[sortColumn as keyof Campaign];
 
-    // Handle special cases for CTR and CPA
     if (sortColumn === 'ctr') {
       aValue = parseFloat(a.ctr.replace('%', ''));
       bValue = parseFloat(b.ctr.replace('%', ''));
@@ -175,7 +163,6 @@ export function CampaignTable({
     return 0;
   });
 
-  // Calculate totals
   const totals: Campaign = {
     name: "Total",
     spend: campaigns.reduce((sum, campaign) => sum + campaign.spend, 0),
@@ -236,28 +223,14 @@ export function CampaignTable({
   return (
     <div className="space-y-4">
       {!useSampleData && (
-        <div className="flex justify-between">
-          <Button
-            onClick={exportToCSV}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Export to CSV
-          </Button>
-          <Button
-            onClick={syncCampaignData}
-            disabled={isSyncing || !dateRange?.from || !dateRange?.to}
-            className="flex items-center gap-2"
-          >
-            {isSyncing ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
-            )}
-            {isSyncing ? "Syncing..." : "Sync Campaign Data"}
-          </Button>
-        </div>
+        <TableActions
+          useSampleData={useSampleData}
+          onExport={exportToCSV}
+          onSync={syncCampaignData}
+          isSyncing={isSyncing}
+          dateRange={dateRange}
+          selectedAccountId={selectedAccountId}
+        />
       )}
       
       <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">
