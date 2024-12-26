@@ -12,7 +12,7 @@ export default function Login() {
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/account-setup");
+        navigate("/audience-insights"); // Changed from /account-setup to /audience-insights
       }
     });
 
@@ -22,7 +22,7 @@ export default function Login() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Auth state changed:", _event, session);
       if (session) {
-        navigate("/account-setup");
+        navigate("/audience-insights"); // Changed from /account-setup to /audience-insights
       }
     });
 

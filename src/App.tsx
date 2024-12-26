@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import AccountSetup from "./pages/AccountSetup";
 import AudienceInsights from "./pages/AudienceInsights";
 import GeoReport from "./pages/GeoReport";
 import ConversionAnalysis from "./pages/ConversionAnalysis";
@@ -16,7 +15,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/account-setup" element={<AccountSetup />} />
         <Route path="/audience-insights" element={<AudienceInsights />} />
         <Route path="/geo-report" element={<GeoReport />} />
         <Route path="/conversion-analysis" element={<ConversionAnalysis />} />
