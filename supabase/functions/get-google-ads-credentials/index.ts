@@ -13,14 +13,18 @@ Deno.serve(async (req) => {
 
   try {
     const clientId = Deno.env.get('GOOGLE_ADS_CLIENT_ID');
+    const apiKey = Deno.env.get('GOOGLE_ADS_API_KEY');
     
-    if (!clientId) {
-      throw new Error('Google Ads client ID not configured');
+    if (!clientId || !apiKey) {
+      throw new Error('Google Ads credentials not configured');
     }
+
+    console.log('Retrieved Google Ads credentials successfully');
 
     return new Response(
       JSON.stringify({ 
         clientId,
+        apiKey,
         status: 'success' 
       }),
       { 

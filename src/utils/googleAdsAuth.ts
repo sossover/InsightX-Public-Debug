@@ -11,8 +11,8 @@ export const initiateGoogleAdsAuth = async () => {
       throw error;
     }
 
-    if (!data?.clientId) {
-      throw new Error('Google Ads client ID not found');
+    if (!data?.clientId || !data?.apiKey) {
+      throw new Error('Google Ads credentials not found');
     }
 
     const redirectUri = `${window.location.origin}/google-ads-callback`;
@@ -25,6 +25,7 @@ export const initiateGoogleAdsAuth = async () => {
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('access_type', 'offline');
     authUrl.searchParams.append('prompt', 'consent');
+    authUrl.searchParams.append('key', data.apiKey);
 
     console.log('Full auth URL:', authUrl.toString());
     

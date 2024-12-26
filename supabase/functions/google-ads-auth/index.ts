@@ -10,6 +10,7 @@ const GOOGLE_ADS_API_VERSION = 'v14';
 const CLIENT_ID = Deno.env.get('GOOGLE_ADS_CLIENT_ID');
 const CLIENT_SECRET = Deno.env.get('GOOGLE_ADS_CLIENT_SECRET');
 const DEVELOPER_TOKEN = Deno.env.get('GOOGLE_ADS_DEVELOPER_TOKEN');
+const API_KEY = Deno.env.get('GOOGLE_ADS_API_KEY');
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -76,9 +77,9 @@ Deno.serve(async (req) => {
     const userInfo = await userInfoResponse.json();
     console.log('Got user info:', userInfo.email);
 
-    // Fetch Google Ads accounts
+    // Fetch Google Ads accounts with API key
     const googleAdsResponse = await fetch(
-      `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers`,
+      `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers?key=${API_KEY}`,
       {
         headers: {
           Authorization: `Bearer ${tokenData.access_token}`,
@@ -99,9 +100,9 @@ Deno.serve(async (req) => {
     const accountPromises = resourceNames.map(async (resourceName: string) => {
       const accountId = resourceName.split('/')[1];
       
-      // Get account details
+      // Get account details with API key
       const accountResponse = await fetch(
-        `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${accountId}`,
+        `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${accountId}?key=${API_KEY}`,
         {
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
@@ -127,7 +128,6 @@ Deno.serve(async (req) => {
 
     const accounts = (await Promise.all(accountPromises)).filter(Boolean);
 
-    // Instead of automatically inserting accounts, return them to the client
     return new Response(
       JSON.stringify({ 
         success: true, 
