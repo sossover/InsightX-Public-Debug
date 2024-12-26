@@ -45,9 +45,9 @@ serve(async (req) => {
       throw new Error('Google Sheets API key not configured');
     }
 
-    // Fetch data from Google Sheets
-    const SHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
-    const TAB_NAME = 'Class Data';
+    // Updated Sheet ID and tab name
+    const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
+    const TAB_NAME = 'Sheet1';
     const RANGE = 'A2:F31';
     
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
