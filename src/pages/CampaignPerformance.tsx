@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 import { useState, useEffect } from "react";
 import { Campaign } from "@/components/campaign-table/types";
 import { CampaignTable } from "@/components/CampaignTable";
@@ -17,19 +16,13 @@ export default function CampaignPerformance() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (selectedAccountId) {
-      fetchCampaignData();
-    }
-  }, [selectedAccountId]);
-
-  const fetchCampaignData = async () => {
+  const fetchCampaignData = async (accountId: string) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('campaigns')
         .select('*')
-        .eq('account_id', selectedAccountId);
+        .eq('account_id', accountId);
 
       if (error) {
         console.error('Error fetching campaigns:', error);
@@ -68,6 +61,12 @@ export default function CampaignPerformance() {
     }
   };
 
+  useEffect(() => {
+    if (selectedAccountId) {
+      fetchCampaignData(selectedAccountId);
+    }
+  }, [selectedAccountId]); // Remove campaigns from dependency array and only trigger on accountId change
+
   return (
     <SidebarProvider>
       <div className="flex h-screen overflow-hidden">
@@ -97,8 +96,6 @@ export default function CampaignPerformance() {
         <div className="w-[400px] border-l border-gray-200 p-6 overflow-y-auto">
           <AiInsights campaigns={campaigns} />
         </div>
-
-        <ChatPanel campaignData={campaigns} />
       </div>
     </SidebarProvider>
   );
