@@ -77,9 +77,9 @@ Deno.serve(async (req) => {
     const userInfo = await userInfoResponse.json();
     console.log('Got user info:', userInfo.email);
 
-    // Fetch Google Ads accounts with API key
+    // Fetch Google Ads accounts
     const googleAdsResponse = await fetch(
-      `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers?key=${API_KEY}`,
+      `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers`,
       {
         headers: {
           Authorization: `Bearer ${tokenData.access_token}`,
@@ -100,9 +100,9 @@ Deno.serve(async (req) => {
     const accountPromises = resourceNames.map(async (resourceName: string) => {
       const accountId = resourceName.split('/')[1];
       
-      // Get account details with API key
+      // Get account details
       const accountResponse = await fetch(
-        `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${accountId}?key=${API_KEY}`,
+        `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers/${accountId}`,
         {
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
@@ -120,13 +120,16 @@ Deno.serve(async (req) => {
       console.log('Account details:', accountData);
 
       return {
-        id: accountId,
-        name: accountData.customer.descriptiveName || accountId,
         customerId: accountId,
+        descriptiveName: accountData.customer?.descriptiveName || `Account ${accountId}`,
+        currencyCode: accountData.customer?.currencyCode,
+        timeZone: accountData.customer?.timeZone,
+        status: accountData.customer?.status,
       };
     });
 
     const accounts = (await Promise.all(accountPromises)).filter(Boolean);
+    console.log('Processed accounts:', accounts);
 
     return new Response(
       JSON.stringify({ 
