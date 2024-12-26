@@ -44,9 +44,15 @@ export default function GoogleAdsCallback() {
           throw new Error('No accounts data received');
         }
 
-        // Encode the accounts data and redirect to account page with the correct URL
-        const encodedAccounts = encodeURIComponent(JSON.stringify(data.accounts));
-        const currentUrl = window.location.origin;
+        // Format accounts data for the selector
+        const formattedAccounts = data.accounts.map(account => ({
+          id: account.customerId,  // Use customerId as the unique identifier
+          name: account.descriptiveName || `Account ${account.customerId}`,
+          customerId: account.customerId
+        }));
+
+        // Encode the accounts data and redirect to account page
+        const encodedAccounts = encodeURIComponent(JSON.stringify(formattedAccounts));
         navigate(`/account?success=true&accounts=${encodedAccounts}`);
       } catch (error) {
         console.error('Error in callback:', error);
