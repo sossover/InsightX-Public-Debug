@@ -21,7 +21,10 @@ serve(async (req) => {
       throw new Error('No authorization code provided')
     }
 
-    const redirectUri = 'https://preview--insightx.lovable.app/google-ads-callback'
+    // Get the origin from request headers or URL
+    const origin = req.headers.get('origin') || url.origin
+    const redirectUri = `${origin}/google-ads-callback`
+    console.log('Using redirect URI:', redirectUri)
     
     // Exchange the code for tokens
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
