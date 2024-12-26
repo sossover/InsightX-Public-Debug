@@ -1,3 +1,5 @@
+import { DateRange } from "react-day-picker";
+
 export interface Campaign {
   name: string;
   spend: number;
@@ -12,4 +14,6 @@ export interface CampaignTableProps {
   useSampleData?: boolean;
   onCampaignsChange?: (campaigns: Campaign[]) => void;
   isLoading?: boolean;
+  dateRange?: DateRange | undefined;
+  selectedAccountId?: string;
 }

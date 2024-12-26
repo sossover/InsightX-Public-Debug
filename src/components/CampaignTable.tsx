@@ -11,8 +11,15 @@ import { Loader2, RefreshCw, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
-export function CampaignTable({ useSampleData = false, onCampaignsChange, isLoading = false }: CampaignTableProps) {
+export function CampaignTable({ 
+  useSampleData = false, 
+  onCampaignsChange, 
+  isLoading = false,
+  dateRange,
+  selectedAccountId 
+}: CampaignTableProps) {
   const [sampleData, setSampleData] = useState(generateSampleData());
   const [realCampaigns, setRealCampaigns] = useState<Campaign[]>([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -22,14 +29,19 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange, isLoad
   const { toast } = useToast();
 
   const fetchCampaignData = async () => {
-    if (useSampleData) return;
+    if (useSampleData || !selectedAccountId || !dateRange?.from || !dateRange?.to) return;
     
     setIsFetching(true);
     try {
+      const fromDate = format(dateRange.from, 'yyyy-MM-dd');
+      const toDate = format(dateRange.to, 'yyyy-MM-dd');
+      
       const { data, error } = await supabase
         .from('campaigns')
         .select('*')
-        .order('created_at', { ascending: false });
+        .eq('account_id', selectedAccountId)
+        .gte('created_at', `${fromDate}T00:00:00`)
+        .lte('created_at', `${toDate}T23:59:59`);
 
       if (error) {
         console.error('Error fetching campaigns:', error);
@@ -131,7 +143,7 @@ export function CampaignTable({ useSampleData = false, onCampaignsChange, isLoad
 
   useEffect(() => {
     fetchCampaignData();
-  }, [useSampleData]);
+  }, [useSampleData, selectedAccountId, dateRange]);
 
   const campaigns = useSampleData ? sampleData : realCampaigns;
 

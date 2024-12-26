@@ -15,6 +15,10 @@ serve(async (req) => {
     const { accountId, dateFrom, dateTo } = await req.json()
     console.log('Syncing campaigns for account:', accountId, 'date range:', { dateFrom, dateTo })
     
+    if (!dateFrom || !dateTo) {
+      throw new Error('Date range is required')
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -37,13 +41,13 @@ serve(async (req) => {
       throw new Error('No Facebook access token found for this account')
     }
 
-    // Format the date range for Facebook API (ensuring UTC timezone)
-    const since = dateFrom + 'T00:00:00+0000'
-    const until = dateTo + 'T23:59:59+0000'
+    // Format dates for Facebook API
+    const since = `${dateFrom}T00:00:00+0000`
+    const until = `${dateTo}T23:59:59+0000`
 
-    console.log('Fetching data with UTC time range:', { since, until })
+    console.log('Fetching data with time range:', { since, until })
 
-    // Fetch campaign data with insights from Facebook API
+    // Fetch campaign data from Facebook API with date range
     const fbResponse = await fetch(
       `https://graph.facebook.com/v19.0/act_${accountData.account_id}/campaigns?fields=name,status,insights.time_range({"since":"${since}","until":"${until}"}){spend,impressions,clicks,actions}&limit=500&access_token=${accountData.access_token}`
     )
@@ -68,12 +72,11 @@ serve(async (req) => {
       )
     }
 
-    // Process and filter campaign data
+    // Process campaign data
     const campaignData = fbData.data
       .map((campaign: any) => {
         const insights = campaign.insights?.data?.[0] || {}
         
-        // Find purchase conversions in actions array
         const conversions = insights.actions?.reduce((total: number, action: any) => {
           if (action.action_type === 'purchase' || 
               action.action_type === 'offsite_conversion.fb_pixel_purchase') {
@@ -82,16 +85,6 @@ serve(async (req) => {
           return total
         }, 0) || 0
 
-        // Log individual campaign data for debugging
-        console.log('Processing campaign:', {
-          name: campaign.name,
-          spend: insights.spend,
-          impressions: insights.impressions,
-          clicks: insights.clicks,
-          conversions: conversions,
-          status: campaign.status
-        })
-
         return {
           account_id: accountId,
           name: campaign.name,
@@ -99,26 +92,28 @@ serve(async (req) => {
           impressions: parseInt(insights.impressions || '0'),
           clicks: parseInt(insights.clicks || '0'),
           conversions: conversions,
-          created_at: new Date().toISOString(),
+          created_at: new Date(since).toISOString(), // Use the start date of the range
           updated_at: new Date().toISOString()
         }
       })
-      .filter(campaign => campaign.impressions > 0) // Only keep campaigns with impressions
+      .filter(campaign => campaign.impressions > 0)
 
     console.log('Processed campaign data:', JSON.stringify(campaignData, null, 2))
 
-    // First, delete existing data for this account
+    // Delete existing data for this account and date range
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
       .eq('account_id', accountId)
+      .gte('created_at', since)
+      .lte('created_at', until)
 
     if (deleteError) {
       console.error('Error deleting existing campaigns:', deleteError)
       throw deleteError
     }
 
-    // Then insert new data if we have any
+    // Insert new data
     if (campaignData.length > 0) {
       const { error: insertError } = await supabaseClient
         .from('campaigns')
