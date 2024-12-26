@@ -1,19 +1,17 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export const initiateGoogleAdsAuth = async () => {
   try {
-    const response = await fetch('https://tetpfwhzydrcoseyvhaw.functions.supabase.co/get-google-ads-credentials', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    const { data, error } = await supabase.functions.invoke('get-google-ads-credentials', {
+      method: 'GET'
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to get Google Ads credentials');
+    if (error) {
+      console.error('Error getting Google Ads credentials:', error);
+      throw error;
     }
 
-    const { clientId } = await response.json();
-    
-    if (!clientId) {
+    if (!data?.clientId) {
       throw new Error('Google Ads client ID not found');
     }
 
@@ -21,7 +19,7 @@ export const initiateGoogleAdsAuth = async () => {
     console.log('Redirect URI:', redirectUri);
 
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    authUrl.searchParams.append('client_id', clientId);
+    authUrl.searchParams.append('client_id', data.clientId);
     authUrl.searchParams.append('redirect_uri', redirectUri);
     authUrl.searchParams.append('scope', 'https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/userinfo.email');
     authUrl.searchParams.append('response_type', 'code');
