@@ -28,8 +28,8 @@ serve(async (req) => {
     }
     console.log('Account ID:', accountId);
 
-    // Fetch data from Google Sheets using the new API key
-    const apiKey = Deno.env.get('Google Sheets API v2');
+    // Use the new API key secret
+    const apiKey = Deno.env.get('Google Sheets API v3');
     if (!apiKey) {
       console.error('Google Sheets API key not found');
       throw new Error('Google Sheets API key not configured');
