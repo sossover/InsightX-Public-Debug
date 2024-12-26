@@ -12,10 +12,15 @@ export type Database = {
       ad_accounts: {
         Row: {
           access_token: string | null
+          account_currency: string | null
           account_id: string
           account_name: string | null
+          account_status: string | null
+          account_timezone: string | null
           created_at: string
           id: string
+          is_active: boolean | null
+          last_sync_at: string | null
           platform: string
           refresh_token: string | null
           updated_at: string
@@ -23,10 +28,15 @@ export type Database = {
         }
         Insert: {
           access_token?: string | null
+          account_currency?: string | null
           account_id: string
           account_name?: string | null
+          account_status?: string | null
+          account_timezone?: string | null
           created_at?: string
           id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
           platform: string
           refresh_token?: string | null
           updated_at?: string
@@ -34,10 +44,15 @@ export type Database = {
         }
         Update: {
           access_token?: string | null
+          account_currency?: string | null
           account_id?: string
           account_name?: string | null
+          account_status?: string | null
+          account_timezone?: string | null
           created_at?: string
           id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
           platform?: string
           refresh_token?: string | null
           updated_at?: string

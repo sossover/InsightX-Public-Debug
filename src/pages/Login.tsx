@@ -12,7 +12,7 @@ export default function Login() {
     // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/account-setup");
       }
     });
 
@@ -22,7 +22,7 @@ export default function Login() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Auth state changed:", _event, session);
       if (session) {
-        navigate("/");
+        navigate("/account-setup");
       }
     });
 
@@ -41,7 +41,7 @@ export default function Login() {
             prompt: 'consent',
           },
           redirectTo: window.location.origin + '/google-ads-callback',
-          skipBrowserRedirect: true // This prevents the automatic redirect
+          skipBrowserRedirect: true
         }
       });
 
@@ -54,7 +54,6 @@ export default function Login() {
         });
       } else if (data?.url) {
         console.log('Opening auth URL in new window:', data.url);
-        // Open in a new window instead of redirecting in the iframe
         window.open(data.url, '_blank', 'width=800,height=600');
       }
     } catch (err) {

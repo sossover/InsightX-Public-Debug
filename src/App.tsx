@@ -1,160 +1,32 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import Landing from "./pages/Landing";
-import Index from "./pages/Index";
-import GeoReport from "./pages/GeoReport";
-import KeywordAnalysis from "./pages/KeywordAnalysis";
-import OptimizationList from "./pages/OptimizationList";
-import ConversionAnalysis from "./pages/ConversionAnalysis";
-import ChannelMix from "./pages/ChannelMix";
-import AudienceInsights from "./pages/AudienceInsights";
-import Settings from "./pages/Settings";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Templates from "./pages/Templates";
-import Pricing from "./pages/Pricing";
-import WebsitePricing from "./pages/WebsitePricing";
+import AccountSetup from "./pages/AccountSetup";
+import AudienceInsights from "./pages/AudienceInsights";
+import GeoReport from "./pages/GeoReport";
+import ConversionAnalysis from "./pages/ConversionAnalysis";
+import KeywordAnalysis from "./pages/KeywordAnalysis";
+import ChannelMix from "./pages/ChannelMix";
+import OptimizationList from "./pages/OptimizationList";
 import Account from "./pages/Account";
-import TermsOfUse from "./pages/TermsOfUse";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import GoogleAdsCallback from "./pages/GoogleAdsCallback";
+import { ChatPanel } from "./components/chat/ChatPanel";
 
-const queryClient = new QueryClient();
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    // Check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
-  }, []);
-
-  // Show nothing while checking authentication
-  if (isAuthenticated === null) {
-    return null;
-  }
-
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes - accessible whether logged in or not */}
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/website-pricing" element={<WebsitePricing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/terms-of-use" element={<TermsOfUse />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/google-ads-callback" element={<GoogleAdsCallback />} />
-          
-          {/* Protected routes - require authentication */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/account"
-            element={
-              <ProtectedRoute>
-                <Account />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/geo-report"
-            element={
-              <ProtectedRoute>
-                <GeoReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/keyword-analysis"
-            element={
-              <ProtectedRoute>
-                <KeywordAnalysis />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/optimization-list"
-            element={
-              <ProtectedRoute>
-                <OptimizationList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/conversion-analysis"
-            element={
-              <ProtectedRoute>
-                <ConversionAnalysis />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/channel-mix"
-            element={
-              <ProtectedRoute>
-                <ChannelMix />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/audience-insights"
-            element={
-              <ProtectedRoute>
-                <AudienceInsights />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/templates"
-            element={
-              <ProtectedRoute>
-                <Templates />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/pricing"
-            element={
-              <ProtectedRoute>
-                <Pricing />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/account-setup" element={<AccountSetup />} />
+        <Route path="/audience-insights" element={<AudienceInsights />} />
+        <Route path="/geo-report" element={<GeoReport />} />
+        <Route path="/conversion-analysis" element={<ConversionAnalysis />} />
+        <Route path="/keyword-analysis" element={<KeywordAnalysis />} />
+        <Route path="/channel-mix" element={<ChannelMix />} />
+        <Route path="/optimization-list" element={<OptimizationList />} />
+        <Route path="/account" element={<Account />} />
+      </Routes>
+      <ChatPanel />
+    </Router>
+  );
+}
 
 export default App;
