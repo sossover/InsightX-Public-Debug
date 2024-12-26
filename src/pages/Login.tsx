@@ -28,6 +28,9 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const redirectUrl = `${window.location.origin}/`;
+  console.log('Auth redirect URL:', redirectUrl); // For debugging
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-custom-purple-50 to-white p-4">
       <div className="w-full max-w-md">
@@ -61,7 +64,7 @@ export default function Login() {
               },
             }}
             providers={["google"]}
-            redirectTo={`${window.location.origin}/`}
+            redirectTo={redirectUrl}
             localization={{
               variables: {
                 sign_in: {
