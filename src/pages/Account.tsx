@@ -9,6 +9,7 @@ import { AdAccountsList } from "@/components/account/AdAccountsList";
 import { PlatformCard } from "@/components/account/PlatformCard";
 import { GoogleAdsAccountSelector } from "@/components/account/GoogleAdsAccountSelector";
 import { FacebookAdsAccountSelector } from "@/components/account/FacebookAdsAccountSelector";
+import { handleFacebookAdsConnect } from "@/utils/facebookAdsAuth";
 
 interface AdAccount {
   id: string;
@@ -17,28 +18,13 @@ interface AdAccount {
   account_name: string | null;
 }
 
-interface GoogleAdsAccount {
-  id: string;
-  name: string;
-  customerId: string;
-}
-
-interface FacebookAdsAccount {
-  id: string;
-  name: string;
-  account_id: string;
-  currency: string;
-  timezone_name: string;
-  account_status: string;
-}
-
 export default function Account() {
   const [adAccounts, setAdAccounts] = useState<AdAccount[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isGoogleAccountSelectorOpen, setIsGoogleAccountSelectorOpen] = useState(false);
   const [isFacebookAccountSelectorOpen, setIsFacebookAccountSelectorOpen] = useState(false);
-  const [googleAdsAccounts, setGoogleAdsAccounts] = useState<GoogleAdsAccount[]>([]);
-  const [facebookAdsAccounts, setFacebookAdsAccounts] = useState<FacebookAdsAccount[]>([]);
+  const [googleAdsAccounts, setGoogleAdsAccounts] = useState([]);
+  const [facebookAdsAccounts, setFacebookAdsAccounts] = useState([]);
   const [loadingPlatform, setLoadingPlatform] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -107,29 +93,14 @@ export default function Account() {
     } else if (platform === 'Facebook Ads') {
       try {
         setLoadingPlatform('Facebook Ads');
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          throw new Error('No authenticated session found');
-        }
-
-        const response = await supabase.functions.invoke('facebook-ads-auth', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        if (!response.data) {
-          throw new Error('Failed to fetch Facebook ad accounts');
-        }
-
-        setFacebookAdsAccounts(response.data.data);
+        const accounts = await handleFacebookAdsConnect();
+        setFacebookAdsAccounts(accounts);
         setIsFacebookAccountSelectorOpen(true);
       } catch (error) {
         console.error('Error connecting Facebook Ads:', error);
         toast({
           title: "Connection Error",
-          description: "Failed to connect Facebook Ads accounts",
+          description: error instanceof Error ? error.message : "Failed to connect Facebook Ads accounts",
           variant: "destructive",
         });
       } finally {
@@ -142,21 +113,6 @@ export default function Account() {
       });
     }
   };
-
-  const platforms = [
-    { 
-      name: 'Google Ads', 
-      description: 'Connect your Google Ads account to analyze performance' 
-    },
-    { 
-      name: 'Facebook Ads', 
-      description: 'Connect your Facebook Ads account to analyze performance' 
-    },
-    { 
-      name: 'TikTok Ads', 
-      description: 'Connect your TikTok Ads account to analyze performance' 
-    }
-  ];
 
   return (
     <SidebarProvider>
@@ -175,7 +131,11 @@ export default function Account() {
                 </div>
 
                 <div className="space-y-4 mb-8">
-                  {platforms.map((platform) => (
+                  {[
+                    { name: 'Google Ads', description: 'Connect your Google Ads account to analyze performance' },
+                    { name: 'Facebook Ads', description: 'Connect your Facebook Ads account to analyze performance' },
+                    { name: 'TikTok Ads', description: 'Connect your TikTok Ads account to analyze performance' }
+                  ].map((platform) => (
                     <PlatformCard
                       key={platform.name}
                       name={platform.name}
