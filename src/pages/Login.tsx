@@ -36,7 +36,6 @@ export default function Login() {
       provider: 'google',
       options: {
         redirectTo: redirectUrl,
-        skipBrowserRedirect: true, // Don't automatically redirect
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -46,24 +45,6 @@ export default function Login() {
 
     if (error) {
       console.error('Google sign-in error:', error);
-      return;
-    }
-
-    // Get the sign-in URL and redirect to it in the top window
-    const { data } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      }
-    });
-
-    if (data.url) {
-      // Force top-level navigation to avoid iframe restrictions
-      window.top.location.href = data.url;
     }
   };
 
