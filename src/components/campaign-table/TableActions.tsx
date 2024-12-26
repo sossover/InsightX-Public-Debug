@@ -1,31 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw } from "lucide-react";
+import { Download } from "lucide-react";
 
 interface TableActionsProps {
   useSampleData: boolean;
   onExport: () => void;
-  onSync: () => void;
 }
 
-export function TableActions({ useSampleData, onExport, onSync }: TableActionsProps) {
+export function TableActions({
+  useSampleData,
+  onExport,
+}: TableActionsProps) {
   return (
-    <div className="flex justify-end gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onSync}
-        className="flex items-center gap-2"
-      >
-        <RefreshCw className="h-4 w-4" />
-        Sync Data
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
+    <div className="flex justify-between">
+      <Button 
         onClick={onExport}
+        variant="outline" 
         className="flex items-center gap-2"
       >
-        <Download className="h-4 w-4" />
+        <Download className="w-4 h-4" />
         Export to CSV
       </Button>
     </div>

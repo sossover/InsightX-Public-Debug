@@ -13,9 +13,6 @@ import { useCampaignData } from "./campaign-table/useCampaignData";
 import { useCampaignSort } from "./campaign-table/useCampaignSort";
 import { calculateTotals } from "./campaign-table/CampaignTableTotals";
 import { exportToCSV } from "./campaign-table/CampaignExport";
-import { useToast } from "./ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
 
 export function CampaignTable({ 
   useSampleData = false, 
@@ -24,7 +21,6 @@ export function CampaignTable({
   dateRange,
   selectedAccountId 
 }: CampaignTableProps) {
-  const { toast } = useToast();
   const {
     campaigns: realCampaigns,
     isFetching,
@@ -35,57 +31,6 @@ export function CampaignTable({
   const campaigns = useSampleData ? sampleData : realCampaigns;
   const { sortedCampaigns, handleSort } = useCampaignSort(campaigns);
   const totals = calculateTotals(campaigns);
-
-  const handleSync = async () => {
-    if (!selectedAccountId) {
-      toast({
-        title: "Error",
-        description: "Please select an ad account first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      console.log('Starting sync with date range:', dateRange);
-      
-      const formattedDateRange = dateRange ? {
-        from: dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : undefined,
-        to: dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : undefined,
-      } : undefined;
-
-      console.log('Formatted date range:', formattedDateRange);
-
-      const { data, error } = await supabase.functions.invoke('fetch-google-sheets', {
-        body: {
-          accountId: selectedAccountId,
-          dateRange: formattedDateRange,
-        },
-      });
-
-      if (error) {
-        console.error('Sync error:', error);
-        throw error;
-      }
-
-      console.log('Sync response:', data);
-
-      toast({
-        title: "Success",
-        description: data.message || "Data synced successfully",
-      });
-
-      // Refresh the campaign data
-      await fetchCampaignData();
-    } catch (error) {
-      console.error('Error syncing data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sync data. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   useEffect(() => {
     if (selectedAccountId) {
@@ -112,7 +57,6 @@ export function CampaignTable({
         <TableActions
           useSampleData={useSampleData}
           onExport={() => exportToCSV(sortedCampaigns, totals)}
-          onSync={handleSync}
         />
       )}
       

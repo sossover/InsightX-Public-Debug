@@ -1,192 +1,134 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { format, parseISO } from "https://esm.sh/date-fns@2.30.0";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
+const TAB_NAME = 'Sheet1';
+const RANGE = 'A:G'; // Columns A through G
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-interface Campaign {
-  date: string;
-  name: string;
-  spend: number;
-  impressions: number;
-  clicks: number;
-  conversions: number;
-}
-
-interface DateRange {
-  from?: string;
-  to?: string;
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-account-id',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Content-Type': 'application/json',
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting fetch-google-sheets function');
+    console.log('Starting Google Sheets fetch process...');
     
-    const { accountId, dateRange } = await req.json();
-    console.log('Received request with accountId:', accountId);
-    console.log('Date range:', dateRange);
-
+    const accountId = req.headers.get('x-account-id');
     if (!accountId) {
-      throw new Error('Account ID is required');
+      console.error('No account ID provided in headers');
+      throw new Error('No account ID provided');
     }
+    console.log('Account ID:', accountId);
 
+    // Fetch data from Google Sheets using the new API key
     const apiKey = Deno.env.get('Google Sheets API v2');
     if (!apiKey) {
       console.error('Google Sheets API key not found');
       throw new Error('Google Sheets API key not configured');
     }
 
-    const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
-    const TAB_NAME = 'Sheet1';
-    const RANGE = 'A2:F31';
-    
+    console.log('API Key found, proceeding with fetch...');
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
     console.log('Fetching from Google Sheets URL:', sheetsUrl);
 
     const response = await fetch(sheetsUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`);
+      console.error('Google Sheets API Error:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('Error details:', errorText);
+      throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Raw data from sheets:', data);
-
-    if (!data.values || !Array.isArray(data.values)) {
-      throw new Error('Invalid data format from Google Sheets');
+    console.log('Received data from Google Sheets:', data.values?.length, 'rows');
+    
+    if (!data.values || data.values.length < 2) {
+      console.error('No data found in sheet or insufficient rows');
+      throw new Error('No data found in sheet');
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    // Skip header row and transform data
+    const campaigns = data.values.slice(1).map((row: any[]) => ({
+      name: row[0] || '',
+      spend: parseFloat(row[1]) || 0,
+      impressions: parseInt(row[2]) || 0,
+      clicks: parseInt(row[3]) || 0,
+      conversions: parseInt(row[4]) || 0,
+      ctr: row[5] || '0%',
+      cpa: parseFloat(row[6]) || 0
+    }));
+
+    console.log('Transformed campaigns:', campaigns.length);
+
+    // Create Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Supabase credentials not found');
+      throw new Error('Supabase configuration missing');
+    }
+
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client created');
 
+    // Clear existing campaign data for this account
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
       .eq('account_id', accountId);
 
     if (deleteError) {
-      console.error('Error clearing existing campaigns:', deleteError);
-      throw deleteError;
+      console.error('Delete Error:', deleteError);
+      throw new Error(`Failed to clear existing data: ${deleteError.message}`);
     }
+
     console.log('Cleared existing campaigns for account');
 
-    const campaigns: Campaign[] = [];
-    let processedCount = 0;
+    // Insert new campaign data
+    const { error: insertError } = await supabaseClient
+      .from('campaigns')
+      .insert(campaigns.map(campaign => ({
+        ...campaign,
+        account_id: accountId,
+      })));
 
-    // Parse the date range boundaries once
-    const rangeStart = dateRange?.from ? parseISO(dateRange.from) : null;
-    const rangeEnd = dateRange?.to ? parseISO(dateRange.to) : null;
-    
-    console.log('Date range boundaries:', {
-      rangeStart: rangeStart?.toISOString(),
-      rangeEnd: rangeEnd?.toISOString()
-    });
-
-    for (const row of data.values) {
-      if (!row || row.length < 6) {
-        console.log('Skipping invalid row:', row);
-        continue;
-      }
-
-      const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
-      
-      try {
-        // Parse the date from the sheet
-        const rowDate = new Date(dateStr);
-        if (isNaN(rowDate.getTime())) {
-          console.log(`Invalid date format for row: ${dateStr}`);
-          continue;
-        }
-
-        const formattedDate = format(rowDate, 'yyyy-MM-dd');
-        console.log('Processing date:', formattedDate, 'Original:', dateStr);
-        
-        // Check if date is within selected range
-        if (rangeStart && rangeEnd) {
-          const currentDate = parseISO(formattedDate);
-          
-          console.log('Comparing dates:', {
-            current: currentDate.toISOString(),
-            start: rangeStart.toISOString(),
-            end: rangeEnd.toISOString()
-          });
-
-          // Compare actual Date objects
-          if (currentDate < rangeStart || currentDate > rangeEnd) {
-            console.log(`Skipping row with date ${formattedDate} - outside range`);
-            continue;
-          }
-        }
-
-        const campaign = {
-          date: formattedDate,
-          name,
-          spend: parseFloat(spendStr) || 0,
-          impressions: parseInt(impressionsStr) || 0,
-          clicks: parseInt(clicksStr) || 0,
-          conversions: parseInt(conversionsStr) || 0,
-        };
-
-        campaigns.push(campaign);
-        processedCount++;
-        console.log('Processed campaign:', campaign);
-        
-      } catch (error) {
-        console.error(`Error processing row: ${JSON.stringify(row)}`, error);
-      }
+    if (insertError) {
+      console.error('Insert Error:', insertError);
+      throw new Error(`Failed to insert new data: ${insertError.message}`);
     }
 
-    console.log(`Transformed ${processedCount} campaigns:`, campaigns);
-
-    if (campaigns.length > 0) {
-      const { error: insertError } = await supabaseClient
-        .from('campaigns')
-        .insert(campaigns.map(campaign => ({
-          account_id: accountId,
-          name: campaign.name,
-          spend: campaign.spend,
-          impressions: campaign.impressions,
-          clicks: campaign.clicks,
-          conversions: campaign.conversions,
-          created_at: campaign.date,
-        })));
-
-      if (insertError) {
-        console.error('Error inserting campaigns:', insertError);
-        throw insertError;
-      }
-    }
+    console.log('Successfully inserted new campaign data');
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Successfully synced ${campaigns.length} campaigns`,
+      JSON.stringify({ 
+        success: true, 
+        message: 'Data synced successfully',
+        rowCount: campaigns.length 
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      { headers: corsHeaders }
     );
 
   } catch (error) {
     console.error('Error in fetch-google-sheets function:', error);
     return new Response(
-      JSON.stringify({
-        success: false,
+      JSON.stringify({ 
+        success: false, 
         error: error.message,
+        details: error.stack 
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      },
+      { 
+        status: 500, 
+        headers: corsHeaders 
+      }
     );
   }
 });
