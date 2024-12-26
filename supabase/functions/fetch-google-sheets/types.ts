@@ -6,3 +6,8 @@ export interface Campaign {
   clicks: number;
   conversions: number;
 }
+
+export interface DateRange {
+  from: string;
+  to: string;
+}

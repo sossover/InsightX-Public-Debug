@@ -1,4 +1,4 @@
-import { Campaign } from '../types';
+import { Campaign, DateRange } from '../types.ts';
 import { isWithinInterval, parseISO } from 'https://esm.sh/date-fns@2.30.0';
 
 const SHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
@@ -24,7 +24,7 @@ export async function fetchSheetData(apiKey: string) {
   return data.values;
 }
 
-export function aggregateCampaignData(rows: any[], dateRange?: { from: string; to: string }) {
+export function aggregateCampaignData(rows: any[], dateRange?: DateRange) {
   const campaignMap = new Map<string, Campaign>();
 
   rows.forEach((row: any[]) => {

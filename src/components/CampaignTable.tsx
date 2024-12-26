@@ -13,6 +13,8 @@ import { useCampaignData } from "./campaign-table/useCampaignData";
 import { useCampaignSort } from "./campaign-table/useCampaignSort";
 import { calculateTotals } from "./campaign-table/CampaignTableTotals";
 import { exportToCSV } from "./campaign-table/CampaignExport";
+import { useToast } from "./ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export function CampaignTable({ 
   useSampleData = false, 
@@ -21,6 +23,7 @@ export function CampaignTable({
   dateRange,
   selectedAccountId 
 }: CampaignTableProps) {
+  const { toast } = useToast();
   const {
     campaigns: realCampaigns,
     isFetching,
@@ -31,6 +34,46 @@ export function CampaignTable({
   const campaigns = useSampleData ? sampleData : realCampaigns;
   const { sortedCampaigns, handleSort } = useCampaignSort(campaigns);
   const totals = calculateTotals(campaigns);
+
+  const handleSync = async () => {
+    if (!selectedAccountId) {
+      toast({
+        title: "Error",
+        description: "Please select an ad account first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-google-sheets', {
+        body: {
+          accountId: selectedAccountId,
+          dateRange: dateRange ? {
+            from: dateRange.from?.toISOString(),
+            to: dateRange.to?.toISOString(),
+          } : undefined,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: data.message || "Data synced successfully",
+      });
+
+      // Refresh the campaign data
+      await fetchCampaignData();
+    } catch (error) {
+      console.error('Error syncing data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sync data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     if (selectedAccountId) {
@@ -57,6 +100,7 @@ export function CampaignTable({
         <TableActions
           useSampleData={useSampleData}
           onExport={() => exportToCSV(sortedCampaigns, totals)}
+          onSync={handleSync}
         />
       )}
       

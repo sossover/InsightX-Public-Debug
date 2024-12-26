@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { Campaign } from '../types';
+import { Campaign } from '../types.ts';
 
 export async function updateCampaigns(
   supabaseClient: any,
