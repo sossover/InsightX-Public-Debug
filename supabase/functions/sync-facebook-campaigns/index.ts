@@ -78,29 +78,31 @@ serve(async (req) => {
     }
 
     // Process and insert campaign data
-    const campaignData = fbData.data.map((campaign: any) => {
-      const insights = campaign.insights?.data?.[0] || {}
-      
-      // Find purchase conversions in actions array
-      const conversions = insights.actions?.reduce((total: number, action: any) => {
-        if (action.action_type === 'purchase' || 
-            action.action_type === 'offsite_conversion.fb_pixel_purchase') {
-          return total + parseInt(action.value || '0')
-        }
-        return total
-      }, 0) || 0
+    const campaignData = fbData.data
+      .map((campaign: any) => {
+        const insights = campaign.insights?.data?.[0] || {}
+        
+        // Find purchase conversions in actions array
+        const conversions = insights.actions?.reduce((total: number, action: any) => {
+          if (action.action_type === 'purchase' || 
+              action.action_type === 'offsite_conversion.fb_pixel_purchase') {
+            return total + parseInt(action.value || '0')
+          }
+          return total
+        }, 0) || 0
 
-      return {
-        account_id: accountId,
-        name: campaign.name,
-        spend: parseFloat(insights.spend || '0'),
-        impressions: parseInt(insights.impressions || '0'),
-        clicks: parseInt(insights.clicks || '0'),
-        conversions: conversions,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
-    })
+        return {
+          account_id: accountId,
+          name: campaign.name,
+          spend: parseFloat(insights.spend || '0'),
+          impressions: parseInt(insights.impressions || '0'),
+          clicks: parseInt(insights.clicks || '0'),
+          conversions: conversions,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      })
+      .filter(campaign => campaign.impressions > 0); // Filter out campaigns with 0 impressions
 
     console.log('Processed campaign data:', JSON.stringify(campaignData, null, 2))
 
