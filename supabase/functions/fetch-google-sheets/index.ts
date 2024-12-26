@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { format, parse } from "https://esm.sh/date-fns@2.30.0";
+import { format } from "https://esm.sh/date-fns@2.30.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -91,9 +91,10 @@ serve(async (req) => {
       const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
       
       try {
-        // Parse the date string directly since it's already in YYYY-MM-DD format
-        const date = dateStr.trim(); // Just trim any whitespace
-        console.log('Processing date:', date);
+        // Convert date string to YYYY-MM-DD format if needed
+        const dateParts = dateStr.split('-');
+        const formattedDate = dateParts.length === 3 ? dateStr : format(new Date(dateStr), 'yyyy-MM-dd');
+        console.log('Processing date:', formattedDate);
         
         // Check if date is within selected range
         if (dateRange?.from && dateRange?.to) {
@@ -101,19 +102,20 @@ serve(async (req) => {
           const toDate = dateRange.to;
           
           console.log('Checking date range:', {
-            date,
+            date: formattedDate,
             fromDate,
             toDate
           });
 
-          if (date < fromDate || date > toDate) {
-            console.log(`Skipping row with date ${date} - outside range ${dateRange.from} to ${dateRange.to}`);
+          // Compare dates as strings in YYYY-MM-DD format
+          if (formattedDate < fromDate || formattedDate > toDate) {
+            console.log(`Skipping row with date ${formattedDate} - outside range ${fromDate} to ${toDate}`);
             continue;
           }
         }
 
         const campaign = {
-          date,
+          date: formattedDate,
           name,
           spend: parseFloat(spendStr) || 0,
           impressions: parseInt(impressionsStr) || 0,
