@@ -1,8 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { ChatPanel } from "@/components/chat/ChatPanel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useState } from "react";
 import { Campaign } from "@/components/campaign-table/types";
 import { MetricCard } from "@/components/MetricCard";
@@ -11,6 +9,7 @@ import { ReferFriend } from "@/components/ReferFriend";
 import { ConversionGoals } from "@/components/ConversionGoals";
 import { ConversionSources } from "@/components/ConversionSources";
 import { AiInsights } from "@/components/AiInsights";
+import { ReportHeader } from "@/components/ReportHeader";
 
 const conversionData = [
   { date: "Jan", conversions: 120, rate: 2.5 },
@@ -22,6 +21,8 @@ const conversionData = [
 ];
 
 export default function ConversionAnalysis() {
+  const [date, setDate] = useState<Date>(new Date());
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [data] = useState(conversionData);
 
   const campaignData: Campaign[] = data.map(item => ({
@@ -48,14 +49,15 @@ export default function ConversionAnalysis() {
         <NavigationSidebar />
         
         <div className="flex-1 overflow-auto bg-gray-50">
-          <main className="p-8 space-y-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-custom-purple-500">Conversion Analysis</h1>
-                <p className="text-gray-600 mt-2">Track and analyze your conversion metrics over time</p>
-              </div>
-            </div>
+          <ReportHeader
+            title="Conversion Analysis"
+            description="Track and analyze your conversion metrics over time"
+            date={date}
+            setDate={setDate}
+            onAccountChange={setSelectedAccountId}
+          />
 
+          <main className="p-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <MetricCard
                 title="Total Conversions"

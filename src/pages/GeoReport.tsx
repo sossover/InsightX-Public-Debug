@@ -9,11 +9,7 @@ import { MetricCard } from "@/components/MetricCard";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import { PricingModal } from "@/components/PricingModal";
 import { HelpDialog } from "@/components/HelpDialog";
-import { TopNavBar } from "@/components/TopNavBar";
-import { CalendarDays, Globe } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { ReportHeader } from "@/components/ReportHeader";
 
 const defaultCampaigns = [
   {
@@ -69,7 +65,8 @@ const countryData = [
 ];
 
 const GeoReport = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date>(new Date());
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
@@ -83,11 +80,12 @@ const GeoReport = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          <TopNavBar 
+          <ReportHeader
+            title="Geographic Performance"
+            description="Analyze performance across different regions"
             date={date}
             setDate={setDate}
-            onPricingClick={() => setIsPricingOpen(true)}
-            onHelpClick={() => setIsHelpOpen(true)}
+            onAccountChange={setSelectedAccountId}
           />
 
           <main className="mt-16">
