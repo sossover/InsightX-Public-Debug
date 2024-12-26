@@ -91,23 +91,15 @@ export default function CampaignPerformance() {
       const fromDate = format(dateRange.from, 'yyyy-MM-dd');
       const toDate = format(dateRange.to, 'yyyy-MM-dd');
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-facebook-campaigns`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            accountId: selectedAccountId,
-            dateFrom: fromDate,
-            dateTo: toDate,
-          }),
+      const response = await supabase.functions.invoke('sync-facebook-campaigns', {
+        body: {
+          accountId: selectedAccountId,
+          dateFrom: fromDate,
+          dateTo: toDate
         }
-      );
+      });
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error('Failed to sync campaign data');
       }
 
@@ -161,7 +153,7 @@ export default function CampaignPerformance() {
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              Sync Data
+              {isSyncing ? "Syncing..." : "Sync Data"}
             </Button>
           </div>
 
