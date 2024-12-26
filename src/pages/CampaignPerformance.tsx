@@ -9,12 +9,15 @@ import { ReportHeader } from "@/components/ReportHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Loader2, RefreshCw } from "lucide-react";
 
 export default function CampaignPerformance() {
   const [date, setDate] = useState<Date>(new Date());
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async (accountId: string, selectedDate: Date) => {
@@ -22,7 +25,6 @@ export default function CampaignPerformance() {
     
     setIsLoading(true);
     try {
-      // Format date to match your database date format
       const formattedDate = format(selectedDate, 'yyyy-MM-dd');
       
       const { data, error } = await supabase
@@ -76,6 +78,49 @@ export default function CampaignPerformance() {
     }
   }, [toast]);
 
+  const handleSync = async () => {
+    if (!selectedAccountId || isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-facebook-campaigns`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            accountId: selectedAccountId,
+            date: format(date, 'yyyy-MM-dd'),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to sync campaign data');
+      }
+
+      toast({
+        title: "Success",
+        description: "Campaign data synced successfully.",
+      });
+
+      // Refresh the data
+      await fetchCampaignData(selectedAccountId, date);
+    } catch (error) {
+      console.error('Error syncing campaigns:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sync campaign data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
     if (selectedAccountId && date) {
       fetchCampaignData(selectedAccountId, date);
@@ -88,13 +133,28 @@ export default function CampaignPerformance() {
         <NavigationSidebar />
         
         <div className="flex-1 overflow-auto">
-          <ReportHeader
-            title="Campaign Performance"
-            description="Track and analyze your campaign metrics"
-            date={date}
-            setDate={setDate}
-            onAccountChange={setSelectedAccountId}
-          />
+          <div className="flex items-center justify-between p-8 pb-0">
+            <ReportHeader
+              title="Campaign Performance"
+              description="Track and analyze your campaign metrics"
+              date={date}
+              setDate={setDate}
+              onAccountChange={setSelectedAccountId}
+            />
+            
+            <Button
+              onClick={handleSync}
+              disabled={!selectedAccountId || isSyncing}
+              className="ml-4"
+            >
+              {isSyncing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              Sync Data
+            </Button>
+          </div>
 
           <main className="p-8 space-y-8">
             <div className="grid grid-cols-1 gap-6">
