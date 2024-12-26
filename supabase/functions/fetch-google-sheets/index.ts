@@ -1,32 +1,28 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 
-const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
-const TAB_NAME = 'Sheet1';
-const RANGE = 'A:G'; // Columns A through G
+const SHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
+const TAB_NAME = 'Class Data';
+const RANGE = 'A2:F31';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-account-id',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type': 'application/json',
+interface Campaign {
+  date: string;
+  name: string;
+  spend: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
   try {
-    console.log('Starting Google Sheets fetch process...');
-    
-    const accountId = req.headers.get('x-account-id');
+    const { accountId, dateRange } = await req.json();
     if (!accountId) {
-      console.error('No account ID provided in headers');
-      throw new Error('No account ID provided');
+      throw new Error('Account ID is required');
     }
+
     console.log('Account ID:', accountId);
+    console.log('Date Range:', dateRange);
 
     // Fetch data from Google Sheets using the new API key
     const apiKey = Deno.env.get('Google Sheets API v2');
@@ -41,94 +37,137 @@ serve(async (req) => {
 
     const response = await fetch(sheetsUrl);
     if (!response.ok) {
-      console.error('Google Sheets API Error:', response.status, response.statusText);
-      const errorText = await response.text();
-      console.error('Error details:', errorText);
-      throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
+      throw new Error(`Failed to fetch data: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Received data from Google Sheets:', data.values?.length, 'rows');
+    console.log('Raw data from sheets:', data);
+
+    // Transform and aggregate the data
+    const campaigns = new Map<string, Campaign>();
     
-    if (!data.values || data.values.length < 2) {
-      console.error('No data found in sheet or insufficient rows');
-      throw new Error('No data found in sheet');
+    data.values.forEach((row: any[]) => {
+      const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
+      const date = new Date(dateStr);
+
+      // Check if date is within selected range
+      if (dateRange?.from && dateRange?.to) {
+        const fromDate = new Date(dateRange.from);
+        const toDate = new Date(dateRange.to);
+        if (date < fromDate || date > toDate) {
+          return; // Skip this row if outside date range
+        }
+      }
+
+      const spend = parseFloat(spendStr) || 0;
+      const impressions = parseInt(impressionsStr) || 0;
+      const clicks = parseInt(clicksStr) || 0;
+      const conversions = parseInt(conversionsStr) || 0;
+
+      if (campaigns.has(name)) {
+        // Aggregate metrics for existing campaign
+        const existing = campaigns.get(name)!;
+        campaigns.set(name, {
+          ...existing,
+          spend: existing.spend + spend,
+          impressions: existing.impressions + impressions,
+          clicks: existing.clicks + clicks,
+          conversions: existing.conversions + conversions,
+        });
+      } else {
+        // Create new campaign entry
+        campaigns.set(name, {
+          date: dateStr,
+          name,
+          spend,
+          impressions,
+          clicks,
+          conversions,
+        });
+      }
+    });
+
+    // Convert aggregated data to array
+    const aggregatedCampaigns = Array.from(campaigns.values());
+    console.log('Aggregated campaigns:', aggregatedCampaigns);
+
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Update campaigns in database
+    for (const campaign of aggregatedCampaigns) {
+      const { data: existingCampaign, error: selectError } = await supabaseClient
+        .from('campaigns')
+        .select()
+        .eq('account_id', accountId)
+        .eq('name', campaign.name)
+        .single();
+
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Error checking existing campaign:', selectError);
+        continue;
+      }
+
+      if (existingCampaign) {
+        // Update existing campaign
+        const { error: updateError } = await supabaseClient
+          .from('campaigns')
+          .update({
+            spend: campaign.spend,
+            impressions: campaign.impressions,
+            clicks: campaign.clicks,
+            conversions: campaign.conversions,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingCampaign.id);
+
+        if (updateError) {
+          console.error('Error updating campaign:', updateError);
+        }
+      } else {
+        // Insert new campaign
+        const { error: insertError } = await supabaseClient
+          .from('campaigns')
+          .insert({
+            account_id: accountId,
+            name: campaign.name,
+            spend: campaign.spend,
+            impressions: campaign.impressions,
+            clicks: campaign.clicks,
+            conversions: campaign.conversions,
+          });
+
+        if (insertError) {
+          console.error('Error inserting campaign:', insertError);
+        }
+      }
     }
-
-    // Skip header row and transform data
-    const campaigns = data.values.slice(1).map((row: any[]) => ({
-      name: row[0] || '',
-      spend: parseFloat(row[1]) || 0,
-      impressions: parseInt(row[2]) || 0,
-      clicks: parseInt(row[3]) || 0,
-      conversions: parseInt(row[4]) || 0,
-      ctr: row[5] || '0%',
-      cpa: parseFloat(row[6]) || 0
-    }));
-
-    console.log('Transformed campaigns:', campaigns.length);
-
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Supabase credentials not found');
-      throw new Error('Supabase configuration missing');
-    }
-
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase client created');
-
-    // Clear existing campaign data for this account
-    const { error: deleteError } = await supabaseClient
-      .from('campaigns')
-      .delete()
-      .eq('account_id', accountId);
-
-    if (deleteError) {
-      console.error('Delete Error:', deleteError);
-      throw new Error(`Failed to clear existing data: ${deleteError.message}`);
-    }
-
-    console.log('Cleared existing campaigns for account');
-
-    // Insert new campaign data
-    const { error: insertError } = await supabaseClient
-      .from('campaigns')
-      .insert(campaigns.map(campaign => ({
-        ...campaign,
-        account_id: accountId,
-      })));
-
-    if (insertError) {
-      console.error('Insert Error:', insertError);
-      throw new Error(`Failed to insert new data: ${insertError.message}`);
-    }
-
-    console.log('Successfully inserted new campaign data');
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Data synced successfully',
-        rowCount: campaigns.length 
+      JSON.stringify({
+        success: true,
+        rowCount: aggregatedCampaigns.length,
+        message: `Successfully synced ${aggregatedCampaigns.length} campaigns`,
       }),
-      { headers: corsHeaders }
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
 
   } catch (error) {
     console.error('Error in fetch-google-sheets function:', error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
+      JSON.stringify({
+        success: false,
         error: error.message,
-        details: error.stack 
       }),
-      { 
-        status: 500, 
-        headers: corsHeaders 
-      }
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
   }
-});
+})
