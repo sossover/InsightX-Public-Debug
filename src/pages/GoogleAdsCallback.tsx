@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { NavigationSidebar } from "@/components/NavigationSidebar";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 export default function GoogleAdsCallback() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -43,9 +46,16 @@ export default function GoogleAdsCallback() {
 
         if (error) throw error;
 
-        // Redirect to account page with success parameter
-        navigate('/account?success=true');
-      } catch (error) {
+        setSuccess(true);
+        setIsProcessing(false);
+        toast({
+          title: "Success!",
+          description: "Google Ads account connected successfully",
+        });
+        
+        // Redirect after a short delay to show success state
+        setTimeout(() => navigate('/account'), 2000);
+      } catch (error: any) {
         console.error('Error connecting Google Ads account:', error);
         setError(error.message || "Failed to connect Google Ads account");
         setIsProcessing(false);
@@ -61,27 +71,39 @@ export default function GoogleAdsCallback() {
     handleCallback();
   }, [navigate, toast]);
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <p className="text-sm text-gray-500">Redirecting you back...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="text-center max-w-md">
-        <div className="flex items-center justify-center mb-4">
-          <Loader2 className="h-8 w-8 animate-spin text-google-blue" />
+    <div className="flex h-screen overflow-hidden">
+      <NavigationSidebar />
+      
+      <main className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg border border-gray-200">
+            {isProcessing ? (
+              <div className="text-center">
+                <Loader2 className="h-12 w-12 animate-spin text-google-blue mx-auto mb-4" />
+                <h1 className="text-2xl font-bold mb-4">Connecting your Google Ads account...</h1>
+                <p className="text-gray-500">Please wait while we complete the connection.</p>
+              </div>
+            ) : error ? (
+              <div className="text-center">
+                <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                <h1 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h1>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <p className="text-sm text-gray-500">Redirecting you back...</p>
+              </div>
+            ) : success ? (
+              <div className="text-center">
+                <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <h1 className="text-2xl font-bold text-green-600 mb-4">Successfully Connected!</h1>
+                <p className="text-gray-600 mb-4">Your Google Ads account has been connected.</p>
+                <p className="text-sm text-gray-500">Redirecting you to your account...</p>
+              </div>
+            ) : null}
+          </div>
         </div>
-        <h1 className="text-2xl font-bold mb-4">Connecting your Google Ads account...</h1>
-        <p className="text-gray-500">Please wait while we complete the connection.</p>
-      </div>
+      </main>
+
+      <ChatPanel />
     </div>
   );
 }
