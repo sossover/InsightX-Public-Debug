@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { format, parse, isWithinInterval } from "https://esm.sh/date-fns@2.30.0";
+import { format, parse } from "https://esm.sh/date-fns@2.30.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +22,6 @@ interface DateRange {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -38,14 +37,12 @@ serve(async (req) => {
       throw new Error('Account ID is required');
     }
 
-    // Get API key from environment
     const apiKey = Deno.env.get('Google Sheets API v2');
     if (!apiKey) {
       console.error('Google Sheets API key not found');
       throw new Error('Google Sheets API key not configured');
     }
 
-    // Updated Sheet ID and tab name
     const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
     const TAB_NAME = 'Sheet1';
     const RANGE = 'A2:F31';
@@ -65,14 +62,12 @@ serve(async (req) => {
       throw new Error('Invalid data format from Google Sheets');
     }
 
-    // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
     console.log('Supabase client created');
 
-    // Clear existing campaigns for this account
     const { error: deleteError } = await supabaseClient
       .from('campaigns')
       .delete()
@@ -84,7 +79,6 @@ serve(async (req) => {
     }
     console.log('Cleared existing campaigns for account');
 
-    // Transform and filter the data
     const campaigns: Campaign[] = [];
     let processedCount = 0;
 
@@ -97,29 +91,29 @@ serve(async (req) => {
       const [dateStr, name, spendStr, impressionsStr, clicksStr, conversionsStr] = row;
       
       try {
-        // Parse the date from the sheet (assuming DD/MM/YYYY format)
-        const date = parse(dateStr, 'dd/MM/yyyy', new Date());
-        console.log('Parsed date:', date, 'from string:', dateStr);
+        // Parse the date string directly since it's already in YYYY-MM-DD format
+        const date = dateStr.trim(); // Just trim any whitespace
+        console.log('Processing date:', date);
         
         // Check if date is within selected range
         if (dateRange?.from && dateRange?.to) {
-          const fromDate = new Date(dateRange.from);
-          const toDate = new Date(dateRange.to);
+          const fromDate = dateRange.from;
+          const toDate = dateRange.to;
           
           console.log('Checking date range:', {
-            date: date.toISOString(),
-            fromDate: fromDate.toISOString(),
-            toDate: toDate.toISOString()
+            date,
+            fromDate,
+            toDate
           });
 
-          if (!isWithinInterval(date, { start: fromDate, end: toDate })) {
-            console.log(`Skipping row with date ${dateStr} - outside range ${dateRange.from} to ${dateRange.to}`);
+          if (date < fromDate || date > toDate) {
+            console.log(`Skipping row with date ${date} - outside range ${dateRange.from} to ${dateRange.to}`);
             continue;
           }
         }
 
         const campaign = {
-          date: format(date, 'yyyy-MM-dd'),
+          date,
           name,
           spend: parseFloat(spendStr) || 0,
           impressions: parseInt(impressionsStr) || 0,
@@ -138,7 +132,6 @@ serve(async (req) => {
 
     console.log(`Transformed ${processedCount} campaigns:`, campaigns);
 
-    // Insert campaign data
     if (campaigns.length > 0) {
       const { error: insertError } = await supabaseClient
         .from('campaigns')
