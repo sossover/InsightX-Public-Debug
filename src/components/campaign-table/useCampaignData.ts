@@ -64,13 +64,12 @@ export function useCampaignData(
 
       const formattedCampaigns: Campaign[] = campaignData.map(campaign => ({
         name: campaign.name,
-        spend: parseFloat(campaign.spend.toString()),
+        spend: typeof campaign.spend === 'string' ? parseFloat(campaign.spend) : campaign.spend,
         impressions: campaign.impressions,
         clicks: campaign.clicks,
         conversions: campaign.conversions,
         get ctr() {
-          const ctrValue = ((this.clicks / this.impressions) * 100).toFixed(2);
-          return `${ctrValue}%`;
+          return `${((this.clicks / this.impressions) * 100).toFixed(2)}%`;
         },
         get cpa() {
           return this.conversions > 0 ? this.spend / this.conversions : 0;
