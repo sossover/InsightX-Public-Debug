@@ -8,10 +8,10 @@ import { AiInsights } from "@/components/AiInsights";
 import { ReportHeader } from "@/components/ReportHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
 import { DateRange } from "react-day-picker";
+import { SimpleCampaignTable } from "@/components/campaign-table/SimpleCampaignTable";
 
 export default function CampaignPerformance() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -165,6 +165,10 @@ export default function CampaignPerformance() {
             <div className="grid grid-cols-1 gap-6">
               <PerformanceChart 
                 useSampleData={!selectedAccountId} 
+              />
+              <SimpleCampaignTable 
+                campaigns={campaigns}
+                dateRange={dateRange}
               />
               <CampaignTable 
                 useSampleData={!selectedAccountId} 
