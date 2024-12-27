@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Campaign } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -19,6 +19,8 @@ export function useCampaignData(
     
     setIsFetching(true);
     try {
+      console.log('Fetching campaign data for account:', selectedAccountId);
+      
       let query = supabase
         .from('campaigns')
         .select('*')
@@ -44,6 +46,8 @@ export function useCampaignData(
         return;
       }
 
+      console.log('Fetched campaigns:', data);
+
       const formattedCampaigns: Campaign[] = data?.map(campaign => ({
         name: campaign.name,
         spend: campaign.spend,
@@ -58,6 +62,7 @@ export function useCampaignData(
         }
       })) || [];
 
+      console.log('Formatted campaigns:', formattedCampaigns);
       setCampaigns(formattedCampaigns);
     } catch (error) {
       console.error('Error:', error);
@@ -70,6 +75,39 @@ export function useCampaignData(
       setIsFetching(false);
     }
   }, [selectedAccountId, dateRange, useSampleData, toast]);
+
+  // Add effect to refetch data when selectedAccountId or dateRange changes
+  useEffect(() => {
+    if (selectedAccountId) {
+      fetchCampaignData();
+    }
+  }, [selectedAccountId, dateRange, fetchCampaignData]);
+
+  // Subscribe to campaign changes
+  useEffect(() => {
+    if (!selectedAccountId || useSampleData) return;
+
+    const subscription = supabase
+      .channel('campaign-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'campaigns',
+          filter: `account_id=eq.${selectedAccountId}`,
+        },
+        () => {
+          console.log('Campaign data changed, refreshing...');
+          fetchCampaignData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [selectedAccountId, useSampleData, fetchCampaignData]);
 
   return {
     campaigns,
