@@ -83,11 +83,13 @@ export function useCampaignData(
     }
   }, [selectedAccountId, dateRange, fetchCampaignData]);
 
-  // Subscribe to campaign changes
+  // Subscribe to real-time campaign changes
   useEffect(() => {
     if (!selectedAccountId || useSampleData) return;
 
-    const subscription = supabase
+    console.log('Setting up real-time subscription for account:', selectedAccountId);
+    
+    const channel = supabase
       .channel('campaign-changes')
       .on(
         'postgres_changes',
@@ -97,15 +99,18 @@ export function useCampaignData(
           table: 'campaigns',
           filter: `account_id=eq.${selectedAccountId}`,
         },
-        () => {
-          console.log('Campaign data changed, refreshing...');
+        (payload) => {
+          console.log('Received real-time update:', payload);
           fetchCampaignData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     return () => {
-      subscription.unsubscribe();
+      console.log('Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
     };
   }, [selectedAccountId, useSampleData, fetchCampaignData]);
 
