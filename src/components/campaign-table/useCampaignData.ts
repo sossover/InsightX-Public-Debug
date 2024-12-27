@@ -64,7 +64,7 @@ export function useCampaignData(
 
       const formattedCampaigns: Campaign[] = campaignData.map(campaign => ({
         name: campaign.name,
-        spend: parseFloat(campaign.spend),
+        spend: parseFloat(campaign.spend.toString()),
         impressions: campaign.impressions,
         clicks: campaign.clicks,
         conversions: campaign.conversions,
