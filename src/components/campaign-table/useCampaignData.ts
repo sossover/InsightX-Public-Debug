@@ -16,8 +16,15 @@ export function useCampaignData(
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async () => {
-    if (useSampleData || !selectedAccountId) {
+    if (useSampleData) {
       setError(null);
+      return;
+    }
+
+    if (!selectedAccountId) {
+      console.log('No account selected, skipping fetch');
+      setError(null);
+      setCampaigns([]);
       return;
     }
     
@@ -47,17 +54,17 @@ export function useCampaignData(
         throw new Error(supabaseError.message);
       }
 
-      if (!campaignData) {
+      console.log('Raw campaign data:', campaignData);
+
+      if (!campaignData || campaignData.length === 0) {
         console.log('No campaign data found');
         setCampaigns([]);
         return;
       }
 
-      console.log('Raw campaign data:', campaignData);
-
       const formattedCampaigns: Campaign[] = campaignData.map(campaign => ({
         name: campaign.name,
-        spend: campaign.spend,
+        spend: parseFloat(campaign.spend),
         impressions: campaign.impressions,
         clicks: campaign.clicks,
         conversions: campaign.conversions,
