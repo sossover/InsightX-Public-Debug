@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { SimpleCampaignTable } from "@/components/campaign-table/SimpleCampaignTable";
+import { format } from "date-fns";
 
 export default function CampaignPerformance() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
