@@ -12,12 +12,14 @@ export function useCampaignData(
 ) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async () => {
     if (useSampleData || !selectedAccountId) return;
     
     setIsFetching(true);
+    setError(null);
     try {
       console.log('Fetching campaign data for account:', selectedAccountId);
       
@@ -34,10 +36,11 @@ export function useCampaignData(
           .lte('created_at', toDate);
       }
 
-      const { data, error } = await query;
+      const { data, error: supabaseError } = await query;
 
-      if (error) {
-        console.error('Error fetching campaigns:', error);
+      if (supabaseError) {
+        console.error('Error fetching campaigns:', supabaseError);
+        setError(new Error(supabaseError.message));
         toast({
           title: "Error",
           description: "Failed to fetch campaign data",
@@ -64,8 +67,9 @@ export function useCampaignData(
 
       console.log('Formatted campaigns:', formattedCampaigns);
       setCampaigns(formattedCampaigns);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err as Error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -76,14 +80,12 @@ export function useCampaignData(
     }
   }, [selectedAccountId, dateRange, useSampleData, toast]);
 
-  // Add effect to refetch data when selectedAccountId or dateRange changes
   useEffect(() => {
     if (selectedAccountId) {
       fetchCampaignData();
     }
   }, [selectedAccountId, dateRange, fetchCampaignData]);
 
-  // Subscribe to real-time campaign changes
   useEffect(() => {
     if (!selectedAccountId || useSampleData) return;
 
@@ -117,6 +119,7 @@ export function useCampaignData(
   return {
     campaigns,
     isFetching,
+    error,
     fetchCampaignData
   };
 }
