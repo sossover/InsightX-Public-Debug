@@ -21,6 +21,7 @@ serve(async (req) => {
   try {
     console.log('Starting Google Sheets fetch process...');
     
+    // Get account ID from headers
     const accountId = req.headers.get('x-account-id');
     if (!accountId) {
       console.error('No account ID provided in headers');
@@ -28,17 +29,19 @@ serve(async (req) => {
     }
     console.log('Account ID:', accountId);
 
-    // Use the new API key secret
+    // Get API key
     const apiKey = Deno.env.get('Google Sheets API v3');
     if (!apiKey) {
       console.error('Google Sheets API key not found');
       throw new Error('Google Sheets API key not configured');
     }
-
     console.log('API Key found, proceeding with fetch...');
+
+    // Construct Google Sheets API URL
     const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${TAB_NAME}!${RANGE}?key=${apiKey}`;
     console.log('Fetching from Google Sheets URL:', sheetsUrl);
 
+    // Fetch data from Google Sheets
     const response = await fetch(sheetsUrl);
     if (!response.ok) {
       console.error('Google Sheets API Error:', response.status, response.statusText);
@@ -47,15 +50,20 @@ serve(async (req) => {
       throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
     }
 
+    // Parse response
     const data = await response.json();
-    console.log('Received data from Google Sheets:', data.values?.length, 'rows');
+    console.log('Raw response from Google Sheets:', data);
     
     if (!data.values || data.values.length < 2) {
       console.error('No data found in sheet or insufficient rows');
       throw new Error('No data found in sheet');
     }
 
-    // Skip header row and transform data
+    // Log the headers and first row of data for debugging
+    console.log('Headers:', data.values[0]);
+    console.log('First row of data:', data.values[1]);
+
+    // Transform the data
     const campaigns = data.values.slice(1).map((row: any[]) => ({
       name: row[0] || '',
       spend: parseFloat(row[1]) || 0,
@@ -66,52 +74,13 @@ serve(async (req) => {
       cpa: parseFloat(row[6]) || 0
     }));
 
-    console.log('Transformed campaigns:', campaigns.length);
-
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Supabase credentials not found');
-      throw new Error('Supabase configuration missing');
-    }
-
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase client created');
-
-    // Clear existing campaign data for this account
-    const { error: deleteError } = await supabaseClient
-      .from('campaigns')
-      .delete()
-      .eq('account_id', accountId);
-
-    if (deleteError) {
-      console.error('Delete Error:', deleteError);
-      throw new Error(`Failed to clear existing data: ${deleteError.message}`);
-    }
-
-    console.log('Cleared existing campaigns for account');
-
-    // Insert new campaign data
-    const { error: insertError } = await supabaseClient
-      .from('campaigns')
-      .insert(campaigns.map(campaign => ({
-        ...campaign,
-        account_id: accountId,
-      })));
-
-    if (insertError) {
-      console.error('Insert Error:', insertError);
-      throw new Error(`Failed to insert new data: ${insertError.message}`);
-    }
-
-    console.log('Successfully inserted new campaign data');
+    console.log('Transformed campaigns:', campaigns);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Data synced successfully',
+        message: 'Data fetched successfully from Google Sheets',
+        data: campaigns,
         rowCount: campaigns.length 
       }),
       { headers: corsHeaders }
