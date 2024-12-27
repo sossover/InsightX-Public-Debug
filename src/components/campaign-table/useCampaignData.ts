@@ -16,10 +16,14 @@ export function useCampaignData(
   const { toast } = useToast();
 
   const fetchCampaignData = useCallback(async () => {
-    if (useSampleData || !selectedAccountId) return;
+    if (useSampleData || !selectedAccountId) {
+      setError(null);
+      return;
+    }
     
     setIsFetching(true);
     setError(null);
+    
     try {
       console.log('Fetching campaign data for account:', selectedAccountId);
       
@@ -36,22 +40,22 @@ export function useCampaignData(
           .lte('created_at', toDate);
       }
 
-      const { data, error: supabaseError } = await query;
+      const { data: campaignData, error: supabaseError } = await query;
 
       if (supabaseError) {
-        console.error('Error fetching campaigns:', supabaseError);
-        setError(new Error(supabaseError.message));
-        toast({
-          title: "Error",
-          description: "Failed to fetch campaign data",
-          variant: "destructive",
-        });
+        console.error('Supabase error:', supabaseError);
+        throw new Error(supabaseError.message);
+      }
+
+      if (!campaignData) {
+        console.log('No campaign data found');
+        setCampaigns([]);
         return;
       }
 
-      console.log('Fetched campaigns:', data);
+      console.log('Raw campaign data:', campaignData);
 
-      const formattedCampaigns: Campaign[] = data?.map(campaign => ({
+      const formattedCampaigns: Campaign[] = campaignData.map(campaign => ({
         name: campaign.name,
         spend: campaign.spend,
         impressions: campaign.impressions,
@@ -63,16 +67,16 @@ export function useCampaignData(
         get cpa() {
           return this.conversions > 0 ? this.spend / this.conversions : 0;
         }
-      })) || [];
+      }));
 
       console.log('Formatted campaigns:', formattedCampaigns);
       setCampaigns(formattedCampaigns);
     } catch (err) {
-      console.error('Error:', err);
-      setError(err as Error);
+      console.error('Error fetching campaign data:', err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch campaign data'));
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Failed to fetch campaign data. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -80,12 +84,14 @@ export function useCampaignData(
     }
   }, [selectedAccountId, dateRange, useSampleData, toast]);
 
+  // Initial data fetch
   useEffect(() => {
     if (selectedAccountId) {
       fetchCampaignData();
     }
   }, [selectedAccountId, dateRange, fetchCampaignData]);
 
+  // Real-time subscription
   useEffect(() => {
     if (!selectedAccountId || useSampleData) return;
 
