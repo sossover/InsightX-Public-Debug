@@ -69,7 +69,7 @@ export function useCampaignData(
         clicks: campaign.clicks,
         conversions: campaign.conversions,
         get ctr() {
-          return ((this.clicks / this.impressions) * 100).toFixed(2) + "%";
+          return ((this.clicks / this.impressions) * 100).toFixed(2).toString() + "%";
         },
         get cpa() {
           return this.conversions > 0 ? this.spend / this.conversions : 0;
