@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const SHEET_ID = '1t4JRDvgLfjj5kfdm_XFKXOec-BrUR2R2iGz16-E-uow';
 const TAB_NAME = 'Sheet1';
@@ -64,15 +63,21 @@ serve(async (req) => {
     console.log('First row of data:', data.values[1]);
 
     // Transform the data
-    const campaigns = data.values.slice(1).map((row: any[]) => ({
-      name: row[0] || '',
-      spend: parseFloat(row[1]) || 0,
-      impressions: parseInt(row[2]) || 0,
-      clicks: parseInt(row[3]) || 0,
-      conversions: parseInt(row[4]) || 0,
-      ctr: row[5] || '0%',
-      cpa: parseFloat(row[6]) || 0
-    }));
+    const campaigns = data.values.slice(1).map((row: any[]) => {
+      const cost = parseFloat(row[2]) || 0;
+      const conversions = parseInt(row[6]) || 0;
+      
+      return {
+        name: row[1] || '', // Campaign name
+        spend: cost,
+        impressions: parseInt(row[3]) || 0,
+        clicks: parseInt(row[4]) || 0,
+        conversions: conversions,
+        ctr: ((parseInt(row[4]) || 0) / (parseInt(row[3]) || 1) * 100).toFixed(2) + '%',
+        // Calculate CPA as cost divided by conversions, handle division by zero
+        cpa: conversions > 0 ? cost / conversions : 0
+      };
+    });
 
     console.log('Transformed campaigns:', campaigns);
 
