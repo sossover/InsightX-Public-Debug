@@ -1,20 +1,7 @@
-import { useState } from "react";
 import { NavigationSidebar } from "@/components/NavigationSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ReportHeader } from "@/components/ReportHeader";
-import { DateRange } from "react-day-picker";
 
 const Test = () => {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: new Date()
-  });
-  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
-
-  const handleAccountChange = (accountId: string) => {
-    setSelectedAccountId(accountId);
-  };
-
   return (
     <SidebarProvider>
       <div className="relative min-h-screen flex w-full">
@@ -25,14 +12,6 @@ const Test = () => {
         <NavigationSidebar />
         
         <div className="flex-1 flex flex-col">
-          <ReportHeader 
-            title="Test"
-            description="Test page"
-            date={date}
-            setDate={setDate}
-            onAccountChange={handleAccountChange}
-          />
-
           <main className="flex-1 flex flex-col">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="bg-white rounded-lg shadow-sm p-6">
