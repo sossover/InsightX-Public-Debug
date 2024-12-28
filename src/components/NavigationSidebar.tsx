@@ -27,7 +27,7 @@ const mainItems = [
   { title: "Conversion Analysis", icon: BarChart, url: "/conversion-analysis" },
   { title: "Channel Mix", icon: PieChart, url: "/channel-mix" },
   { title: "Canvas", icon: Palette, url: "/canvas" },
-  { title: "Tables", icon: Table, url: "/tables" },
+  { title: "Test", icon: Table, url: "/test" },
   { title: "Optimization List", icon: ListChecks, url: "/optimization-list" },
   { title: "Account", icon: Link, url: "/account" },
   { title: "Settings", icon: Settings, url: "/settings" },
